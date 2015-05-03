@@ -19,3 +19,6 @@ adv7180_tvin-objs := adv7180.o
 obj-$(CONFIG_MXC_TVIN_ADV7180) += adv7180_tvin.o
 
 obj-$(CONFIG_VIDEO_V4L2_MXC_INT_DEVICE) += v4l2-int-device.o
+
+tvp5150_mxc-objs := tvp5150.o
+obj-$(CONFIG_MXC_TVP5150) += tvp5150_mxc.o
