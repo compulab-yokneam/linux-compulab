@@ -11,6 +11,10 @@
 
 #include "mtd_test.h"
 
+static int dev = -EINVAL;
+module_param(dev, int, S_IRUGO);
+MODULE_PARM_DESC(dev, "MTD device number to use");
+
 /*
  * Test the implementation for software ECC
  *
