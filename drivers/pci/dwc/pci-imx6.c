@@ -98,6 +98,7 @@ struct imx_pcie {
 	struct regulator	*pcie_phy_regulator;
 	struct regulator	*pcie_bus_regulator;
 	struct regulator	*epdev_on;
+	bool			pcie_phy_refclk_sel;
 };
 
 /* Parameters for the waiting for PCIe PHY PLL to lock on i.MX7 */
@@ -1304,7 +1305,8 @@ static void imx_pcie_init_phy(struct imx_pcie *imx_pcie)
 
 		/* pcie phy ref clock select; 1? internal pll : external osc */
 		regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR12,
-				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL, 0);
+				   IMX7D_GPR12_PCIE_PHY_REFCLK_SEL,
+				   imx_pcie->pcie_phy_refclk_sel ? IMX7D_GPR12_PCIE_PHY_REFCLK_SEL : 0);
 	} else if (imx_pcie->variant == IMX6SX) {
 		/* Force PCIe PHY reset */
 		regmap_update_bits(imx_pcie->iomuxc_gpr, IOMUXC_GPR5,
@@ -2553,6 +2555,10 @@ static int imx_pcie_probe(struct platform_device *pdev)
 				   &imx_pcie->link_gen);
 	if (ret)
 		imx_pcie->link_gen = 1;
+
+	/* PCI PHY reference clock source select */
+	imx_pcie->pcie_phy_refclk_sel =
+		of_property_read_bool(node, "fsl,pcie-phy-refclk-internal");
 
 	imx_pcie->vpcie = devm_regulator_get_optional(&pdev->dev, "vpcie");
 	if (IS_ERR(imx_pcie->vpcie)) {

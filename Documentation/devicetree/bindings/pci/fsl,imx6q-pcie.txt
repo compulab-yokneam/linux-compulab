@@ -56,6 +56,11 @@ Additional required properties for imx7d-pcie:
 	       - "pciephy"
 	       - "apps"
 
+Additional optional properties for imx7d-pcie:
+- fsl,pcie-phy-refclk-internal: If present then an internal PLL input is used
+  as PCIe PHY reference clock source. By default an external ocsillator input
+  is used.
+
 Additional required properties for imx8 pcie:
 - hsio : should be <&hsio>.
    The phandle points to the hsio region containing the hsio
