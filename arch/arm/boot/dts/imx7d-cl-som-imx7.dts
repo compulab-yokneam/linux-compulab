@@ -22,6 +22,7 @@
 		reg = <0x80000000 0x10000000>; /* 256 MB - minimal configuration */
 	};
 
+	/* Regulators */
 	reg_usb_otg1_vbus: regulator-vbus {
 		compatible = "regulator-fixed";
 		regulator-name = "usb_otg1_vbus";
@@ -38,6 +39,7 @@
 		regulator-max-microvolt = <3300000>;
 		regulator-always-on;
 	};
+	/* Regulators - end */
 
 	leds {
 		compatible = "gpio-leds";
@@ -264,6 +266,14 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		reg = <0x20>;
+
+		/* USB Hub nRST */
+		usb_hub_nreset {
+			gpio-hog;
+			gpios = <6 GPIO_ACTIVE_HIGH>;
+			output-high;
+			line-name = "usb_hub_nreset";
+		};
 	};
 
 	eeprom@50 {
@@ -295,6 +305,10 @@
 
 &usbotg2 {
 	dr_mode = "host";
+	status = "okay";
+};
+
+&usbh {
 	status = "okay";
 };
 
