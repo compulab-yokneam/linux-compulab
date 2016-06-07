@@ -1,0 +1,135 @@
+/*
+ * Copyright 2014 CompuLab Ltd.
+ *
+ * Author: Valentin Raevsky <valentin@compulab.co.il>
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	iomux_uart2: pinmux@20E0924 {
+		compatible = "pinctrl-single";
+		reg = <0x20E0000 0x924>;	/* Single register */
+		#address-cells = <1>;
+		#size-cells = <0>;
+		pinctrl-single,register-width = <32>;
+		pinctrl-single,function-mask = <0x4>;
+	};
+
+	eth@pcie {
+		compatible = "intel,i211";
+		local-mac-address = [FF FF FF FF FF FF];
+		status = "okay";
+	};
+
+	gpio-keys {
+		compatible = "gpio-keys";
+		power {
+			label = "Power Button";
+			gpios = <&gpio1 29 1>;
+			linux,code = <116>; /* KEY_POWER */
+			gpio-key,wakeup;
+		};
+	};
+
+	i2cmux {
+		compatible = "i2c-mux-gpio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		mux-gpios = <&gpio1 2 0>;
+		i2c-parent = <&i2c1>;
+
+		i2c@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			eeprom@50 {
+				compatible = "at24,24c02";
+				reg = <0x50>;
+				pagesize = <16>;
+			};
+
+			rtc@56 {
+				compatible = "emmicro,em3027";
+				reg = <0x56>;
+			};
+		};
+
+		i2c@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dvi_edid: edid@50 {
+				compatible = "fsl,imx6-dvi-i2c";
+				reg = <0x50>;
+				status = "disabled";
+			};
+		};
+	};
+};
+
+&iomuxc {
+	imx6q-sbc-fx6m {
+		/* pins for uart2 */
+		pinctrl_uart2: uart2grp {
+			fsl,pins = <
+				MX6QDL_PAD_GPIO_7__UART2_TX_DATA 0x1b0b1
+				MX6QDL_PAD_GPIO_8__UART2_RX_DATA 0x1b0b1
+				MX6QDL_PAD_SD4_DAT5__UART2_RTS_B 0x1b0b1
+				MX6QDL_PAD_SD4_DAT6__UART2_CTS_B 0x1b0b1
+		>;
+		};
+	};
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&usdhc3 {
+	non-removable;
+	status = "okay";
+};
+
+/* rear serial console */
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	fsl,uart-has-rtscts;
+	status = "okay";
+};
+
+&hdmi_core {
+	ipu_id = <1>;
+	disp_id = <0>;
+	status = "okay";
+};
+
+&ipu1di0_disp {
+	compatible = "fsl,dvi";
+	hp_gpio = <4>;
+	status = "okay";
+};
+
+&dvi_edid {
+	status = "okay";
+};
+
+&mxcfb1 {
+	disp_dev = "hdmi";
+	status = "okay";
+};
+
+&mxcfb2 {
+	disp_dev = "dvi";
+	mode_str ="1920x1080M@50";
+	depends = "fsl,dvi";
+	status = "okay";
+};

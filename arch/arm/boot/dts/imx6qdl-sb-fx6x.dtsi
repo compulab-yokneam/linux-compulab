@@ -1,0 +1,110 @@
+/*
+ * Copyright 2014 CompuLab Ltd.
+ *
+ * Author: Valentin Raevsky <valentin@compulab.co.il>
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+/ {
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/* regulator for mmc */
+		reg_3p3v: 3p3v {
+			compatible = "regulator-fixed";
+			regulator-name = "3P3V";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			regulator-always-on;
+		};
+	};
+
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_dvi0>;
+
+	imx6q-sb-fx6x {
+		/* pins for i2c1 */
+		pinctrl_i2c1: i2c1grp {
+			fsl,pins = <
+				MX6QDL_PAD_EIM_D21__I2C1_SCL 0x4001b8b1
+				MX6QDL_PAD_EIM_D28__I2C1_SDA 0x4001b8b1
+			>;
+		};
+
+		/* pins for mmc */
+		pinctrl_usdhc3: usdhc3grp {
+			fsl,pins = <
+				MX6QDL_PAD_SD3_CMD__SD3_CMD    0x17059
+				MX6QDL_PAD_SD3_CLK__SD3_CLK    0x10059
+				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x17059
+				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x17059
+				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x17059
+				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x17059
+				MX6QDL_PAD_SD3_DAT4__GPIO7_IO01 0x80000000
+				MX6QDL_PAD_SD3_DAT5__GPIO7_IO00 0x80000000
+			>;
+		};
+
+		pinctrl_usdhc3_100mhz: usdhc3grp-100mhz { /* 100Mhz */
+			fsl,pins = <
+				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170B9
+				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100B9
+				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170B9
+				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170B9
+				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170B9
+				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170B9
+			>;
+		};
+
+		pinctrl_usdhc3_200mhz: usdhc3grp-200mhz { /* 200Mhz */
+			fsl,pins = <
+				MX6QDL_PAD_SD3_CMD__SD3_CMD 0x170F9
+				MX6QDL_PAD_SD3_CLK__SD3_CLK 0x100F9
+				MX6QDL_PAD_SD3_DAT0__SD3_DATA0 0x170F9
+				MX6QDL_PAD_SD3_DAT1__SD3_DATA1 0x170F9
+				MX6QDL_PAD_SD3_DAT2__SD3_DATA2 0x170F9
+				MX6QDL_PAD_SD3_DAT3__SD3_DATA3 0x170F9
+			>;
+		};
+
+		/* pins for dvi/ts */
+		pinctrl_dvi0: dvi0grp {
+			fsl,pins = <
+				/* DVI_DDC_SEL */
+				MX6QDL_PAD_GPIO_2__GPIO1_IO02 0x80000000
+				/* SB-FX6 Himax TS PENDOWN or SB-FX6m DVI HPD */
+				MX6QDL_PAD_GPIO_4__GPIO1_IO04 0x80000000
+			>;
+		};
+	};
+};
+
+/* i2c1 */
+&i2c1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "disabled";
+};
+
+/* mmc */
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+	no-1-8-v;
+	keep-power-in-suspend;
+	vmmc-supply = <&reg_3p3v>;
+	status = "disabled";
+};

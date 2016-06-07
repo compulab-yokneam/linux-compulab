@@ -1,0 +1,155 @@
+/*
+ * Copyright 2014 CompuLab Ltd.
+ *
+ * Author: Valentin Raevsky <valentin@compulab.co.il>
+ *
+ * The code contained herein is licensed under the GNU General Public
+ * License. You may obtain a copy of the GNU General Public License
+ * Version 2 or later at the following locations:
+ *
+ * http://www.opensource.org/licenses/gpl-license.html
+ * http://www.gnu.org/copyleft/gpl.html
+ */
+
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+
+/ {
+	backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm3 0 5000000>;
+		brightness-levels = <0 4 8 16 32 64 128 255>;
+		default-brightness-level = <7>;
+	};
+
+	i2cmux {
+		compatible = "i2c-mux-gpio";
+		#address-cells = <1>;
+		#size-cells = <0>;
+		mux-gpios = <&gpio1 2 0>;
+		i2c-parent = <&i2c1>;
+
+		i2c@0 {
+			reg = <0>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			pca9555:pca9555@26 {
+			      compatible = "nxp,pca9555";
+			      gpio-controller;
+			      #gpio-cells = <2>;
+			      reg = <0x26>;
+			};
+
+			hx8526@4a {
+			      compatible = "himax,himax_ts";
+			      reg = <0x4a>;
+			      gpio_intr = <&gpio1 4 0>;
+			};
+
+			eeprom@50 {
+				compatible = "at24,24c02";
+				reg = <0x50>;
+				pagesize = <16>;
+			};
+
+			adv5150: adv5150@5c {
+				compatible = "ti,tvp5150";
+				reg = <0x5c>;
+				pinctrl-names = "default";
+				pinctrl-0 = <&pinctrl_ipu1_3>;
+				clocks = <&clks 201>;
+				clock-names = "csi_mclk";
+				csi_id = <0>;
+				mclk = <27000000>;
+				mclk_source = <0>;
+			};
+		};
+
+		i2c@1 {
+			reg = <1>;
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			dvi_edid: edid@50 {
+				compatible = "fsl,imx6-dvi-i2c";
+				reg = <0x50>;
+				status = "disabled";
+			};
+		};
+
+	};
+
+	reg_mipi_dsi_pwr_on_mode: mipi_dsi_pwr_on_mode {
+		compatible = "regulator-fixed";
+		regulator-name = "mipi_dsi_pwr_on_mode";
+		gpio = <&pca9555 12 0>;
+		enable-active-high;
+	};
+
+	mipi_dsi_reset: mipi-dsi-reset {
+		compatible = "gpio-reset";
+		reset-gpios = <&pca9555 11 GPIO_ACTIVE_LOW>;
+		reset-delay-us = <100>;
+		#reset-cells = <0>;
+	};
+};
+
+&i2c1 {
+	status = "okay";
+};
+
+&usdhc3 {
+	wp-gpios = <&gpio7 0 0>;
+	cd-gpios = <&gpio7 1 0>;
+	status = "okay";
+};
+
+&pwm3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm3_1>;
+	status = "okay";
+};
+
+&mxcfb1 {
+	mode_str ="KD050C-WVGA";
+	status = "okay";
+};
+
+&mxcfb2 {
+	status = "okay";
+};
+
+&mxcfb3 {
+	status = "okay";
+};
+
+&mxcfb4 {
+	status = "okay";
+};
+
+&ldb {
+	ipu_id = <1>;
+	disp_id = <0>;
+	ext_ref = <1>;
+	mode = "sep0";
+	sec_ipu_id = <1>;
+	sec_disp_id = <1>;
+	status = "okay";
+};
+
+&can1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan1_1>;
+	status = "okay";
+};
+
+&mipi_dsi {
+	dev_id = <0>;
+	disp_id = <0>;
+	lcd_panel = "TRULY-WVGA";
+	depends = "nxp,pca9555";
+	disp-power-on-supply = <&reg_mipi_dsi_pwr_on_mode>;
+	resets = <&mipi_dsi_reset>;
+	status = "disabled";
+};
