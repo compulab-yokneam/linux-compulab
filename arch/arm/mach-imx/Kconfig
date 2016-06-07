@@ -680,6 +680,12 @@ config SOC_LS1021A
 	help
 	  This enables support for Freescale LS1021A processor.
 
+config MACH_CM_FX6
+	bool "CompuLab CM-FX6 Support"
+
+	help
+	  This enable support for CompuLab CM-FX6 board.
+
 endif
 
 source "arch/arm/mach-imx/devices/Kconfig"
