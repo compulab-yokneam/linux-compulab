@@ -579,7 +579,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_gpmi_nand>;
 	status = "okay";
-	depends = "fsl,imx6q-ecspi";
+	depends = &ecspi1;
 
 	partition@0 {
 		label = "linux";
