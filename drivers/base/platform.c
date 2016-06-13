@@ -23,6 +23,7 @@
 #include <linux/pm_runtime.h>
 #include <linux/pm_domain.h>
 #include <linux/idr.h>
+#include <linux/i2c.h>
 #include <linux/acpi.h>
 #include <linux/clk/clk-conf.h>
 #include <linux/limits.h>
@@ -502,11 +503,42 @@ err_alloc:
 }
 EXPORT_SYMBOL_GPL(platform_device_register_full);
 
+static int platform_drv_check_dep(struct device_node *of_node)
+{
+	struct device_node *np;
+	struct platform_device *pdev;
+	struct i2c_client *client;
+	const char *depends;
+	int ret;
+
+	depends = of_get_property(of_node, "depends", NULL);
+	if (!depends)
+		return 0;
+
+	np = of_find_node_by_path(depends);
+	if (!np)
+		return 1;
+
+	pdev=of_find_device_by_node(np);
+	if (!pdev) {
+		client = of_find_i2c_device_by_node(np);
+		ret = (!client || !client->dev.driver);
+	} else {
+		ret = (!pdev || !pdev->dev.driver);
+	}
+
+	of_node_put(np);
+	return ret;
+}
+
 static int platform_drv_probe(struct device *_dev)
 {
 	struct platform_driver *drv = to_platform_driver(_dev->driver);
 	struct platform_device *dev = to_platform_device(_dev);
 	int ret;
+
+	if (platform_drv_check_dep(dev->dev.of_node))
+		return -EPROBE_DEFER;
 
 	ret = of_clk_set_defaults(_dev->of_node, false);
 	if (ret < 0)
