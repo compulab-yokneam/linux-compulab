@@ -10,6 +10,7 @@
  * http://www.opensource.org/licenses/gpl-license.html
  * http://www.gnu.org/copyleft/gpl.html
  */
+#include <dt-bindings/sound/fsl-imx-audmux.h>
 
 #define MX6QDL_GPR1	0x04 0x04 0x000 0x0 0x0
 #define MX6QDL_GPR6	0x18 0x18 0x000 0x0 0x0
@@ -105,13 +106,36 @@
 	};
 
 	sound {
-		compatible = "fsl,imx-audio-wm8731";
-		model = "wm8731-audio";
-		ssi-controller = <&ssi2>;
-		src-port = <2>;
-		ext-port = <4>;
-		audio-codec = <&codec>;
-		audio-routing = "LOUT", "ROUT", "LLINEIN", "RLINEIN";
+		compatible = "simple-audio-card";
+		simple-audio-card,name = "cm-fx6";
+		simple-audio-card,widgets =
+			"Headphone", "Headphone Jack",
+			"Line", "Line Out",
+			"Microphone", "Mic Jack",
+			"Line", "Line In";
+		simple-audio-card,routing =
+			"Headphone Jack", "RHPOUT",
+			"Headphone Jack", "LHPOUT",
+			"LLINEIN", "Line Jack",
+			"RLINEIN", "Line Jack",
+			"MICIN", "Mic Bias",
+			"Mic Bias", "Mic Jack";
+		simple-audio-card,format = "i2s";
+		simple-audio-card,bitclock-master = <&sound_master>;
+		simple-audio-card,frame-master = <&sound_master>;
+		simple-audio-card,bitclock-inversion;
+
+		sound_master: simple-audio-card,cpu {
+			sound-dai = <&ssi2>;
+			system-clock-frequency = <0>;
+			system-clock-direction = "out";
+		};
+
+		simple-audio-card,codec {
+			sound-dai = <&wm8731>;
+			system-clock-direction = "in";
+		};
+
 	};
 
 	sound-hdmi {
@@ -580,15 +604,11 @@
 		pagesize = <16>;
 	};
 
-	codec: wm8731@1a {
+	wm8731: wm8731@1a {
+		#sound-dai-cells = <0>;
 		compatible = "wlf,wm8731";
 		reg = <0x1a>;
-		clocks = <&clks 173>, <&clks 158>, <&clks 201>, <&clks 200>;
-		clock-names = "pll4", "imx-ssi.1", "cko", "cko2";
-		AVDD-supply = <&pu_dummy>;
-		HPVDD-supply = <&pu_dummy>;
-		DCVDD-supply = <&pu_dummy>;
-		DBVDD-supply = <&pu_dummy>;
+		status = "okay";
 	};
 };
 
@@ -634,9 +654,20 @@
 	status = "okay";
 };
 
+&clks {
+	assigned-clocks = <&clks IMX6QDL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <786432000>;
+};
+
 &ssi2 {
+	#sound-dai-cells = <0>;
 	fsl,mode = "i2s-master";
 	status = "okay";
+
+	assigned-clocks = <&clks IMX6QDL_CLK_SSI2_SEL>,
+			<&clks IMX6QDL_CLK_SSI2>;
+	assigned-clock-parents = <&clks IMX6QDL_CLK_PLL4_AUDIO_DIV>;
+	assigned-clock-rates = <0>;
 };
 
 &hdmi_core {
@@ -662,8 +693,34 @@
 	status = "okay";
 };
 
+#define SRC_PORT (1)
+#define EXT_PORT (3)
 &audmux {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_audmux>;
 	status = "okay";
+
+	ssi2 {
+		fsl,audmux-port = <SRC_PORT>;
+		fsl,port-config = <
+			(IMX_AUDMUX_V2_PTCR_RCLKDIR |
+			IMX_AUDMUX_V2_PTCR_RCSEL(EXT_PORT | 0x8) |
+			IMX_AUDMUX_V2_PTCR_TCLKDIR |
+			IMX_AUDMUX_V2_PTCR_TCSEL(EXT_PORT))
+			IMX_AUDMUX_V2_PDCR_RXDSEL(EXT_PORT)
+		>;
+	};
+
+	pins5 {
+		fsl,audmux-port = <EXT_PORT>;
+		fsl,port-config = <
+			(IMX_AUDMUX_V2_PTCR_TFSDIR |
+			IMX_AUDMUX_V2_PTCR_TFSEL(SRC_PORT) |
+			IMX_AUDMUX_V2_PTCR_RCLKDIR |
+			IMX_AUDMUX_V2_PTCR_RCSEL(SRC_PORT | 0x8) |
+			IMX_AUDMUX_V2_PTCR_TCLKDIR |
+			IMX_AUDMUX_V2_PTCR_TCSEL(SRC_PORT))
+			IMX_AUDMUX_V2_PDCR_RXDSEL(SRC_PORT)
+		>;
+	};
 };
