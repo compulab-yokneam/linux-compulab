@@ -115,6 +115,8 @@
 &ipu1di0_disp {
 	compatible = "fsl,dvi";
 	hp_gpio = <4>;
+	ipu_id = <0>;
+	disp_id = <0>;
 	status = "okay";
 };
 
@@ -129,7 +131,6 @@
 
 &mxcfb2 {
 	disp_dev = "dvi";
-	mode_str ="1920x1080M@50";
-	depends = "fsl,dvi";
+	depends = &ipu1di0_disp;
 	status = "okay";
 };
