@@ -500,7 +500,7 @@
 
 &gpc {
 	/* use ldo-enable, u-boot will check it and configure */
-	fsl,ldo-bypass = <0>;
+	fsl,ldo-bypass = <1>;
 };
 
 /* spi */
@@ -679,6 +679,8 @@
 &hdmi_video {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_hdmi_hdcp>;
+        fsl,phy_reg_vlev = <0x0294>;
+        fsl,phy_reg_cksymtx = <0x800d>;
 	fsl,hdcp;
 	status = "okay";
 };
