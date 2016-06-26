@@ -183,12 +183,3 @@
 	status = "okay";
 };
 
-&mipi_dsi {
-	dev_id = <0>;
-	disp_id = <0>;
-	lcd_panel = "TRULY-WVGA";
-	depends = "nxp,pca9555";
-	disp-power-on-supply = <&reg_mipi_dsi_pwr_on_mode>;
-	resets = <&mipi_dsi_reset>;
-	status = "disabled";
-};
