@@ -91,5 +91,10 @@
 
 /* sata */
 &sata {
+	target-supply = <&reg_sata_nstandby2>;
 	status = "okay";
+	fsl,transmit-level-mV = <1104>;
+	fsl,transmit-boost-mdB = <370>;
+	fsl,transmit-atten-16ths = <9>;
+	fsl,receive-eq-mdB = <3000>;
 };
