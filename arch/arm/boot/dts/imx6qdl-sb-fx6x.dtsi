@@ -27,6 +27,11 @@
 		};
 	};
 
+	eth@pcie {
+		compatible = "intel,i211";
+		local-mac-address = [FF FF FF FF FF FF];
+		status = "okay";
+	};
 };
 
 &iomuxc {

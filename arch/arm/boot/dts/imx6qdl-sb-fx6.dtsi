@@ -93,6 +93,18 @@
 		reset-delay-us = <100>;
 		#reset-cells = <0>;
 	};
+
+	pcie_power_on_gpio: regulator-pcie-power-on-gpio {
+		compatible = "regulator-fixed";
+		regulator-name = "regulator-pcie-power-on-gpio";
+		gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
+		enable-active-low;
+	};
+};
+
+&pcie {
+	vdd-supply = <&pcie_power_on_gpio>;
+	status = "okay";
 };
 
 &i2c1 {

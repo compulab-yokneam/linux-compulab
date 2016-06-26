@@ -15,6 +15,7 @@
 #define MX6QDL_GPR1	0x04 0x04 0x000 0x0 0x0
 #define MX6QDL_GPR6	0x18 0x18 0x000 0x0 0x0
 #define MX6QDL_GPR7	0x1c 0x1c 0x000 0x0 0x0
+#define MX6QDL_GPR1    0x04 0x04 0x000 0x0 0x0
 
 / {
 	memory {
@@ -42,16 +43,6 @@
 			regulator-min-microvolt = <5000000>;
 			regulator-max-microvolt = <5000000>;
 			gpio = <&gpio3 22 0>;
-			enable-active-high;
-		};
-
-		/* regulator1 for pcie power-on-gpio */
-		pcie_power_on_gpio: regulator-pcie-power-on-gpio {
-			compatible = "regulator-fixed";
-			regulator-name = "regulator-pcie-power-on-gpio";
-			regulator-min-microvolt = <3300000>;
-			regulator-max-microvolt = <3300000>;
-			gpio = <&gpio2 24 0>;
 			enable-active-high;
 		};
 
@@ -417,7 +408,6 @@
 		pinctrl_pcie: pciegrp {
 			fsl,pins = <
 				MX6QDL_PAD_ENET_RXD1__GPIO1_IO26 0x80000000
-				MX6QDL_PAD_EIM_CS1__GPIO2_IO24 0x80000000
 			>;
 		};
 
@@ -616,8 +606,7 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
 	reset-gpio = <&gpio1 26 0>;
-	vdd-supply = <&pcie_power_on_gpio>;
-	status = "okay";
+	status = "disabled";
 };
 
 /* console */
