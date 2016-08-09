@@ -18,6 +18,9 @@ Optional properties:
                       deasserted reset line. If this property exists, the
                       reset line should be kept in reset.
 
+- gpio-can-sleep: boolean. If not set, then initial state is false.
+                  Make the gpio-core use the correct gpio_set() function.
+
 example:
 
 sii902x_reset: gpio-reset {

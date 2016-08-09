@@ -21,6 +21,7 @@ struct gpio_reset_data {
 	unsigned int gpio;
 	bool active_low;
 	s32 delay_us;
+	void (*gpio_set_value)(unsigned, int);
 };
 
 static void gpio_reset_set(struct reset_controller_dev *rcdev, int asserted)
@@ -32,7 +33,7 @@ static void gpio_reset_set(struct reset_controller_dev *rcdev, int asserted)
 	if (drvdata->active_low)
 		value = !value;
 
-	gpio_set_value(drvdata->gpio, value);
+	drvdata->gpio_set_value(drvdata->gpio, value);
 }
 
 static int gpio_reset(struct reset_controller_dev *rcdev, unsigned long id)
@@ -121,6 +122,11 @@ static int gpio_reset_probe(struct platform_device *pdev)
 		gpio_flags = GPIOF_OUT_INIT_HIGH;
 	else
 		gpio_flags = GPIOF_OUT_INIT_LOW;
+
+	if (of_get_property(np, "gpio-can-sleep", NULL))
+		drvdata->gpio_set_value = gpio_set_value_cansleep;
+	else
+		drvdata->gpio_set_value = gpio_set_value;
 
 	ret = devm_gpio_request_one(&pdev->dev, drvdata->gpio, gpio_flags, NULL);
 	if (ret < 0) {
