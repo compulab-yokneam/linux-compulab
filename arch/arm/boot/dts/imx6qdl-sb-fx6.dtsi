@@ -91,6 +91,7 @@
 		compatible = "gpio-reset";
 		reset-gpios = <&pca9555 11 GPIO_ACTIVE_LOW>;
 		reset-delay-us = <100>;
+		gpio-can-sleep;
 		#reset-cells = <0>;
 	};
 
