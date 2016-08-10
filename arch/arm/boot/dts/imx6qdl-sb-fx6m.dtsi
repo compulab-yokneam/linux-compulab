@@ -80,16 +80,6 @@
 
 &iomuxc {
 	imx6q-sbc-fx6m {
-		/* pins for uart2 */
-		pinctrl_uart2: uart2grp {
-			fsl,pins = <
-				MX6QDL_PAD_GPIO_7__UART2_TX_DATA 0x1b0b1
-				MX6QDL_PAD_GPIO_8__UART2_RX_DATA 0x1b0b1
-				MX6QDL_PAD_SD4_DAT5__UART2_RTS_B 0x1b0b1
-				MX6QDL_PAD_SD4_DAT6__UART2_CTS_B 0x1b0b1
-		>;
-		};
-
 		/* pins for pcie */
 		pinctrl_fx6m_pcie: pciefx6mgrp {
 			fsl,pins = <
