@@ -1,5 +1,5 @@
 /*
-* Copyright 2014 CompuLab Ltd.
+* Copyright 2015 CompuLab Ltd.
 *
 * Author: Valentin Raevsky <valentin@compulab.co.il>
 *
@@ -12,13 +12,13 @@
 */
 
 /dts-v1/;
-#include "imx6q.dtsi"
-#include "imx6q-cm-fx6.dtsi"
+#include "imx6dl.dtsi"
+#include "imx6qdl-cm-fx6.dtsi"
 #include "imx6qdl-sb-fx6x.dtsi"
 #include "imx6qdl-sb-fx6.dtsi"
 #include "imx6qdl-cm-fx6-hdmi.dtsi"
 
 / {
 	model = "CompuLab CM-FX6 on SBC-FX6";
-	compatible = "compulab,cm-fx6", "compulab,sbc-fx6", "fsl,imx6q";
+	compatible = "compulab,cm-fx6", "compulab,sbc-fx6", "fsl,imx6dl";
 };

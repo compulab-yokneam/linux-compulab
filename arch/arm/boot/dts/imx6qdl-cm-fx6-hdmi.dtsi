@@ -1,0 +1,9 @@
+&mxcfb1 {
+	mode_str ="1920x1080M@60";
+	disp_dev = "hdmi";
+};
+
+&mxcfb2 {
+	mode_str ="KD050C-WVGA";
+	disp_dev = "lcd";
+};

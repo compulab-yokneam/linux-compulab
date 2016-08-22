@@ -1,0 +1,35 @@
+&ipu1di0_disp {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	dev_id = <0>;
+	disp_id = <0>;
+	lcd_panel = "TRULY-WVGA";
+	depends = &pca9555;
+	disp-power-on-supply = <&reg_mipi_dsi_pwr_on_mode>;
+	resets = <&mipi_dsi_reset>;
+	status = "okay";
+};
+
+&mxcfb1 {
+	mode_str ="TRULY-WVGA";
+	disp_dev = "mipi_dsi";
+	depends = &mipi_dsi;
+	status = "okay";
+};
+
+&mxcfb2 {
+	depends = &mipi_dsi;
+	status = "okay";
+};
+
+&mxcfb3 {
+	depends = &mipi_dsi;
+	status = "okay";
+};
+
+&mxcfb4 {
+	depends = &mipi_dsi;
+	status = "okay";
+};

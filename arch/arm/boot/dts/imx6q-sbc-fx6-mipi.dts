@@ -16,29 +16,9 @@
 #include "imx6q-cm-fx6.dtsi"
 #include "imx6qdl-sb-fx6x.dtsi"
 #include "imx6qdl-sb-fx6.dtsi"
+#include "imx6qdl-cm-fx6-mipi.dtsi"
 
 / {
 	model = "CompuLab CM-FX6 on SBC-FX6";
 	compatible = "compulab,cm-fx6", "compulab,sbc-fx6", "fsl,imx6q";
-};
-
-&ipu1di0_disp {
-	status = "disabled";
-};
-
-&mipi_dsi {
-	dev_id = <0>;
-	disp_id = <0>;
-	lcd_panel = "TRULY-WVGA";
-	depends = &pca9555;
-	disp-power-on-supply = <&reg_mipi_dsi_pwr_on_mode>;
-	resets = <&mipi_dsi_reset>;
-	status = "okay";
-};
-
-&mxcfb1 {
-	mode_str ="TRULY-WVGA";
-	disp_dev = "mipi_dsi";
-	depends = &mipi_dsi;
-	status = "okay";
 };
