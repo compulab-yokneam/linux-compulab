@@ -237,3 +237,4 @@ module_platform_driver(regulator_userspace_consumer_driver);
 MODULE_AUTHOR("Mike Rapoport <mike@compulab.co.il>");
 MODULE_DESCRIPTION("Userspace consumer for voltage and current regulators");
 MODULE_LICENSE("GPL");
+MODULE_ALIAS("platform:reg-userspace-consumer");
