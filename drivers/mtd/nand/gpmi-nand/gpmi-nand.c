@@ -2190,7 +2190,7 @@ static int gpmi_init_last(struct gpmi_nand_data *this)
 		return ret;
 
 	/* Save the geometry to debugfs*/
-	ret = bch_create_debugfs(this);
+	ret = bch_save_geometry(this);
 	if (ret)
 		return ret;
 
