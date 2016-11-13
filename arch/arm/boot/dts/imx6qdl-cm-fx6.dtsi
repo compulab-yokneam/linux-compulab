@@ -93,7 +93,7 @@
 		mxcfb3 = &mxcfb4;
 	};
 
-	sound {
+	simple_sound: sound {
 		compatible = "simple-audio-card";
 		simple-audio-card,name = "cm-fx6";
 		simple-audio-card,widgets =
@@ -725,12 +725,14 @@
 };
 
 &hdmi_audio {
+	depends = &simple_sound;
 	status = "okay";
 };
 
 &spdif {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_spdif>;
+	depends = &hdmi_audio;
 	status = "okay";
 };
 
