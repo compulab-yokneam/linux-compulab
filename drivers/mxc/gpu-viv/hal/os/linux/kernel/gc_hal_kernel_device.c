@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2016 Vivante Corporation
+*    Copyright (c) 2014 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2016 Vivante Corporation
+*    Copyright (C) 2014  Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -382,7 +382,7 @@ gc_version_show(struct seq_file *m, void *data)
     gcsPLATFORM * platform = device->platform;
     gctCONST_STRING name;
 
-    seq_printf(m, "%s built at %s\n",  gcvVERSION_STRING, HOST);
+    seq_printf(m, "%s+fslc built at %s\n",  gcvVERSION_STRING, HOST);
 
     if (platform->ops->name)
     {
@@ -2114,8 +2114,12 @@ gckGALDEVICE_Setup_ISR(
 #else
 #if gcdMULTI_GPU
     ret = request_irq(
-        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, gcdIRQF_FLAG,
-        "galcore_3d_0", Device
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, IRQF_DISABLED,
+#else
+        Device->irqLine3D[gcvCORE_3D_0_ID], isrRoutine3D0, 0x0,
+#endif
+     	"galcore_3d_0", Device
         );
 
     if (ret != 0)
@@ -2135,7 +2139,11 @@ gckGALDEVICE_Setup_ISR(
 
 #if gcdMULTI_GPU > 1
     ret = request_irq(
-        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, gcdIRQF_FLAG,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, IRQF_DISABLED,
+#else
+        Device->irqLine3D[gcvCORE_3D_1_ID], isrRoutine3D1, 0x0,
+#endif
         "galcore_3d_1", Device
         );
 
@@ -2156,8 +2164,12 @@ gckGALDEVICE_Setup_ISR(
 #endif
 #elif gcdMULTI_GPU_AFFINITY
     ret = request_irq(
-        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, gcdIRQF_FLAG,
-        "galcore_3d_0", Device
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, IRQF_DISABLED,
+#else
+        Device->irqLines[gcvCORE_MAJOR], isrRoutine3D0, 0x0,
+#endif
+	"galcore_3d_0", Device
         );
 
     if (ret != 0)
@@ -2176,7 +2188,11 @@ gckGALDEVICE_Setup_ISR(
     Device->isrInitializeds[gcvCORE_MAJOR] = gcvTRUE;
 
     ret = request_irq(
-        Device->irqLines[gcvCORE_OCL], isrRoutine3D1, gcdIRQF_FLAG,
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLines[gcvCORE_OCL], isrRoutine3D1, IRQF_DISABLED,
+#else
+	Device->irqLines[gcvCORE_OCL], isrRoutine3D1, 0x0,
+#endif
         "galcore_3d_1", Device
         );
 
@@ -2196,8 +2212,12 @@ gckGALDEVICE_Setup_ISR(
     Device->isrInitializeds[gcvCORE_OCL] = gcvTRUE;
 #else
     ret = request_irq(
-        Device->irqLines[gcvCORE_MAJOR], isrRoutine, gcdIRQF_FLAG,
-        "galcore interrupt service", Device
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLines[gcvCORE_MAJOR], isrRoutine, IRQF_DISABLED,
+#else
+	Device->irqLines[gcvCORE_MAJOR], isrRoutine, 0x0,
+#endif
+    	"galcore interrupt service", Device
         );
 
     if (ret != 0)
@@ -2255,8 +2275,12 @@ gckGALDEVICE_Setup_ISR_2D(
         );
 #else
     ret = request_irq(
-        Device->irqLines[gcvCORE_2D], isrRoutine2D, gcdIRQF_FLAG,
-        "galcore interrupt service for 2D", Device
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLines[gcvCORE_2D], isrRoutine2D, IRQF_DISABLED,
+#else
+        Device->irqLines[gcvCORE_2D], isrRoutine2D, 0x0,
+#endif
+	"galcore interrupt service for 2D", Device
         );
 #endif
 
@@ -2313,8 +2337,12 @@ gckGALDEVICE_Setup_ISR_VG(
         );
 #else
     ret = request_irq(
-        Device->irqLines[gcvCORE_VG], isrRoutineVG, gcdIRQF_FLAG,
-        "galcore interrupt service for 2D", Device
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+        Device->irqLines[gcvCORE_VG], isrRoutineVG, IRQF_DISABLED,
+#else
+        Device->irqLines[gcvCORE_VG], isrRoutineVG, 0x0,
+#endif
+	"galcore interrupt service for 2D", Device
         );
 #endif
 

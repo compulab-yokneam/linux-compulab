@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2016 Vivante Corporation
+*    Copyright (c) 2014 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2016 Vivante Corporation
+*    Copyright (C) 2014  Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -70,7 +70,7 @@ const char * _VERSION = "\n\0$VERSION$"
                         gcmTXT2STR(gcvVERSION_MAJOR) "."
                         gcmTXT2STR(gcvVERSION_MINOR) "."
                         gcmTXT2STR(gcvVERSION_PATCH) ":"
-                        gcmTXT2STR(gcvVERSION_BUILD) "$\n";
+                        gcmTXT2STR(gcvVERSION_BUILD) "+fslc$\n";
 
 /******************************************************************************\
 ******************************* gckKERNEL API Code ******************************
@@ -285,7 +285,7 @@ _DumpDriverConfigure(
     gcmkPRINT_N(0, "***   GPU DRV CONFIG   ***\n");
     gcmkPRINT_N(0, "**************************\n");
 
-    gcmkPRINT("Galcore version %d.%d.%d.%d\n",
+    gcmkPRINT("Galcore version %d.%d.%d.%d+fslc\n",
               gcvVERSION_MAJOR, gcvVERSION_MINOR, gcvVERSION_PATCH, gcvVERSION_BUILD);
 
     gckOS_DumpParam();
@@ -1611,6 +1611,7 @@ gckKERNEL_Dispatch(
 #endif
     gckVIRTUAL_COMMAND_BUFFER_PTR buffer;
 
+    gckVIDMEM_NODE nodeObject;
     gctBOOL powerMutexAcquired = gcvFALSE;
 
     gcmkHEADER_ARG("Kernel=0x%x FromUser=%d Interface=0x%x",
@@ -2416,6 +2417,25 @@ gckKERNEL_Dispatch(
     case gcvHAL_CACHE:
 
         logical = gcmUINT64_TO_PTR(Interface->u.Cache.logical);
+
+        if (Interface->u.Cache.node)
+        {
+            gcmkONERROR(gckVIDMEM_HANDLE_Lookup(
+                Kernel,
+                processID,
+                Interface->u.Cache.node,
+                &nodeObject));
+
+            if (nodeObject->node->VidMem.memory->object.type == gcvOBJ_VIDMEM
+             || nodeObject->node->Virtual.contiguous
+            )
+            {
+                /* If memory is contiguous, get physical address. */
+                gcmkONERROR(gckOS_UserLogicalToPhysical(
+                    Kernel->os, logical, &paddr));
+            }
+        }
+
         bytes = (gctSIZE_T) Interface->u.Cache.bytes;
         switch(Interface->u.Cache.operation)
         {
@@ -2503,7 +2523,7 @@ gckKERNEL_Dispatch(
         Interface->u.Version.build = gcvVERSION_BUILD;
 #if gcmIS_DEBUG(gcdDEBUG_TRACE)
         gcmkTRACE_ZONE(gcvLEVEL_INFO, gcvZONE_KERNEL,
-                       "KERNEL version %d.%d.%d build %u",
+                       "KERNEL version %d.%d.%d build %u (fslc)",
                        gcvVERSION_MAJOR, gcvVERSION_MINOR,
                        gcvVERSION_PATCH, gcvVERSION_BUILD);
 #endif

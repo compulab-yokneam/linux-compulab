@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2016 Vivante Corporation
+*    Copyright (c) 2014 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2016 Vivante Corporation
+*    Copyright (C) 2014  Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -126,13 +126,11 @@ typedef struct _gcsMirrorPageTable
 
     /* Number of cores use this shared pagetable. */
     gctUINT32       reference;
-
-    /* Mutex. */
-    gctPOINTER      mutex;
 }
 gcsMirrorPageTable;
 
 static gcsMirrorPageTable_PTR mirrorPageTable = gcvNULL;
+static gctPOINTER mirrorPageTableMutex = gcvNULL;
 #endif
 
 typedef struct _gcsDynamicSpaceNode * gcsDynamicSpaceNode_PTR;
@@ -1362,7 +1360,7 @@ OnError:
                     sizeof(struct _gcsMirrorPageTable)));
 
         gcmkONERROR(
-            gckOS_CreateMutex(Kernel->os, &mirrorPageTable->mutex));
+            gckOS_CreateMutex(Kernel->os, &mirrorPageTableMutex));
     }
 
     gcmkONERROR(_Construct(Kernel, MmuSize, Mmu));
@@ -1415,8 +1413,8 @@ gckMMU_Destroy(
 
     if (mirrorPageTable->reference == 0)
     {
-        gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTable->mutex));
         gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTable));
+        gcmkVERIFY_OK(gcmkOS_SAFE_FREE(Mmu->os, mirrorPageTableMutex));
     }
 
     return _Destroy(Mmu);
@@ -1763,35 +1761,57 @@ gckMMU_AllocatePagesEx(
 {
 #if gcdMIRROR_PAGETABLE
     gceSTATUS status;
+    gctPOINTER pageTable;
+    gctUINT32 address;
+    gctINT i;
     gckMMU mmu;
     gctBOOL acquired = gcvFALSE;
+    gctBOOL allocated = gcvFALSE;
 
-    gcmkHEADER();
-
-    gckOS_AcquireMutex(Mmu->os, mirrorPageTable->mutex, gcvINFINITE);
+    gckOS_AcquireMutex(Mmu->os, mirrorPageTableMutex, gcvINFINITE);
     acquired = gcvTRUE;
 
-    /* Get first mmu. */
-    mmu = mirrorPageTable->mmus[0];
-
-    gcmkVERIFY_OBJECT(mmu, gcvOBJ_MMU);
-
-    /* Allocate page table from first mmu. */
-    gcmkONERROR(_AllocatePages(mmu, PageCount, Type, PageTable, Address));
-
-    gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
-    acquired = gcvFALSE;
-
-    gcmkFOOTER_NO();
-    return gcvSTATUS_OK;
-
-OnError:
-    if (acquired)
+    /* Allocate page table for current MMU. */
+    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
     {
-        gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
+        if (Mmu == mirrorPageTable->mmus[i])
+        {
+            gcmkONERROR(_AllocatePages(Mmu, PageCount, Type, PageTable, Address));
+            allocated = gcvTRUE;
+        }
     }
 
-    gcmkFOOTER();
+    /* Allocate page table for other MMUs. */
+    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
+    {
+        mmu = mirrorPageTable->mmus[i];
+
+        if (Mmu != mmu)
+        {
+            gcmkONERROR(_AllocatePages(mmu, PageCount, Type, &pageTable, &address));
+            gcmkASSERT(address == *Address);
+        }
+    }
+
+    gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
+    acquired = gcvFALSE;
+
+    return gcvSTATUS_OK;
+OnError:
+
+    if (allocated)
+    {
+        /* Page tables for multiple GPU always keep the same. So it is impossible
+         * the fist one allocates successfully but others fail.
+         */
+        gcmkASSERT(0);
+    }
+
+    if (acquired)
+    {
+        gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
+    }
+
     return status;
 #else
     return _AllocatePages(Mmu, PageCount, Type, PageTable, Address);
@@ -1808,22 +1828,25 @@ gckMMU_FreePages(
 #if gcdMIRROR_PAGETABLE
     gctINT i;
     gctUINT32 offset;
-    gckMMU mmu = mirrorPageTable->mmus[0];
+    gckMMU mmu;
 
-    gckOS_AcquireMutex(Mmu->os, mirrorPageTable->mutex, gcvINFINITE);
+    gckOS_AcquireMutex(Mmu->os, mirrorPageTableMutex, gcvINFINITE);
 
-    gcmkVERIFY_OK(_FreePages(mmu, PageTable, PageCount));
+    gcmkVERIFY_OK(_FreePages(Mmu, PageTable, PageCount));
 
-    offset = (gctUINT32)PageTable - (gctUINT32)mmu->pageTableLogical;
+    offset = (gctUINT32)PageTable - (gctUINT32)Mmu->pageTableLogical;
 
-    for (i = 1; i < (gctINT)mirrorPageTable->reference; i++)
+    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
     {
         mmu = mirrorPageTable->mmus[i];
 
-        gcmkVERIFY_OK(_FreePages(mmu, mmu->pageTableLogical + offset/4, PageCount));
+        if (mmu != Mmu)
+        {
+            gcmkVERIFY_OK(_FreePages(mmu, mmu->pageTableLogical + offset/4, PageCount));
+        }
     }
 
-    gckOS_ReleaseMutex(Mmu->os, mirrorPageTable->mutex);
+    gckOS_ReleaseMutex(Mmu->os, mirrorPageTableMutex);
 
     return gcvSTATUS_OK;
 #else
@@ -1841,8 +1864,8 @@ gckMMU_SetPage(
 #if gcdMIRROR_PAGETABLE
     gctUINT32_PTR pageEntry;
     gctINT i;
-    gckMMU mmu = mirrorPageTable->mmus[0];
-    gctUINT32 offset = (gctUINT32)PageEntry - (gctUINT32)mmu->pageTableLogical;
+    gckMMU mmu;
+    gctUINT32 offset = (gctUINT32)PageEntry - (gctUINT32)Mmu->pageTableLogical;
 #endif
     gctUINT32 addressExt;
     gctUINT32 address;
@@ -1859,11 +1882,6 @@ gckMMU_SetPage(
     /* [39:32]. */
     addressExt = (gctUINT32)((PageAddress >> 32) & 0xFF);
 
-#if gcdMIRROR_PAGETABLE
-    /* Set first mmu. */
-    Mmu = mmu;
-#endif
-
     if (Mmu->hardware->mmuVersion == 0)
     {
         _WritePageEntry(PageEntry, address);
@@ -1874,20 +1892,24 @@ gckMMU_SetPage(
     }
 
 #if gcdMIRROR_PAGETABLE
-    for (i = 1; i < (gctINT)mirrorPageTable->reference; i++)
+    for (i = 0; i < (gctINT)mirrorPageTable->reference; i++)
     {
         mmu = mirrorPageTable->mmus[i];
 
-        pageEntry = mmu->pageTableLogical + offset / 4;
+        if (mmu != Mmu)
+        {
+            pageEntry = mmu->pageTableLogical + offset / 4;
 
-        if (mmu->hardware->mmuVersion == 0)
-        {
-            _WritePageEntry(pageEntry, address);
+            if (mmu->hardware->mmuVersion == 0)
+            {
+                _WritePageEntry(pageEntry, address);
+            }
+            else
+            {
+                _WritePageEntry(pageEntry, _SetPage(address, addressExt));
+            }
         }
-        else
-        {
-            _WritePageEntry(pageEntry, _SetPage(address, addressExt));
-        }
+
     }
 #endif
 

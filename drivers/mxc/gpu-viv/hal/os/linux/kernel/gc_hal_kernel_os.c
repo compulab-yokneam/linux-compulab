@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2016 Vivante Corporation
+*    Copyright (c) 2014 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2016 Vivante Corporation
+*    Copyright (C) 2014  Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -3993,9 +3993,6 @@ gckOS_MapPagesEx(
 
     allocator = mdl->allocator;
 
-    /* Only support pagedMem, and pagedMem always has its allocator. */
-    gcmkASSERT(allocator != gcvNULL);
-
     gcmkTRACE_ZONE(
         gcvLEVEL_INFO, gcvZONE_OS,
         "%s(%d): Physical->0x%X PageCount->0x%X PagedMemory->?%d",
@@ -4027,7 +4024,23 @@ gckOS_MapPagesEx(
         gctUINT i;
         gctPHYS_ADDR_T phys = ~0U;
 
-        allocator->ops->Physical(allocator, mdl, offset, &phys);
+        if (mdl->pagedMem && !mdl->contiguous)
+        {
+            allocator->ops->Physical(allocator, mdl, offset, &phys);
+        }
+        else
+        {
+            if (!mdl->pagedMem)
+            {
+                gcmkTRACE_ZONE(
+                    gcvLEVEL_INFO, gcvZONE_OS,
+                    "%s(%d): we should not get this call for Non Paged Memory!",
+                    __FUNCTION__, __LINE__
+                    );
+            }
+
+            phys = page_to_phys(nth_page(mdl->u.contiguousPages, offset));
+        }
 
         gcmkVERIFY_OK(gckOS_CPUPhysicalToGPUPhysical(Os, phys, &phys));
 
@@ -4868,7 +4881,6 @@ OnError:
 
     gcsPageInfo_PTR info = gcvNULL;
     struct page **pages = gcvNULL;
-    gctBOOL *ref = gcvNULL;
 
     /* Verify the arguments. */
     gcmkVERIFY_OBJECT(Os, gcvOBJ_OS);
@@ -4932,14 +4944,6 @@ OnError:
             break;
         }
 
-        ref = (gctBOOL *)kzalloc((pageCount + extraPage) * sizeof(gctBOOL), GFP_KERNEL | gcdNOWARN);
-
-        if (ref == gcvNULL)
-        {
-            status = gcvSTATUS_OUT_OF_MEMORY;
-            break;
-        }
-
         if (Physical != ~0U)
         {
             for (i = 0; i < pageCount; i++)
@@ -4948,7 +4952,7 @@ OnError:
 
                 if (pfn_valid(page_to_pfn(pages[i])))
                 {
-                    ref[i] = get_page_unless_zero(pages[i]);
+                    get_page(pages[i]);
                 }
             }
         }
@@ -5078,16 +5082,8 @@ OnError:
                 {
                     if (pfn_valid(page_to_pfn(pages[i])))
                     {
-                        ref[i] = get_page_unless_zero(pages[i]);
+                        get_page(pages[i]);
                     }
-                }
-            }
-            else
-            {
-                /* Mark feference when pages from get_user_pages. */
-                for (i = 0; i < pageCount; i++)
-                {
-                    ref[i] = gcvTRUE;
                 }
             }
         }
@@ -5277,7 +5273,6 @@ OnError:
         /* Save pointer to page table. */
         info->pageTable = pageTable;
         info->pages = pages;
-        info->ref   = ref;
 
         *Info = (gctPOINTER) info;
 
@@ -5350,13 +5345,6 @@ OnError:
             /* Free the page table. */
             kfree(pages);
             info->pages = gcvNULL;
-        }
-
-        if (info!= gcvNULL && ref != gcvNULL)
-        {
-            /* Free the ref table. */
-            kfree(ref);
-            info->ref = gcvNULL;
         }
 
         /* Release page info struct. */
@@ -5446,7 +5434,6 @@ OnError:
     gcsPageInfo_PTR info;
     gctSIZE_T pageCount, i;
     struct page **pages;
-    gctBOOL *ref;
 
     /* Verify the arguments. */
     gcmkVERIFY_OBJECT(Os, gcvOBJ_OS);
@@ -5459,8 +5446,6 @@ OnError:
         info = (gcsPageInfo_PTR) Info;
 
         pages = info->pages;
-
-        ref = info->ref;
 
         gcmkTRACE_ZONE(
             gcvLEVEL_INFO, gcvZONE_OS,
@@ -5579,7 +5564,7 @@ OnError:
                      SetPageDirty(pages[i]);
                 }
 
-                if (pfn_valid(page_to_pfn(pages[i])) && ref[i])
+                if (pfn_valid(page_to_pfn(pages[i])))
                 {
                     page_cache_release(pages[i]);
                 }
@@ -5597,11 +5582,6 @@ OnError:
         if (info->pages != gcvNULL)
         {
             kfree(info->pages);
-        }
-
-        if (info->ref != gcvNULL)
-        {
-            kfree(info->ref);
         }
 
         kfree(info);
@@ -6886,16 +6866,15 @@ gckOS_QueryProfileTickRate(
     OUT gctUINT64_PTR TickRate
     )
 {
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(4,2,0)
+    *TickRate = hrtimer_resolution;
+#else
     struct timespec res;
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(4, 2, 0)
-    res.tv_sec = 0;
-    res.tv_nsec = hrtimer_resolution;
-#else
     hrtimer_get_res(CLOCK_MONOTONIC, &res);
-#endif
 
     *TickRate = res.tv_nsec + res.tv_sec * 1000000000ULL;
+#endif
 
     return gcvSTATUS_OK;
 }
@@ -8503,7 +8482,7 @@ gckOS_CreateNativeFence(
     /* Cast timeline. */
     timeline = (struct viv_sync_timeline *) Timeline;
 
-    fd = get_unused_fd_flags(O_CLOEXEC);
+    fd = get_unused_fd();
 
     if (fd < 0)
     {
@@ -8565,6 +8544,7 @@ gckOS_WaitNativeFence(
     )
 {
     struct sync_timeline * timeline;
+    struct list_head *pos;
     struct sync_fence * fence;
     gctBOOL wait = gcvFALSE;
     gceSTATUS status = gcvSTATUS_OK;
@@ -8583,40 +8563,18 @@ gckOS_WaitNativeFence(
         gcmkONERROR(gcvSTATUS_INVALID_ARGUMENT);
     }
 
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(3,17,0)
+    list_for_each(pos, &fence->pt_list_head)
     {
-        int i;
+        struct sync_pt * pt =
+        container_of(pos, struct sync_pt, pt_list);
 
-        for (i = 0; i < fence->num_fences; i++)
+        /* Do not need to wait on same timeline. */
+        if (pt->parent != timeline)
         {
-            struct fence *f = fence->cbs[i].sync_pt;
-            struct sync_pt *pt = container_of(f, struct sync_pt, base);
-
-            /* Do not need to wait on same timeline. */
-            if ((sync_pt_parent(pt) != timeline) && !fence_is_signaled(f))
-            {
-                wait = gcvTRUE;
-                break;
-            }
+            wait = gcvTRUE;
+            break;
         }
     }
-#else
-    {
-        struct list_head *pos;
-        list_for_each(pos, &fence->pt_list_head)
-        {
-            struct sync_pt * pt =
-            container_of(pos, struct sync_pt, pt_list);
-
-            /* Do not need to wait on same timeline. */
-            if (pt->parent != timeline)
-            {
-                wait = gcvTRUE;
-                break;
-            }
-        }
-    }
-#endif
 
     if (wait)
     {
@@ -8696,11 +8654,28 @@ gckOS_AllocatePageArray(
     {
         unsigned long phys = ~0;
 
-        gctPHYS_ADDR_T phys_addr;
+        if (mdl->pagedMem && !mdl->contiguous)
+        {
+            if (allocator)
+            {
+                gctPHYS_ADDR_T phys_addr;
+                allocator->ops->Physical(allocator, mdl, offset, &phys_addr);
+                phys = (unsigned long)phys_addr;
+            }
+        }
+        else
+        {
+            if (!mdl->pagedMem)
+            {
+                gcmkTRACE_ZONE(
+                    gcvLEVEL_INFO, gcvZONE_OS,
+                    "%s(%d): we should not get this call for Non Paged Memory!",
+                    __FUNCTION__, __LINE__
+                    );
+            }
 
-        allocator->ops->Physical(allocator, mdl, offset, &phys_addr);
-
-        phys = (unsigned long)phys_addr;
+            phys = page_to_phys(nth_page(mdl->u.contiguousPages, offset));
+        }
 
         table[offset] = phys;
 

@@ -2,7 +2,7 @@
 *
 *    The MIT License (MIT)
 *
-*    Copyright (c) 2014 - 2016 Vivante Corporation
+*    Copyright (c) 2014 Vivante Corporation
 *
 *    Permission is hereby granted, free of charge, to any person obtaining a
 *    copy of this software and associated documentation files (the "Software"),
@@ -26,7 +26,7 @@
 *
 *    The GPL License (GPL)
 *
-*    Copyright (C) 2014 - 2016 Vivante Corporation
+*    Copyright (C) 2014  Vivante Corporation
 *
 *    This program is free software; you can redistribute it and/or
 *    modify it under the terms of the GNU General Public License
@@ -518,15 +518,28 @@ _DebugFSPrint (
  **                     LINUX SYSTEM FUNCTIONS (START)
  **
  *******************************************************************************/
-static int
-_DebugFSOpen (
-    struct inode* inode,
-    struct file* filp
-    )
-{
-    filp->private_data = inode->i_private;
 
-    return 0;
+/*******************************************************************************
+ **
+ **  find the vivlog structure associated with an inode.
+ **      returns a    pointer to the structure if found, NULL if not found
+ **
+ *******************************************************************************/
+static gcsDEBUGFS_Node*
+_GetNodeInfo (
+               IN struct inode *Inode
+               )
+{
+    gcsDEBUGFS_Node* node ;
+
+    if ( Inode == NULL )
+        return NULL ;
+
+    for ( node = gc_dbgfs.linkedlist ; node != NULL ; node = node->next )
+        if ( node->filen->d_inode->i_ino == Inode->i_ino )
+            return node ;
+
+    return NULL ;
 }
 
 /*******************************************************************************
@@ -544,9 +557,13 @@ _DebugFSRead (
 {
     int retval ;
     caddr_t data_to_return ;
-    gcsDEBUGFS_Node* node = file->private_data;
-
-    if (node == NULL)
+    gcsDEBUGFS_Node* node ;
+    /* get the metadata about this emlog */
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+    if ( ( node = _GetNodeInfo ( file->f_dentry->d_inode ) ) == NULL )
+#else
+    if ( ( node = _GetNodeInfo ( file_inode(file) ) ) == NULL )
+#endif
     {
         printk ( "debugfs_read: record not found\n" ) ;
         return - EIO ;
@@ -610,10 +627,14 @@ _DebugFSWrite (
 {
     caddr_t message = NULL ;
     int n ;
-    gcsDEBUGFS_Node* node = file->private_data;
+    gcsDEBUGFS_Node*node ;
 
     /* get the metadata about this log */
-    if (node == NULL)
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,1,0)
+    if ( ( node = _GetNodeInfo ( file->f_dentry->d_inode ) ) == NULL )
+#else
+    if ( ( node = _GetNodeInfo ( file_inode(file) ) ) == NULL )
+#endif    
     {
         return - EIO ;
     }
@@ -881,7 +902,6 @@ vidmem_write(
  *******************************************************************************/
 static const struct file_operations debugfs_operations = {
                                                           .owner = THIS_MODULE ,
-                                                          .open = _DebugFSOpen ,
                                                           .read = _DebugFSRead ,
                                                           .write = _DebugFSWrite ,
 } ;
@@ -892,7 +912,6 @@ static const struct file_operations vidmem_operations = {
     .read = seq_read,
     .write = vidmem_write,
     .llseek = seq_lseek,
-    .release = single_release,
 } ;
 
 /*******************************************************************************
@@ -1032,7 +1051,7 @@ gckDEBUGFS_CreateNode (
         node->temp = NULL;
 
         /*creating the file*/
-        node->filen = debugfs_create_file(NodeName, S_IRUGO|S_IWUSR, node->parent, node,
+        node->filen = debugfs_create_file(NodeName, S_IRUGO|S_IWUSR, node->parent, NULL,
                                           &debugfs_operations);
     }
 
