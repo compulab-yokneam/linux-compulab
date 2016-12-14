@@ -53,6 +53,24 @@
 				pagesize = <16>;
 			};
 
+			ov564x_mipi: ov564x_mipi@3c {
+				compatible = "ovti,ov564x_mipi";
+				reg = <0x3c>;
+				clocks = <&clks IMX6QDL_CLK_CKO>;
+				clock-names = "csi_mclk";
+
+				DOVDD-supply = <&vgen4_reg>;
+				AVDD-supply = <&vgen3_reg>;
+				DVDD-supply = <&vgen2_reg>;
+
+				pwn-gpios = <&gpio1 25 1>;
+				rst-gpios = <&gpio4 20 0>;
+
+				csi_id = <0>;
+				mclk = <24000000>;
+				mclk_source = <0>;
+			};
+
 			adv5150: adv5150@5c {
 				compatible = "ti,tvp5150";
 				reg = <0x5c>;
@@ -93,6 +111,22 @@
 		reset-delay-us = <100>;
 		gpio-can-sleep;
 		#reset-cells = <0>;
+	};
+
+	vgen2_reg: vgen2 {
+		regulator-min-microvolt = <800000>;
+		regulator-max-microvolt = <1550000>;
+	};
+
+	vgen3_reg: vgen3 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+	};
+
+	vgen4_reg: vgen4 {
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 
 	pcie_power_on_gpio: regulator-pcie-power-on-gpio {
@@ -196,3 +230,10 @@
 	status = "okay";
 };
 
+&mipi_csi {
+	status = "okay";
+	ipu_id = <0>;
+	csi_id = <0>;
+	v_channel = <0>;
+	lanes = <2>;
+};

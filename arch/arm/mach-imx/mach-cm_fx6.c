@@ -77,9 +77,23 @@ static void __init cm_fx6_csi_mux_init(void)
 	 * Set GPR13 bit 0-2 to 0x4.
 	 */
 	struct regmap *gpr;
+	struct device_node *np;
+	const char *status;
+	int ret;
+
+	/* Read mipi-csi status and set IPU1 CSI0 accordingly */
+	np = of_find_compatible_node(NULL, NULL, "fsl,imx6q-mipi-csi2");
+	if (np) {
+		ret = of_property_read_string(np, "status", &status);
+		if (!ret && (!strcasecmp(status, "okay"))) {
+			pr_info("IPU1 CSI0 is in mipi mode\n");
+			return;
+		}
+	}
 
 	gpr = syscon_regmap_lookup_by_compatible("fsl,imx6q-iomuxc-gpr");
 	if (!IS_ERR(gpr)) {
+		pr_info("IPU1 CSI0 is in parallel mode\n");
 		if (of_machine_is_compatible("fsl,imx6q"))
 			regmap_update_bits(gpr, IOMUXC_GPR1, 1 << 19, 1 << 19);
 		else if (of_machine_is_compatible("fsl,imx6dl"))
