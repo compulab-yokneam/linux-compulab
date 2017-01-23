@@ -171,15 +171,15 @@
 		display-timings {
 			native-mode = <&timing0>;
 			timing0: hsd100pxn1 {
-				clock-frequency = <65000000>;
-				hactive = <1024>;
+				clock-frequency = <85859000>;
+				hactive = <1368>;
 				vactive = <768>;
 				hback-porch = <220>;
-				hfront-porch = <40>;
-				vback-porch = <21>;
-				vfront-porch = <7>;
-				hsync-len = <60>;
-				vsync-len = <10>;
+				hfront-porch = <72>;
+				vback-porch = <23>;
+				vfront-porch = <1>;
+				hsync-len = <144>;
+				vsync-len = <26>;
 			};
 		};
 	};
@@ -193,15 +193,15 @@
 		display-timings {
 			native-mode = <&timing1>;
 			timing1: hsd100pxn1 {
-				clock-frequency = <65000000>;
-				hactive = <1024>;
+				clock-frequency = <85859000>;
+				hactive = <1368>;
 				vactive = <768>;
 				hback-porch = <220>;
-				hfront-porch = <40>;
-				vback-porch = <21>;
-				vfront-porch = <7>;
-				hsync-len = <60>;
-				vsync-len = <10>;
+				hfront-porch = <72>;
+				vback-porch = <23>;
+				vfront-porch = <1>;
+				hsync-len = <144>;
+				vsync-len = <26>;
 			};
 		};
 	};
