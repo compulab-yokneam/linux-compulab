@@ -1,0 +1,57 @@
+/*
+* Copyright 2016 CompuLab Ltd.
+*
+* Author: Valentin Raevsky <valentin@compulab.co.il>
+*
+* The code contained herein is licensed under the GNU General Public
+* License. You may obtain a copy of the GNU General Public License
+* Version 2 or later at the following locations:
+*
+* http://www.opensource.org/licenses/gpl-license.html
+* http://www.gnu.org/copyleft/gpl.html
+*/
+
+#include "imx6q-sbc-fx6.dts"
+#include "imx6q-display-settings.dtsi"
+
+&mxcfb1 {
+	LDB
+	mode_str ="640x240M-18@60";
+	default_bpp = <24>;
+};
+
+&mxcfb2 {
+	HDMI
+};
+
+&mxcfb3 {
+	status = "disabled";
+};
+
+&mxcfb4 {
+	status = "disabled";
+};
+
+#if __TIMINGS_HELP___
+mode "640x240-65"
+    # D: 22.800 MHz, H: 30.000 kHz, V: 64.517 Hz
+    geometry 640 240 640 240 24
+    timings 43859 40 40 75 75 40 75
+    rgba 8/16,8/8,8/0,0/0
+endmode
+Hitachi:
+    43860    40      40    75      75       40    75
+<pixclock> <left> <right> <upper> <lower> <hslen> <vslen>
+#endif
+
+&timing01 {
+	clock-frequency = <22800000>;
+	hactive = <640>;
+	vactive = <240>;
+	hback-porch = <40>;
+	hfront-porch = <40>;
+	vback-porch = <75>;
+	vfront-porch = <75>;
+	hsync-len = <40>;
+	vsync-len = <75>;
+};

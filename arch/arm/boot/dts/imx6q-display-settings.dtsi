@@ -1,0 +1,25 @@
+/*
+* Copyright 2016 CompuLab Ltd.
+*
+* Author: Valentin Raevsky <valentin@compulab.co.il>
+*
+* The code contained herein is licensed under the GNU General Public
+* License. You may obtain a copy of the GNU General Public License
+* Version 2 or later at the following locations:
+*
+* http://www.opensource.org/licenses/gpl-license.html
+* http://www.gnu.org/copyleft/gpl.html
+*/
+
+#define LCD	disp_dev = "lcd";\
+		interface_pix_fmt = "RGB24";
+
+#define HDMI	disp_dev = "hdmi";\
+		interface_pix_fmt = "RGB24";
+
+#define LDB 	disp_dev = "ldb";\
+		interface_pix_fmt = "RGB666";
+
+#define LDB24 	disp_dev = "ldb";\
+		interface_pix_fmt = "RGB24";
+
