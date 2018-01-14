@@ -18,6 +18,7 @@
 
 	aliases {
 		lcdif = &lcdif;
+		pcie = &pcie;
 	};
 
 	backlight {
@@ -131,6 +132,12 @@
 			};
 		};
 	};
+};
+
+&pcie {
+	reset-gpio = <&pca9555_sb 1 GPIO_ACTIVE_LOW>;
+	ext_osc = <0>;
+	status = "okay";
 };
 
 &pwm2 {
