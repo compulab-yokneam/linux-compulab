@@ -57,17 +57,6 @@
 		enable-active-high;
 		startup-delay-us = <500>;
 	};
-
-	reg_fec0_supply: fec0_nvcc {
-		compatible = "regulator-fixed";
-		regulator-name = "fec0_nvcc";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 6 GPIO_ACTIVE_HIGH>;
-		regulator-always-on;
-		enable-active-high;
-		startup-delay-us = <500>;
-	};
 };
 
 &iomuxc {
@@ -522,7 +511,6 @@
 	pinctrl-0 = <&pinctrl_fec1>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
-	phy-supply = <&reg_fec0_supply>;
 	fsl,magic-packet;
 	fsl,rgmii_rxc_dly;
 	status = "okay";
