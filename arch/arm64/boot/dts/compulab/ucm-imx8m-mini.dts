@@ -26,6 +26,15 @@
 		stdout-patch = &uart3;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		heartbeat-led {
+			label = "Heartbeat";
+			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
 		regulator-name = "VSD_3V3";
