@@ -1,0 +1,14 @@
+#include "sbc-imx8.dts"
+
+/ {
+    model = "CompuLab CL-SOM-iMX8 rev1.1 (thernmal) on SBC-iMX8";
+    compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+};
+
+&cpu_alert0 {
+       temperature = <125000>;
+};
+
+&cpu_crit0 {
+       temperature = <165000>;
+};

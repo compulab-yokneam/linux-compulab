@@ -1,0 +1,58 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "compulab-imx8mq.dtsi"
+
+/ {
+	model = "CompuLab UCM-iMX8";
+	compatible = "compulab,ucm-imx8", "fsl,imx8mq";
+};
+
+&iomuxc {
+	ucm-imx8 {
+	pinctrl_pcie1: pcie1grp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO01_GPIO1_IO1	0x16 /* WIFI rest-gpio    pin#23 */
+		>;
+	};
+	pinctrl_murata: muratagrp {
+		fsl,pins = <
+			MX8MQ_IOMUXC_NAND_CE2_B_GPIO3_IO3	0x17059
+			MX8MQ_IOMUXC_NAND_CE3_B_GPIO3_IO4	0x17059
+		>;
+	};
+
+    };
+};
+
+&em3027 {
+	status = "disabled";
+};
+
+&i2c2 {
+    rtc@69 {
+        compatible = "ab1805";
+        reg = <0x69>;
+        pagesize = <16>;
+    };
+};
+
+&pcie1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie1>;
+	reset-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;    /* pin#23 */
+	status = "okay";
+};

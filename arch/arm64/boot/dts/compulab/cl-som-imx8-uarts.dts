@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/*
+ * UART1 loop back mode.
+ * Option#1) Remove all jumpers from E1 and E2 and short E1.2 and E2.2
+ * Option#2) Set jumperis on E1.1-2 and E2.1-2 and short P20.19 and P20.21
+ *
+ * UART4 loop back mode.
+ * Option#1) Short P20.15 and P20.17
+ *
+ * How to validate:
+ * make use of picocon, issue:
+ * UART1)
+ * picocom /dev/ttymxc0 --baud 115200 --nolock --echo
+ * UART4)
+ * picocom /dev/ttymxc3 --baud 115200 --nolock --echo
+ *
+ * Type any text, it has to show up twice.
+*/
+
+#include "cl-som-imx8.dts"
+
+/ {
+    model = "CompuLab CL-SOM-iMX8 rev1.1 on SBC-iMX8 (uart sample)";
+    compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+};
+
+&iomuxc {
+    cl-som-imx8-uart {
+
+        pinctrl_uart1_sample: uart1grp_sample {
+            fsl,pins = <
+                MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX	0x79
+                MX8MQ_IOMUXC_UART1_TXD_UART1_DCE_TX	0x79
+            >;
+        };
+
+        pinctrl_uart4_sample: uart4grp_sample {
+            fsl,pins = <
+                MX8MQ_IOMUXC_UART4_RXD_UART4_DCE_RX	0x79
+                MX8MQ_IOMUXC_UART4_TXD_UART4_DCE_TX	0x79
+            >;
+        };
+    };
+};
+
+&uart1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_uart1_sample>;
+    assigned-clocks = <&clk IMX8MQ_CLK_UART1>;
+    assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+    status = "okay";
+};
+
+&uart4 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_uart4_sample>;
+    assigned-clocks = <&clk IMX8MQ_CLK_UART4>;
+    assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+    status = "okay";
+};

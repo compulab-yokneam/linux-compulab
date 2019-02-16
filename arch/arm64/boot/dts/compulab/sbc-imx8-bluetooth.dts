@@ -1,0 +1,26 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "cl-som-imx8.dts"
+#include "sb-imx8.dtsi"
+
+/ {
+    model = "CompuLab CL-SOM-iMX8 rev1.1 on SBC-iMX8";
+    compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+};
+
+/* bluetooth is on */
+&reg_usb_mux {
+    enable-active-high;
+};

@@ -1,0 +1,149 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "cl-som-imx8.dts"
+
+/ {
+    model = "CompuLab CL-SOM-iMX8 rev1.1 on SBC-iMX8 (ecspi sample)";
+    compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+
+    ecspi1: ecspi@30820000 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "fsl,imx7d-ecspi", "fsl,imx51-ecspi";
+        reg = <0 0x30820000 0 0x10000>;
+        interrupts = <GIC_SPI 31 IRQ_TYPE_LEVEL_HIGH>;
+        clocks = <&clk  IMX8MQ_CLK_ECSPI1_ROOT>,
+            <&clk IMX8MQ_CLK_ECSPI1_ROOT>;
+        clock-names = "ipg", "per";
+        status = "disabled";
+    };
+
+    ecspi2: ecspi@30830000 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "fsl,imx7d-ecspi", "fsl,imx51-ecspi";
+        reg = <0 0x30830000 0 0x10000>;
+        interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+        clocks = <&clk  IMX8MQ_CLK_ECSPI2_ROOT>,
+            <&clk IMX8MQ_CLK_ECSPI2_ROOT>;
+        clock-names = "ipg", "per";
+        status = "disabled";
+    };
+
+    ecspi3: ecspi@30840000 {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        compatible = "fsl,imx7d-ecspi", "fsl,imx51-ecspi";
+        reg = <0 0x30840000 0 0x10000>;
+        interrupts = <GIC_SPI 33 IRQ_TYPE_LEVEL_HIGH>;
+        clocks = <&clk  IMX8MQ_CLK_ECSPI3_ROOT>,
+            <&clk IMX8MQ_CLK_ECSPI3_ROOT>;
+        clock-names = "ipg", "per";
+        status = "disabled";
+    };
+};
+
+&iomuxc {
+    cl-som-imx8-ecspi {
+
+        pinctrl_ecspi1_sample: ecspi1_samplegrp {
+            fsl,pins = <
+                MX8MQ_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK 	0x82 /* P1.13 */
+                MX8MQ_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x82 /* P1.11 */
+                MX8MQ_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x82 /* P1.15 */
+                MX8MQ_IOMUXC_ECSPI1_SS0_GPIO5_IO9       0x82 /* P1.17 */
+            >;
+        };
+
+        pinctrl_ecspi2_sample: ecspi2_samplegrp {
+            fsl,pins = <
+                MX8MQ_IOMUXC_ECSPI2_MOSI_ECSPI2_MOSI    0x82 /* P1.11 */
+                MX8MQ_IOMUXC_ECSPI2_MISO_ECSPI2_MISO    0x82 /* P1.15 */
+                MX8MQ_IOMUXC_ECSPI2_SCLK_ECSPI2_SCLK    0x82 /* P1.13 */
+                MX8MQ_IOMUXC_ECSPI2_SS0_GPIO5_IO13      0x82 /* P1.17 */
+            >;
+        };
+
+        pinctrl_ecspi3_sample: ecspi3_samplegrp {
+            fsl,pins = <
+                MX8MQ_IOMUXC_UART1_RXD_ECSPI3_SCLK  0x82 /* P1.69 */
+                MX8MQ_IOMUXC_UART1_TXD_ECSPI3_MOSI  0x82 /* P1.65 */
+                MX8MQ_IOMUXC_UART2_RXD_ECSPI3_MISO  0x82 /* P1.63 */
+                MX8MQ_IOMUXC_UART2_TXD_GPIO5_IO25   0x82 /* P1.58 */
+            >;
+        };
+
+        pinctrl_uart3_sample: uart3_samplegrp {
+            fsl,pins = <
+                MX8MQ_IOMUXC_UART3_TXD_UART3_DCE_TX 0x79
+                MX8MQ_IOMUXC_UART3_RXD_UART3_DCE_RX 0x79
+            >;
+        };
+    };
+};
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart3_sample>;
+	status = "okay";
+};
+
+/*
+ * Must be disabled; conflictis with ecspi2.
+ */
+&uart4 {
+	status = "disabled";
+};
+
+/* Rev 1.1 only */
+&ecspi1 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_ecspi1_sample>;
+    fsl,spi-num-chipselects = <1>;
+    cs-gpios = <&gpio5 9 0>;
+    status = "okay";
+    spi@0 {
+        compatible = "spidev", "rohm,dh2228fv";
+        reg = <0>;
+        spi-max-frequency = <54000000>;
+    };
+};
+
+/* Rev 1.0 w/out WB only */
+&ecspi2 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_ecspi2_sample>;
+    fsl,spi-num-chipselects = <1>;
+    cs-gpios = <&gpio5 13 0>;
+    status = "okay";
+    spi@0 {
+        compatible = "spidev", "rohm,dh2228fv";
+        reg = <0>;
+        spi-max-frequency = <54000000>;
+    };
+};
+
+&ecspi3 {
+    pinctrl-names = "default";
+    pinctrl-0 = <&pinctrl_ecspi3_sample>;
+    fsl,spi-num-chipselects = <1>;
+    cs-gpios = <&gpio5 25 0>;
+    status = "okay";
+    spi@0 {
+        compatible = "spidev", "rohm,dh2228fv";
+        reg = <0>;
+        spi-max-frequency = <54000000>;
+    };
+};

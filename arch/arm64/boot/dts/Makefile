@@ -9,6 +9,7 @@ dts-dirs += apm
 dts-dirs += arm
 dts-dirs += broadcom
 dts-dirs += cavium
+dts-dirs += compulab
 dts-dirs += exynos
 dts-dirs += freescale
 dts-dirs += hisilicon

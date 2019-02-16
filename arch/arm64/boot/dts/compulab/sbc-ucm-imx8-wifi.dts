@@ -1,0 +1,34 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+#include "ucm-imx8.dts"
+#include "sb-ucm-imx8.dtsi"
+
+/ {
+    model = "CompuLab UCM-iMX8 on SBC-UCM-iMX8";
+    compatible = "compulab,sbc-ucm-imx8", "compulab,ucm-imx8", "fsl,imx8mq";
+};
+
+&usdhc2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>, <&pinctrl_murata>;
+	bus-width = <4>;
+	non-removable;
+	wifi-host;
+	cd-post;
+	pm-ignore-notify;
+	vmmc-supply = <&reg_usdhc2_vmmc>;
+	status = "okay";
+};
+
