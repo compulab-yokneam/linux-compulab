@@ -39,11 +39,3 @@
         };
     };
 };
-
-&dcss {
-	status = "disabled";
-};
-
-&hdmi {
-	status = "disabled";
-};

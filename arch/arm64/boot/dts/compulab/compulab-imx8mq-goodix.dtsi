@@ -1,0 +1,17 @@
+&i2c3 {
+    status = "okay";
+    goodix_ts@5d {
+    compatible = "goodix,gt911";
+        reg = <0x5d>;
+
+        interrupt-parent = <&gpio3>;
+        interrupts = <3 IRQ_TYPE_EDGE_FALLING>;
+
+        pinctrl-names = "default";
+        pinctrl-0 = <&touchscreen_pins>;
+
+        irq-gpios = <&gpio3 3 GPIO_ACTIVE_HIGH>;
+        reset-gpios = <&gpio3 4 GPIO_ACTIVE_HIGH>;
+        status = "okay";
+    };
+};
