@@ -44,9 +44,19 @@
 			enable-active-high;
 		};
 
+		reg_usdhc1_vmmc: usdhc1_vmmc {
+			compatible = "regulator-fixed";
+			regulator-name = "USBHC1_VSD_1V8";
+			regulator-min-microvolt = <1800000>;
+			regulator-max-microvolt = <1800000>;
+			gpio = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+			off-on-delay = <20000>;
+			enable-active-high;
+		};
+
 		reg_usdhc2_vmmc: usdhc2_vmmc {
 			compatible = "regulator-fixed";
-			regulator-name = "VSD_3V3";
+			regulator-name = "USDHC2_VSD_3V3";
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 			gpio = <&gpio2 19 GPIO_ACTIVE_HIGH>;
@@ -256,6 +266,12 @@
 			>;
 		};
 
+		pinctrl_usdhc1_gpio: usdhc1grpgpio {
+			fsl,pins = <
+				MX8MQ_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x1c
+			>;
+		};
+
 		pinctrl_usdhc1: usdhc1grp {
 			fsl,pins = <
 				MX8MQ_IOMUXC_SD1_CLK_USDHC1_CLK			0x83
@@ -269,7 +285,6 @@
 				MX8MQ_IOMUXC_SD1_DATA6_USDHC1_DATA6		0xc3
 				MX8MQ_IOMUXC_SD1_DATA7_USDHC1_DATA7		0xc3
 				MX8MQ_IOMUXC_SD1_STROBE_USDHC1_STROBE 		0x83
-				MX8MQ_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0xc1
 			>;
 		};
 
@@ -286,7 +301,6 @@
 				MX8MQ_IOMUXC_SD1_DATA6_USDHC1_DATA6		0xcd
 				MX8MQ_IOMUXC_SD1_DATA7_USDHC1_DATA7		0xcd
 				MX8MQ_IOMUXC_SD1_STROBE_USDHC1_STROBE		0x8d
-				MX8MQ_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0xc1
 			>;
 		};
 
@@ -303,7 +317,6 @@
 				MX8MQ_IOMUXC_SD1_DATA6_USDHC1_DATA6		0xdf
 				MX8MQ_IOMUXC_SD1_DATA7_USDHC1_DATA7		0xdf
 				MX8MQ_IOMUXC_SD1_STROBE_USDHC1_STROBE		0x9f
-				MX8MQ_IOMUXC_SD1_RESET_B_USDHC1_RESET_B		0xc1
 			>;
 		};
 
@@ -561,11 +574,12 @@
 
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc1>;
-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
+	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>, <&pinctrl_usdhc1_gpio>;
 	bus-width = <8>;
 	non-removable;
+	vmmc-supply = <&reg_usdhc1_vmmc>;
 	status = "okay";
 };
 
