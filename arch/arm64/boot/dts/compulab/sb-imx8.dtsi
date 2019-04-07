@@ -24,6 +24,17 @@
 			regulator-min-microvolt = <3300000>;
 			regulator-max-microvolt = <3300000>;
 		};
+
+		hubpwren: hub-pwren {
+			compatible = "regulator-fixed";
+			regulator-name = "hub_pwren";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+			regulator-boot-on;
+			regulator-always-on;
+			enable-active-high;
+		};
 	};
 };
 
