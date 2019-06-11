@@ -63,19 +63,6 @@
 			off-on-delay = <20000>;
 			enable-active-high;
 		};
-
-		reg_gpio_dvfs: regulator-gpio {
-			compatible = "regulator-gpio";
-			pinctrl-names = "default";
-			pinctrl-0 = <&pinctrl_dvfs>;
-			regulator-min-microvolt = <900000>;
-			regulator-max-microvolt = <1000000>;
-			regulator-name = "gpio_dvfs";
-			regulator-type = "voltage";
-			gpios = <&gpio3 15 GPIO_ACTIVE_HIGH>;
-			states = <900000 0x1 1000000 0x0>;
-		};
-
 	};
 
 	simple_sound: sound {
@@ -238,12 +225,6 @@
 				MX8MQ_IOMUXC_UART1_TXD_ECSPI3_MOSI	0x82
 				MX8MQ_IOMUXC_UART2_RXD_ECSPI3_MISO 	0x82
 				MX8MQ_IOMUXC_UART2_TXD_GPIO5_IO25	0x82
-			>;
-		};
-
-		pinctrl_dvfs: dvfsgrp {
-			fsl,pins = <
-				MX8MQ_IOMUXC_NAND_RE_B_GPIO3_IO15	0x16
 			>;
 		};
 
@@ -705,7 +686,6 @@
 		1000000 900000
 		800000  900000
 	>;
-	dc-supply = <&reg_gpio_dvfs>;
 };
 
 &resmem {
