@@ -131,7 +131,7 @@
 		clock-names = "csi_mclk";
 		assigned-clocks = <&clk IMX8MQ_CLK_CLKO2>;
 		assigned-clock-parents = <&clk IMX8MQ_SYS2_PLL_200M>;
-		assigned-clock-rates = <20000000>;
+		assigned-clock-rates = <25000000>;
 		csi_id = <0>;
 		/*
 		To be looked into & fixed
@@ -139,7 +139,7 @@
 		*/
 		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_LOW>;
 		rst-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
-		mclk = <20000000>;
+		mclk = <25000000>;
 		mclk_source = <0>;
 		port {
 		    ov5640_mipi1_ep: endpoint {
