@@ -128,6 +128,16 @@
 
 &cpu0 {
 	arm-supply = <&sw1a_reg>;
+	operating-points = <
+		/* KHz	uV */
+		996000	1075000
+		792000	975000
+	>;
+	clock-frequency = <996000000>;
+};
+
+&cpu1 {
+	clock-frequency = <996000000>;
 };
 
 &ecspi1 {
