@@ -30,6 +30,20 @@
 	};
 };
 
+&ecspi2 {
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2 &pinctrl_ecspi2_cs>;
+	cs-gpios = <&gpio4 23 0>;
+	status = "okay";
+
+	spidev0: spi@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <10000000>;
+	};
+};
+
 &flexcan1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan1>;
@@ -196,6 +210,20 @@
 			MX7D_PAD_I2C2_SCL__GPIO4_IO10		0x54 /* P4-06 - gpio106 */
 			MX7D_PAD_I2C2_SDA__GPIO4_IO11 		0x54 /* P4-18 - gpio107 */
 			MX7D_PAD_SD1_RESET_B__GPIO5_IO2		0x54 /* P5-02 - gpio130 */
+		>;
+	};
+
+	pinctrl_ecspi2: ecspi2grp {
+		fsl,pins = <
+			MX7D_PAD_ECSPI2_MOSI__ECSPI2_MOSI	0xf /* P18-10 */
+			MX7D_PAD_ECSPI2_MISO__ECSPI2_MISO	0xf /* P18-11 */
+			MX7D_PAD_ECSPI2_SCLK__ECSPI2_SCLK	0xf /* P18-09 */
+		>;
+	};
+
+	pinctrl_ecspi2_cs: ecspi2_cs_grp {
+		fsl,pins = <
+			MX7D_PAD_ECSPI2_SS0__GPIO4_IO23		0x34 /* P18-12 */
 		>;
 	};
 
