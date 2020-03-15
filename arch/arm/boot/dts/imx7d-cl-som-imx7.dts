@@ -418,6 +418,11 @@
 	assigned-clock-parents = <&clks IMX7D_PLL_SYS_MAIN_240M_CLK>;
 	status = "okay";
 	fsl,uart-has-rtscts;
+
+	bluetooth {
+		compatible = "ti,wl1835-st";
+		enable-gpios = <&pca9555 1 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &usbotg1 {
