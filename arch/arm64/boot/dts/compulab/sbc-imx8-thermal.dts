@@ -5,10 +5,10 @@
     compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
 };
 
-&cpu_alert0 {
+&cpu_alert {
        temperature = <125000>;
 };
 
-&cpu_crit0 {
+&cpu_crit {
        temperature = <165000>;
 };

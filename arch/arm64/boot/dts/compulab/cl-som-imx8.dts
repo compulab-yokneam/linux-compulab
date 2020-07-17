@@ -38,6 +38,12 @@
 			regulator-always-on;
 		};
 	};
+
+	pcie1_refclk: pcie0-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
 };
 
 &iomuxc {
@@ -68,9 +74,14 @@
 	pinctrl-0 = <&pinctrl_pcie1>;
 	reset-gpio = <&gpio4 29 GPIO_ACTIVE_LOW>;
 	disable-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
+		 <&clk IMX8MQ_CLK_PCIE2_AUX>,
+		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
+		 <&pcie1_refclk>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
 	ext_osc = <0>;
 	hard-wired = <1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &wm8731 {

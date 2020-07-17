@@ -234,7 +234,7 @@
 					type = "passive";
 				};
 
-				cpu-crit {
+				cpu_crit: cpu-crit {
 					temperature = <90000>;
 					hysteresis = <2000>;
 					type = "critical";

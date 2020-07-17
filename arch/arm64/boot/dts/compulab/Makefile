@@ -1,5 +1,6 @@
 dtb-$(CONFIG_ARCH_MXC) += cl-som-imx8.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-thermal.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-bluetooth.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-no-edid.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-dp.dtb
