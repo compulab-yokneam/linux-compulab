@@ -122,6 +122,7 @@ export	TEXT_OFFSET GZFLAGS
 core-y		+= arch/arm64/
 libs-y		:= arch/arm64/lib/ $(libs-y)
 core-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
+core-$(CONFIG_ARCH_MXC) += arch/arm64/mach-imx/
 
 # Default target when executing plain make
 boot		:= arch/arm64/boot

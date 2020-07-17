@@ -1,0 +1,12 @@
+/ {
+	usbmux_sel: uart4sel {
+		compatible = "regulator-fixed";
+		regulator-name = "usbmux_sel";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555 1 GPIO_ACTIVE_LOW>;
+		regulator-always-on;
+		enable-active-low;
+	};
+};
+

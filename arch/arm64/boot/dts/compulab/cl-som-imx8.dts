@@ -1,0 +1,78 @@
+/*
+ * Copyright (C) 2017 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "compulab-imx8mq.dtsi"
+
+/ {
+	model = "CompuLab CL-SOM-iMX8 rev1.1";
+	compatible = "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+
+	bcmdhd_wlan_0: bcmdhd_wlan@0 {
+		compatible = "android,bcmdhd_wlan";
+		bcmdhd_fw = "/lib/firmware/bcm/1CX_BCM4356/fw_bcmdhd.bin";
+		bcmdhd_nv = "/lib/firmware/bcm/1CX_BCM4356/bcmdhd.cal";
+	};
+
+	regulators {
+		reg_usb_mux: usb_mux {
+			compatible = "regulator-fixed";
+			pinctrl-names = "default";
+			pinctrl-0 = <&pinctrl_usbimux1>;
+			regulator-name = "usb_mux";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+			regulator-always-on;
+		};
+	};
+};
+
+&iomuxc {
+	cl-som-imx8 {
+		pinctrl_usbimux1: usbmux1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_GPIO1_IO04_GPIO1_IO4	0x16
+			>;
+		};
+		pinctrl_pcie1: pcie1grp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_SAI3_RXC_GPIO4_IO29 	0x16 /* WIFI reset-gpio   */
+				MX8MQ_IOMUXC_GPIO1_IO01_GPIO1_IO1	0x16 /* WIFI disable-gpio */
+
+				MX8MQ_IOMUXC_GPIO1_IO03_GPIO1_IO3	0x16 /* WIFI pewake */
+				MX8MQ_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K 0x16
+			>;
+		};
+	};
+};
+
+&pcie0 {
+	status = "okay";
+};
+
+&pcie1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie1>;
+	reset-gpio = <&gpio4 29 GPIO_ACTIVE_LOW>;
+	disable-gpio = <&gpio1 1 GPIO_ACTIVE_LOW>;
+	ext_osc = <0>;
+	hard-wired = <1>;
+	status = "okay";
+};
+
+&wm8731 {
+    status = "okay";
+};

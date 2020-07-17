@@ -1,0 +1,19 @@
+#include "cl-som-imx8.dts"
+#include "sb-imx8.dtsi"
+
+/ {
+    model = "CompuLab CL-SOM-iMX8 rev1.1 on SBC-iMX8";
+    compatible = "compulab,sbc-imx8", "compulab,cl-som-imx8,rev1.1", "compulab,cl-som-imx8", "fsl,imx8mq";
+};
+
+/* usb hub is on */
+&reg_usb_mux {
+    enable-active-low;
+};
+
+&usdhc1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
+	/delete-property/ pinctrl-1;
+	/delete-property/ pinctrl-2;
+};

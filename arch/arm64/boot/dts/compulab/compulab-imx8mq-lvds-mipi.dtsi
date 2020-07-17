@@ -1,0 +1,73 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&iomuxc {
+    compulab-imx8mq-lvds {
+        pinctrl_dsi_lvds: dsilvds_group {
+            fsl,pins = <
+                MX8MQ_IOMUXC_GPIO1_IO06_GPIO1_IO6 0x16
+            >;
+        };
+    };
+};
+
+&sbc_i2c_lvds {
+    ti_bridge: sn65dsi83@2c {
+        compatible = "ti,sn65dsi83";
+        reg = <0x2c>;
+        ti,dsi-lanes = <2>;
+        ti,lvds-format = <2>;
+        ti,lvds-bpp = <24>;
+        ti,width-mm = <149>;
+        ti,height-mm = <93>;
+        enable-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_dsi_lvds>;
+        status = "okay";
+
+        display-timings {
+            lvds {
+                clock-frequency = <74250000>;
+                hactive = <1280>;
+                vactive = <800>;
+                hback-porch = <6>;
+                hfront-porch = <5>;
+                vback-porch = <2>;
+                vfront-porch = <3>;
+                hsync-len = <2>;
+                vsync-len = <1>;
+                hsync-active = <0>;
+                vsync-active = <0>;
+                de-active = <0>;
+                pixelclk-active = <0>;
+            };
+        };
+
+        port {
+            sn65dsi83_in: endpoint {
+                remote-endpoint = <&mipi_dsi_bridge_out>;
+            };
+        };
+    };
+};
+
+&mipi_dsi_bridge {
+    status = "okay";
+
+    port@1 {
+        mipi_dsi_bridge_out: endpoint {
+            remote-endpoint = <&sn65dsi83_in>;
+        };
+    };
+};

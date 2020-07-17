@@ -1,0 +1,204 @@
+/*
+ * Copyright (C) 2018 CopuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/ {
+	regulators {
+		compatible = "simple-bus";
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		tsc2046reg: tsc2046-reg {
+			compatible = "regulator-fixed";
+			regulator-name = "tsc2046-reg";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+		};
+
+		hubpwren: hub-pwren {
+			compatible = "regulator-fixed";
+			regulator-name = "hub_pwren";
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+			regulator-boot-on;
+			regulator-always-on;
+			enable-active-high;
+		};
+	};
+};
+
+&iomuxc {
+	sb-imx8 {
+		pinctrl_pca95xx: pca95xx {
+			fsl,pins = <
+				MX8MQ_IOMUXC_NAND_WE_B_GPIO3_IO17	0xC0
+			>;
+		};
+		pinctrl_uart1_rs485_hdx: uart1rs485hdxgrp {
+			fsl,pins = <
+				MX8MQ_IOMUXC_UART1_RXD_UART1_DCE_RX	0x79
+				MX8MQ_IOMUXC_UART1_TXD_UART1_DCE_TX	0x79
+			>;
+		};
+		/*
+		Copy & Paste from an MXP evk
+		As of now an external OSC1 25MHz is in use
+		Left as an example for the next revision
+		*/
+		pinctrl_csi1: csi1grp {
+		    fsl,pins = <
+			MX8MQ_IOMUXC_GPIO1_IO15_CCMSRCGPCMIX_CLKO2	0x59
+		    >;
+		};
+		touchscreen_pins: touchscreen-pins {
+			fsl,pins = <
+				MX8MQ_IOMUXC_NAND_CE3_B_GPIO3_IO4 0x17059 /* P21.34 IRQ */
+				MX8MQ_IOMUXC_NAND_CE2_B_GPIO3_IO3 0x17059 /* P21.32 RST */
+			>;
+		};
+	};
+};
+
+&ecspi3 {
+	fsl,spi-num-chipselects = <1>;
+	cs-gpios = <&gpio5 25 0>;
+	status = "disabled";
+
+	touch:	tsc2046@0 {
+		compatible = "ti,tsc2046";
+		vcc-supply = <&tsc2046reg>;
+
+		reg = <0>;
+		spi-max-frequency = <1500000>;
+
+		interrupt-parent = <&pca9555>;
+		interrupts = <2 0>;
+		pendown-gpio = <&pca9555 2 0>;
+
+		ti,x-min = /bits/ 16 <0x0>;
+		ti,x-max = /bits/ 16 <0x0fff>;
+		ti,y-min = /bits/ 16 <0x0>;
+		ti,y-max = /bits/ 16 <0x0fff>;
+
+		ti,x-plate-ohms = /bits/ 16 <180>;
+		ti,pressure-max = /bits/ 16 <255>;
+
+		ti,debounce-max = /bits/ 16 <30>;
+		ti,debounce-tol = /bits/ 16 <10>;
+		ti,debounce-rep = /bits/ 16 <1>;
+
+		linux,wakeup;
+	};
+};
+
+&i2c1 {
+	status = "okay";
+
+	pca9555:pca9555@20 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca95xx>;
+		compatible = "nxp,pca9555";
+		/* Role #0 */
+		gpio-controller;
+		#gpio-cells = <2>;
+		/* Role #1 */
+		interrupt-parent = <&gpio3>;
+		interrupts = <17 0x1>;
+		interrupt-controller;
+		#interrupt-cells = <2>;
+		/* Bus address */
+		reg = <0x20>;
+	};
+
+	ov5640_mipi: ov5640_mipi@3c {
+		compatible = "ovti,ov5640_mipi";
+		reg = <0x3c>;
+		status = "okay";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi1>;
+		clocks = <&clk IMX8MQ_CLK_CLKO2>;
+		clock-names = "csi_mclk";
+		assigned-clocks = <&clk IMX8MQ_CLK_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MQ_SYS2_PLL_200M>;
+		assigned-clock-rates = <25000000>;
+		csi_id = <0>;
+		/*
+		To be looked into & fixed
+		As of now the device is alwas out of reset & under the power
+		*/
+		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_LOW>;
+		rst-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
+		mclk = <25000000>;
+		mclk_source = <0>;
+		port {
+		    ov5640_mipi1_ep: endpoint {
+			remote-endpoint = <&mipi1_sensor_ep>;
+		    };
+		};
+	};
+
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
+sbc_i2c_lvds: &i2c2 {
+	status = "okay";
+};
+
+&pcie0 {
+	reset-gpio = <&pca9555 0 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&uart1 { /* rs-485 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart1_rs485_hdx>;
+	assigned-clocks = <&clk IMX8MQ_CLK_UART1>;
+	assigned-clock-parents = <&clk IMX8MQ_CLK_25M>;
+	linux,rs485-enabled-at-boot-time;
+	rs485-rts-active-high;
+	rts-gpio = <&pca9555 6 0>;
+	status = "disabled";
+};
+
+&mipi_csi_1 {
+    #address-cells = <1>;
+    #size-cells = <0>;
+    status = "okay";
+    port {
+        mipi1_sensor_ep: endpoint@0 {
+            remote-endpoint = <&ov5640_mipi1_ep>;
+            data-lanes = <1 2>;
+        };
+
+        csi1_mipi_ep: endpoint@1 {
+            remote-endpoint = <&csi1_ep>;
+        };
+    };
+};
+
+&csi1_bridge {
+    fsl,mipi-mode;
+    fsl,two-8bit-sensor-mode;
+    status = "okay";
+
+    port {
+        csi1_ep: endpoint {
+            remote-endpoint = <&csi1_mipi_ep>;
+        };
+    };
+};
