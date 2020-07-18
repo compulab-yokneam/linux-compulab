@@ -54,20 +54,10 @@
             };
         };
 
-        port {
+        port@0 {
             sn65dsi83_in: endpoint {
-                remote-endpoint = <&mipi_dsi_bridge_out>;
+                remote-endpoint = <&mipi_dsi_out>;
             };
-        };
-    };
-};
-
-&mipi_dsi_bridge {
-    status = "okay";
-
-    port@1 {
-        mipi_dsi_bridge_out: endpoint {
-            remote-endpoint = <&sn65dsi83_in>;
         };
     };
 };

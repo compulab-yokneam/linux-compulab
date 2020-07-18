@@ -16,11 +16,3 @@
 #include "compulab-imx8mq-lvds-mipi.dtsi"
 #include "compulab-imx8mq-mipi-lcdif.dtsi"
 #include "compulab-imx8mq-goodix.dtsi"
-
-&dcss {
-	status = "disabled";
-};
-
-&hdmi {
-	status = "disabled";
-};

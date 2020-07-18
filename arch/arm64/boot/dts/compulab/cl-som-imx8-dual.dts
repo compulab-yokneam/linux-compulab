@@ -56,48 +56,57 @@
             };
         };
 
-        port {
+        port@0 {
             sn65dsi83_in: endpoint {
-                remote-endpoint = <&mipi_dsi_bridge_out>;
+                remote-endpoint = <&mipi_dsi_out>;
             };
         };
     };
 };
 
 &lcdif {
-    status = "okay";
-    max-res = <1280>, <800>;
+	status = "okay";
+	max-memory-bandwidth = <314676293>; /* 1280x1024-32@60 */
 
-    port@0 {
-        lcdif_mipi_dsi: mipi-dsi-endpoint {
-            remote-endpoint = <&mipi_dsi_in>;
-        };
-    };
-};
+	assigned-clocks = <&clk IMX8MQ_CLK_LCDIF_PIXEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1_BYPASS>,
+			  <&clk IMX8MQ_VIDEO_PLL1_REF_SEL>,
+			  <&clk IMX8MQ_VIDEO_PLL1>;
+	assigned-clock-parents = <&clk IMX8MQ_VIDEO_PLL1_OUT>,
+				 <&clk IMX8MQ_VIDEO_PLL1>,
+				 <&clk IMX8MQ_CLK_27M>;
+	assigned-clock-rate = <126000000>, <0>, <0>, <1134000000>;
 
-&mipi_dsi_phy {
-    status = "okay";
+	port@0 {
+		lcdif_out: endpoint {
+			remote-endpoint = <&mipi_dsi_in>;
+		};
+	};
 };
 
 &mipi_dsi {
     status = "okay";
-    as_bridge;
-    sync-pol = <1>;
-    pwr-delay = <10>;
 
-    port@1 {
-        mipi_dsi_in: endpoint {
-            remote-endpoint = <&lcdif_mipi_dsi>;
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+        port@0 {
+            reg = <0>;
+            mipi_dsi_in: endpoint {
+                remote-endpoint = <&lcdif_out>;
+            };
+        };
+
+        port@1 {
+            reg = <1>;
+            mipi_dsi_out: endpoint {
+                remote-endpoint = <&sn65dsi83_in>;
+            };
         };
     };
 };
 
-&mipi_dsi_bridge {
-    status = "okay";
-
-    port@1 {
-        mipi_dsi_bridge_out: endpoint {
-            remote-endpoint = <&sn65dsi83_in>;
-        };
-    };
+&dphy {
+	status = "okay";
 };

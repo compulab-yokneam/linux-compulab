@@ -7,6 +7,8 @@ dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-dp.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-m4.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-no-wp.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-emmc-low.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-lvds-lcdif.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-imx8-lvds-dcss.dtb
 
 always		:= $(dtb-y)
 subdir-y	:= $(dts-dirs)
