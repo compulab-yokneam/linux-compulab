@@ -28,6 +28,18 @@
 			linux,default-trigger = "heartbeat";
 		};
 	};
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		rpmsg_reserved: rpmsg@0xb8000000 {
+			no-map;
+			reg = <0 0xb8000000 0 0x400000>;
+		};
+	};
+
 	//Fake regulator provides WL_REG_ON signal for wireless interface
 	wlreg_on: wlregon-regulator {
 		compatible = "regulator-fixed";
