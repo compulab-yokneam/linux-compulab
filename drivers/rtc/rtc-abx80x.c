@@ -644,8 +644,17 @@ static char const *const SQFS[SQFS_COUNT] = { "1_century", "32768_Hz", "8192_Hz"
 				"1/2_Hz", "1/4_Hz", "1/8_Hz", "1/16_Hz",
 				"1/32_Hz", "1_min", "16384_Hz", "100_Hz",
 				"1_hour", "1_day", "TIRQ", "nTIRQ",
-				"1_year", "1_Hz_to_Counters",
-				"1/32_Hz_from_Acal", "1/8_Hz_from_Acal"
+				"1_year", "1_Hz_to_Counters", "1/32_Hz_from_Acal", "1/8_Hz_from_Acal",
+};
+
+static const bool valid_for_rc_mode [SQFS_COUNT] = { true, false, false, false,
+				false, false, false, false,
+				true, true, true, true,
+				true, true, true, true,
+				true, true, true, true,
+				true, true, false, false,
+				true, true, true, true,
+				true, true, true, true,
 };
 
 static int sqw_set(struct i2c_client *client, const char *buf)
@@ -661,6 +670,9 @@ static int sqw_set(struct i2c_client *client, const char *buf)
 
 		if( 0 > idx )
 			return idx;
+
+		if(abx80x_is_rc_mode(client) && !valid_for_rc_mode[idx])
+			dev_warn(&client->dev, "sqw frequency %s is valid only in xt mode\n", SQFS[idx]);
 
 		dev_info(&client->dev, "sqw output enabled @ %s\n",SQFS[idx]);
 		reg &= ~((1 << ABX8XX_REG_SQW_MODE_BITS) - 1);
@@ -1125,6 +1137,8 @@ static int abx80x_probe(struct i2c_client *client)
 
 	if (!of_property_read_string(np, "sqw", &sqw_mode_name))
 		sqw_set(client, sqw_mode_name);
+	else
+		sqw_set(client, "none");
 
 	err = i2c_smbus_write_byte_data(client, ABX8XX_REG_CD_TIMER_CTL,
 					BIT(2));
