@@ -34,6 +34,10 @@
 		};
 	};
 
+	soc@0 {
+		dma-ranges = <0x40000000 0x0 0x40000000 0xc0000000>;
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
