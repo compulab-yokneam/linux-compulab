@@ -57,6 +57,10 @@
 #define ABX8XX_REG_SQW_MODE_BITS	5
 #define ABX8XX_REG_SQW_EN		BIT(7)
 
+#define ABX8XX_REG_CAL_XT		0x14
+#define ABX8XX_REG_CAL_XT_CMDX_SHIFT	7
+#define ABX8XX_REG_CAL_XT_OFFSETX_MASK	((1 << (ABX8XX_REG_CAL_XT_CMDX_SHIFT)) - 1)
+
 #define ABX8XX_REG_CD_TIMER_CTL	0x18
 
 #define ABX8XX_REG_OSC		0x1c
@@ -70,6 +74,9 @@
 #define ABX8XX_REG_OSS		0x1d
 #define ABX8XX_OSS_OF		BIT(1)
 #define ABX8XX_OSS_OMODE	BIT(4)
+#define ABX8XX_REG_OSS_XTCAL_SHIFT	6
+#define ABX8XX_REG_OSS_XTCAL_MASK	((1 << (ABX8XX_REG_OSS_XTCAL_SHIFT)) - 1)
+
 
 #define ABX8XX_REG_WDT		0x1b
 #define ABX8XX_WDT_WDS		BIT(7)
@@ -112,6 +119,7 @@ struct abx80x_cap {
 	u16 pn;
 	bool has_tc;
 	bool has_wdog;
+	bool has_atk; /* Has advanced timekeeping */
 };
 
 static struct abx80x_cap abx80x_caps[] = {
@@ -122,7 +130,7 @@ static struct abx80x_cap abx80x_caps[] = {
 	[AB1801] = {.pn = 0x1801},
 	[AB1803] = {.pn = 0x1803},
 	[AB1804] = {.pn = 0x1804, .has_tc = true, .has_wdog = true},
-	[AB1805] = {.pn = 0x1805, .has_tc = true, .has_wdog = true},
+	[AB1805] = {.pn = 0x1805, .has_tc = true, .has_wdog = true, .has_atk = true},
 	[RV1805] = {.pn = 0x1805, .has_tc = true, .has_wdog = true},
 	[ABX80X] = {.pn = 0}
 };
@@ -502,6 +510,132 @@ static ssize_t oscillator_show(struct device *dev,
 
 static DEVICE_ATTR_RW(oscillator);
 
+static int const xt_freq_std = 32768000;
+
+static int xt_calibration_set(struct i2c_client *client,
+				u32 xt_freq)
+{
+	int retval, flags;
+	u8 reg;
+
+	long Adj;
+	u8 XTCAL, CMDX, OFFSETX;
+
+	Adj = (xt_freq_std - (int)xt_freq) * 16 / 1000;
+	if (Adj < -320 ) {
+		dev_err(&client->dev, "The XT oscillator is too fast to be adjusted\n");
+		return -ERANGE;
+	}
+	else if(Adj < -256 ) {
+		XTCAL = 3;
+		CMDX = 1;
+		OFFSETX = (Adj + 192) / 2;
+	}
+	else if(Adj < -192 ) {
+		XTCAL = 3;
+		CMDX = 0;
+		OFFSETX = Adj + 192;
+	}
+	else if(Adj < -128 ) {
+		XTCAL = 2;
+		CMDX = 0;
+		OFFSETX = Adj + 128;
+	}
+	else if(Adj < -64 ) {
+		XTCAL = 1;
+		CMDX = 0;
+		OFFSETX = Adj + 64;
+	}
+	else if(Adj < 64 ) {
+		XTCAL = 0;
+		CMDX = 0;
+		OFFSETX = Adj;
+	}
+	else if(Adj < 128 ) {
+		XTCAL = 0;
+		CMDX = 1;
+		OFFSETX = Adj / 2;
+	}
+	else {
+		dev_err(&client->dev, "The XT oscillator is too slow to be adjusted\n");
+		return -ERANGE;
+	}
+
+	reg = ABX8XX_REG_OSS;
+	retval = i2c_smbus_read_byte_data(client, reg);
+	if (retval < 0)
+		goto err;
+
+	flags = retval & ABX8XX_REG_OSS_XTCAL_MASK;
+	flags |= XTCAL << ABX8XX_REG_OSS_XTCAL_SHIFT;
+
+	retval = i2c_smbus_write_byte_data(client, reg, flags);
+	if (retval < 0)
+		goto err;
+
+	OFFSETX &= ABX8XX_REG_CAL_XT_OFFSETX_MASK;
+	OFFSETX |= CMDX << ABX8XX_REG_CAL_XT_CMDX_SHIFT;
+
+	reg = ABX8XX_REG_CAL_XT;
+	retval = i2c_smbus_write_byte_data(client, reg, OFFSETX);
+	if (retval < 0)
+		goto err;
+
+	return 0;
+err:
+	dev_err(&client->dev, "Failed to access register %x\n", reg);
+	return retval;
+
+}
+
+static ssize_t xt_calibration_store(struct device *dev,
+				struct device_attribute *attr,
+				const char *buf, size_t count)
+{
+	int retval;
+	unsigned long xt_freq;
+
+	retval = kstrtoul(buf, 10, &xt_freq);
+	if (retval < 0) {
+		dev_err(dev, "Invalid value of oscillator frequency\n");
+		return -EINVAL;
+	}
+
+	dev_info(dev,"xt osc drift is %li ppm\n", \
+			1000000l * ((long)xt_freq - xt_freq_std) / xt_freq_std);
+
+	retval = xt_calibration_set(to_i2c_client(dev->parent), xt_freq);
+	if(retval)
+		return retval;
+	return count;
+}
+
+static ssize_t xt_calibration_show(struct device *dev,
+				struct device_attribute *attr, char *buf)
+{
+	struct i2c_client *client = to_i2c_client(dev->parent);
+	u8 XTCAL, CMDX, OFFSETX;
+	int flags;
+
+	flags = i2c_smbus_read_byte_data(client, ABX8XX_REG_OSS);
+	if (flags < 0)
+		goto err;
+	XTCAL = flags >> ABX8XX_REG_OSS_XTCAL_SHIFT;
+	flags = i2c_smbus_read_byte_data(client, ABX8XX_REG_CAL_XT);
+	if (flags < 0)
+		goto err;
+	OFFSETX = flags & ABX8XX_REG_CAL_XT_OFFSETX_MASK;
+	CMDX = flags >> ABX8XX_REG_CAL_XT_CMDX_SHIFT;
+
+	return sprintf(buf, "XTCAL %x\nCMDX %x\nOFFSETX %x\n", XTCAL, CMDX, OFFSETX);
+err:
+	dev_err(dev, "Failed to read calibration data\n");
+	return sprintf(buf, "\n");
+	return flags;
+}
+
+static DEVICE_ATTR_RW(xt_calibration);
+
 #define SQFS_COUNT (1 << ABX8XX_REG_SQW_MODE_BITS)
 static char const *const SQFS[SQFS_COUNT] = { "1_century", "32768_Hz", "8192_Hz", "4096_Hz",
 				"2048_Hz", "1024_Hz", "512_Hz", "256_Hz",
@@ -590,6 +724,7 @@ static struct attribute *rtc_calib_attrs[] = {
 	&dev_attr_autocalibration.attr,
 	&dev_attr_oscillator.attr,
 	&dev_attr_sqw.attr,
+	&dev_attr_xt_calibration.attr,
 	NULL,
 };
 
@@ -869,6 +1004,7 @@ static int abx80x_probe(struct i2c_client *client)
 	unsigned int wafer;
 	unsigned int uid;
 	const char *sqw_mode_name;
+	unsigned int xt_freq;
 
 	if (!i2c_check_functionality(client->adapter, I2C_FUNC_I2C))
 		return -ENODEV;
@@ -981,6 +1117,14 @@ static int abx80x_probe(struct i2c_client *client)
 		dev_info(&client->dev, "Enabling trickle charger: %02x\n",
 			 trickle_cfg);
 		abx80x_enable_trickle_charger(client, trickle_cfg);
+	}
+
+	if (np && abx80x_caps[part].has_atk) {
+		if (!of_property_read_u32(np,"xt-frequency", &xt_freq)) {
+			dev_info(&client->dev, "Calibrate XT %d mHz:\n",
+			xt_freq);
+			xt_calibration_set(client, xt_freq);
+		}
 	}
 
 	if (!of_property_read_string(np, "sqw", &sqw_mode_name))
