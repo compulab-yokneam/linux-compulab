@@ -90,6 +90,9 @@
 #define ABX8XX_CFG_KEY_OSC	0xa1
 #define ABX8XX_CFG_KEY_MISC	0x9d
 
+#define ABX8XX_REG_BATMODE	0x27
+#define ABX8XX_BATMODE_IOBM	BIT(7)
+
 #define ABX8XX_REG_ID0		0x28
 
 #define ABX8XX_REG_OUT_CTRL	0x30
@@ -922,6 +925,35 @@ static int abx80x_setup_watchdog(struct abx80x_priv *priv)
 }
 #endif
 
+/* Disable bus (i2c or SPI) when the RTC is powered from battery */
+static int abx80x_setup_brownout_bus_cutoff(struct i2c_client *client)
+{
+	int reg, val;
+
+	reg = ABX8XX_REG_BATMODE;
+	val = i2c_smbus_read_byte_data(client, reg);
+	if(0 > val)
+		goto err;
+
+	if(!(val & ABX8XX_BATMODE_IOBM))
+		return 0; //Already set
+
+	reg = ABX8XX_REG_CFG_KEY;
+	val = i2c_smbus_write_byte_data(client, reg, ABX8XX_CFG_KEY_MISC);
+	if (val < 0)
+		goto err;
+
+	reg = ABX8XX_REG_BATMODE;
+	val = i2c_smbus_write_byte_data(client, reg, 0);
+	if (val < 0)
+		goto err;
+
+	return 0;
+err:
+	dev_err(&client->dev, "Failed to access register %x err %i\n", reg, val);
+	return val;
+}
+
 static int abx80x_nvmem_xfer(struct abx80x_priv *priv, unsigned int offset,
 			     void *val, size_t bytes, bool write)
 {
@@ -1140,6 +1172,10 @@ static int abx80x_probe(struct i2c_client *client)
 		sqw_set(client, sqw_mode_name);
 	else
 		sqw_set(client, "none");
+
+	err = abx80x_setup_brownout_bus_cutoff(client);
+	if (err)
+		return err;
 
 	err = i2c_smbus_write_byte_data(client, ABX8XX_REG_CD_TIMER_CTL,
 					BIT(2));
