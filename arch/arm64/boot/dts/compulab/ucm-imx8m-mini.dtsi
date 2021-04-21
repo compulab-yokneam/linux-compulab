@@ -85,6 +85,15 @@
 		compatible = "mmc-pwrseq-simple";
 		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
 	};
+
+	modem_reset: modem-reset {
+		compatible = "gpio-reset";
+		reset-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
+		reset-delay-us = <2000>;
+		reset-post-delay-ms = <40>;
+		#reset-cells = <0>;
+	};
+
 };
 
 &iomuxc {
@@ -96,9 +105,6 @@
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO10_GPIO1_IO10	0x19
 				MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16	0x190
-				/* BT */
-				MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7	0x19
-				MX8MM_IOMUXC_SD1_DATA6_GPIO2_IO8	0x19
 			>;
 		};
 
@@ -188,7 +194,6 @@
 				MX8MM_IOMUXC_ECSPI2_MOSI_UART4_DCE_TX    0x140
 				MX8MM_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B  0x140
 				MX8MM_IOMUXC_ECSPI2_SCLK_UART4_DCE_RX    0x140
-				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x19
 			>;
 		};
 
@@ -364,6 +369,14 @@
 		pinctrl_pwm_backlight: pwm_backlightgrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO13_PWM2_OUT	0x03
+			>;
+		};
+
+		pinctrl_bt: bt0grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x19 /* BT_REG_ON */
+				MX8MM_IOMUXC_SD1_DATA5_GPIO2_IO7	0x19 /* BT_DEV_WU */
+				MX8MM_IOMUXC_SD1_DATA6_GPIO2_IO8	0x19 /* BT_HST_WU */
 			>;
 		};
 	};
@@ -581,6 +594,25 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
 	status = "okay";
+};
+
+&uart4 { /* bluetooth */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+	uart-has-rtscts;
+	status = "okay";
+
+	bluetooth {
+		compatible = "brcm,bcm4330-bt";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_bt>;
+		max-speed = <3000000>;
+		device-wakeup-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+		host-wakeup-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
+		shutdown-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+	};
 };
 
 &usdhc2 {
