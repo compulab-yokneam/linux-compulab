@@ -470,11 +470,12 @@
 	clocks = <&clk IMX8MQ_CLK_PCIE2_ROOT>,
 		 <&clk IMX8MQ_CLK_PCIE2_AUX>,
 		 <&clk IMX8MQ_CLK_PCIE2_PHY>,
-		 <&pcie1_refclk>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+		 <&pcie1_refclk>,
+		 <&clk IMX8MQ_CLK_CLK2_CG>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus", "pcie_ext_src";
 	ext_osc = <0>;
 	hard-wired = <1>;
-	status = "disabled";
+	status = "okay";
 };
 
 &fec1 {
