@@ -91,6 +91,17 @@ static const struct fb_videomode vga_mode = {
 	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, FB_MODE_IS_VESA,
 };
 
+static const struct fb_videomode vga_mode0 = {
+	NULL, 60, 1024, 768, 15598, 160, 56, 23, 1, 104, 3,
+	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_4_3, FB_MODE_IS_VESA,
+};
+
+static const struct fb_videomode vga_mode1 = {
+	NULL, 60, 1280, 1024, 9184, 216, 80, 32, 1, 136, 3,
+	FB_SYNC_HOR_HIGH_ACT | FB_SYNC_VERT_HIGH_ACT,
+	FB_VMODE_NONINTERLACED | FB_VMODE_ASPECT_16_9, 0
+};
+
 enum hdmi_datamap {
 	RGB444_8B = 0x01,
 	RGB444_10B = 0x03,
@@ -1788,6 +1799,8 @@ static void mxc_hdmi_edid_rebuild_modelist(struct mxc_hdmi *hdmi)
 
 	fb_destroy_modelist(&hdmi->fbi->modelist);
 	fb_add_videomode(&vga_mode, &hdmi->fbi->modelist);
+	fb_add_videomode(&vga_mode1, &hdmi->fbi->modelist);
+	fb_add_videomode(&vga_mode0, &hdmi->fbi->modelist);
 
 	for (i = 0; i < hdmi->fbi->monspecs.modedb_len; i++) {
 		/*
