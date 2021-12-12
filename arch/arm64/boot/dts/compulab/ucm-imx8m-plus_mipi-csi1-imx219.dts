@@ -1,0 +1,57 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2021 CompuLab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus.dts"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+/delete-node/ &ar1335_af_mipi1;
+
+&i2c5 {
+	imx219_mipi1: imx219_mipi1@10 {
+		compatible = "sony,imx219";
+		reg = <0x10>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		csi_id = <0>;
+		reset-gpios = <&pca9555 12 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		status = "disabled";
+
+		port {
+			imx219_mipi1_ep: endpoint {
+				data-lanes = <1 2>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <456000000>;
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+&mipi1_sensor_ep {
+	data-lanes = <2>;
+	remote-endpoint = <&imx219_mipi1_ep>;
+};
+
+&imx219_mipi1 {
+	status = "okay";
+};
+
+&mipi_csi_0 {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+};

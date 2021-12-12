@@ -122,4 +122,6 @@ source "drivers/staging/hikey9xx/Kconfig"
 
 source "drivers/staging/fsl_ppfe/Kconfig"
 
+source "drivers/staging/em9190/Kconfig"
+
 endif # STAGING

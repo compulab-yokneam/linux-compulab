@@ -1,0 +1,6 @@
+#
+# E-CON SYSTEM INDIA PRIVATE LIMITED
+# AR1335 MCU camera module
+#
+
+obj-$(CONFIG_MXC_CAMERA_AR1335_MIPI_AF) += ar1335_af.o

@@ -1026,47 +1026,29 @@ static int imx219_start_streaming(struct imx219 *imx219)
 	const struct imx219_reg_list *reg_list;
 	int ret;
 
-	ret = pm_runtime_get_sync(&client->dev);
-	if (ret < 0) {
-		pm_runtime_put_noidle(&client->dev);
-		return ret;
-	}
-
 	/* Apply default values of current mode */
 	reg_list = &imx219->mode->reg_list;
 	ret = imx219_write_regs(imx219, reg_list->regs, reg_list->num_of_regs);
 	if (ret) {
 		dev_err(&client->dev, "%s failed to set mode\n", __func__);
-		goto err_rpm_put;
+		return ret;
 	}
 
 	ret = imx219_set_framefmt(imx219);
 	if (ret) {
 		dev_err(&client->dev, "%s failed to set frame format: %d\n",
 			__func__, ret);
-		goto err_rpm_put;
+		return ret;
 	}
 
 	/* Apply customized values from user */
 	ret =  __v4l2_ctrl_handler_setup(imx219->sd.ctrl_handler);
 	if (ret)
-		goto err_rpm_put;
+		return ret;
 
 	/* set stream on register */
-	ret = imx219_write_reg(imx219, IMX219_REG_MODE_SELECT,
-			       IMX219_REG_VALUE_08BIT, IMX219_MODE_STREAMING);
-	if (ret)
-		goto err_rpm_put;
-
-	/* vflip and hflip cannot change during streaming */
-	__v4l2_ctrl_grab(imx219->vflip, true);
-	__v4l2_ctrl_grab(imx219->hflip, true);
-
-	return 0;
-
-err_rpm_put:
-	pm_runtime_put(&client->dev);
-	return ret;
+	return imx219_write_reg(imx219, IMX219_REG_MODE_SELECT,
+				IMX219_REG_VALUE_08BIT, IMX219_MODE_STREAMING);
 }
 
 static void imx219_stop_streaming(struct imx219 *imx219)
@@ -1079,16 +1061,12 @@ static void imx219_stop_streaming(struct imx219 *imx219)
 			       IMX219_REG_VALUE_08BIT, IMX219_MODE_STANDBY);
 	if (ret)
 		dev_err(&client->dev, "%s failed to set stream\n", __func__);
-
-	__v4l2_ctrl_grab(imx219->vflip, false);
-	__v4l2_ctrl_grab(imx219->hflip, false);
-
-	pm_runtime_put(&client->dev);
 }
 
 static int imx219_set_stream(struct v4l2_subdev *sd, int enable)
 {
 	struct imx219 *imx219 = to_imx219(sd);
+	struct i2c_client *client = v4l2_get_subdevdata(sd);
 	int ret = 0;
 
 	mutex_lock(&imx219->mutex);
@@ -1098,23 +1076,36 @@ static int imx219_set_stream(struct v4l2_subdev *sd, int enable)
 	}
 
 	if (enable) {
+		ret = pm_runtime_get_sync(&client->dev);
+		if (ret < 0) {
+			pm_runtime_put_noidle(&client->dev);
+			goto err_unlock;
+		}
+
 		/*
 		 * Apply default & customized values
 		 * and then start streaming.
 		 */
 		ret = imx219_start_streaming(imx219);
 		if (ret)
-			goto err_unlock;
+			goto err_rpm_put;
 	} else {
 		imx219_stop_streaming(imx219);
+		pm_runtime_put(&client->dev);
 	}
 
 	imx219->streaming = enable;
+
+	/* vflip and hflip cannot change during streaming */
+	__v4l2_ctrl_grab(imx219->vflip, enable);
+	__v4l2_ctrl_grab(imx219->hflip, enable);
 
 	mutex_unlock(&imx219->mutex);
 
 	return ret;
 
+err_rpm_put:
+	pm_runtime_put(&client->dev);
 err_unlock:
 	mutex_unlock(&imx219->mutex);
 
@@ -1240,7 +1231,13 @@ static int imx219_identify_module(struct imx219 *imx219)
 	return 0;
 }
 
+static int v4l2_s_power(struct v4l2_subdev *sd, int on)
+{
+	return 0;
+
+}
 static const struct v4l2_subdev_core_ops imx219_core_ops = {
+	.s_power	= v4l2_s_power,
 	.subscribe_event = v4l2_ctrl_subdev_subscribe_event,
 	.unsubscribe_event = v4l2_event_subdev_unsubscribe,
 };
@@ -1430,6 +1427,24 @@ error_out:
 	return ret;
 }
 
+/**
+ * camera_link_setup
+ *
+ * Note: Function is needed by imx8mp
+ *
+ * Returns always zero
+ */
+static int imx219_camera_link_setup(struct media_entity *entity,
+				    const struct media_pad *local,
+				    const struct media_pad *remote, u32 flags)
+{
+	return 0;
+}
+
+static const struct media_entity_operations imx219_camera_sd_media_ops = {
+	.link_setup = imx219_camera_link_setup,
+};
+
 static int imx219_probe(struct i2c_client *client)
 {
 	struct device *dev = &client->dev;
@@ -1510,6 +1525,7 @@ static int imx219_probe(struct i2c_client *client)
 	imx219->sd.internal_ops = &imx219_internal_ops;
 	imx219->sd.flags |= V4L2_SUBDEV_FL_HAS_DEVNODE;
 	imx219->sd.entity.function = MEDIA_ENT_F_CAM_SENSOR;
+	imx219->sd.entity.ops = &imx219_camera_sd_media_ops;
 
 	/* Initialize source pad */
 	imx219->pad.flags = MEDIA_PAD_FL_SOURCE;

@@ -261,6 +261,7 @@ struct mxc_mipi_csi2_dev {
 	u8 data_lanes[4];
 	u8 vchannel;
 	u8 running;
+	u8 ar1335_mipi;
 };
 
 enum mxc_mipi_csi2_pm_state {

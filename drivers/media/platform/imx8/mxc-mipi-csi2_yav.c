@@ -289,10 +289,69 @@ static int mipi_csi2_open(struct v4l2_subdev *sd, struct v4l2_subdev_fh *fh)
 
 /*
  * V4L2 subdev operations
+ *
+ * NOTE: The control related ioctls have been introduced as a work around to
+ * support controls. The proper way to support controls is via the control
+ * handler API.
  */
+static int mipi_csi2_querymenu(struct v4l2_subdev *sd, struct v4l2_querymenu *qm)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, querymenu, qm);
+}
+
+static int mipi_csi2_queryctrl(struct v4l2_subdev *sd, struct v4l2_queryctrl *qc)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, queryctrl, qc);
+}
+
+static int mipi_csi2_g_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, g_ctrl, ctrl);
+}
+
+static int mipi_csi2_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, s_ctrl, ctrl);
+}
+
+static int mipi_csi2_g_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, g_ext_ctrls, ctrls);
+}
+
+static int mipi_csi2_try_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, try_ext_ctrls, ctrls);
+}
+
+static int mipi_csi2_s_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	return v4l2_subdev_call(csi2dev->sensor_sd, core, s_ext_ctrls, ctrls);
+}
+
 static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 {
-	return 0;
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sensor_sd;
+	int ret = 0;
+
+	sensor_sd = csi2dev->sensor_sd;
+	if (sensor_sd == NULL)
+	{
+		return -EINVAL;
+	}
+
+	if (sensor_sd->ops && v4l2_subdev_has_op(sensor_sd, core, s_power))
+		ret = v4l2_subdev_call(sensor_sd, core, s_power, on);
+
+	return ret;
 }
 
 static int mipi_csi2_s_stream(struct v4l2_subdev *sd, int enable)
@@ -383,11 +442,19 @@ static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
 	if (fmt->pad)
 		return -EINVAL;
 
-	if (fmt->format.width * fmt->format.height > 720 * 480) {
+	if (csi2dev->ar1335_mipi)
+	{
 		csi2dev->hs_settle = rxhs_settle[1];
-	} else {
-		csi2dev->hs_settle = rxhs_settle[0];
 	}
+	else
+	{
+		if (fmt->format.width * fmt->format.height > 720 * 480) {
+			csi2dev->hs_settle = rxhs_settle[1];
+		} else {
+			csi2dev->hs_settle = rxhs_settle[0];
+		}
+	}
+
 	csi2dev->send_level = 64;
 
 	return v4l2_subdev_call(sensor_sd, pad, set_fmt, NULL, fmt);
@@ -423,6 +490,13 @@ static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
 
 static struct v4l2_subdev_core_ops mipi_csi2_core_ops = {
 	.s_power = mipi_csi2_s_power,
+	.queryctrl = mipi_csi2_queryctrl,
+	.g_ctrl = mipi_csi2_g_ctrl,
+	.s_ctrl = mipi_csi2_s_ctrl,
+	.g_ext_ctrls = mipi_csi2_g_ext_ctrls,
+	.s_ext_ctrls = mipi_csi2_s_ext_ctrls,
+	.try_ext_ctrls = mipi_csi2_try_ext_ctrls,
+	.querymenu = mipi_csi2_querymenu,
 };
 
 static struct v4l2_subdev_video_ops mipi_csi2_video_ops = {
@@ -448,6 +522,11 @@ static int mipi_csi2_parse_dt(struct mxc_mipi_csi2_dev *csi2dev)
 	csi2dev->id = of_alias_get_id(node, "csi");
 
 	csi2dev->vchannel = of_property_read_bool(node, "virtual-channel");
+
+	/*
+	 * Add a flag to identify the AR1335 device tree
+	 */
+	csi2dev->ar1335_mipi = of_property_read_bool(node, "ar1335-mipi-csi");
 
 	node = of_graph_get_next_endpoint(node, NULL);
 	if (!node) {

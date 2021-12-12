@@ -1,0 +1,7 @@
+ACTION=="add" KERNEL=="????_??.??.??_DUN", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhitty.ko"
+ACTION=="add" KERNEL=="????_??.??.??_DIAG", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhitty.ko"
+ACTION=="add" KERNEL=="????_??.??.??_MBIM", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhiuci.ko"
+ACTION=="add" KERNEL=="????_??.??.??_QMI0", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhiuci.ko"
+ACTION=="add" KERNEL=="????_??.??.??_IP_HW0", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhinet.ko"
+ACTION=="add" KERNEL=="????_??.??.??_SAHARA", SUBSYSTEM=="mhi", RUN+="/sbin/insmod /lib/modules/KERNEL_VERSION/kernel/drivers/pci/mhitty.ko"
+
