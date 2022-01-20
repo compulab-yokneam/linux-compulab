@@ -613,14 +613,17 @@
 	status = "okay";
 };
 
+/* mipi dsi */
 &lcdif1 {
 	status = "okay";
 };
 
+/* lvds */
 &lcdif2 {
 	status = "okay";
 };
 
+/* hdmi */
 &lcdif3 {
 	status = "okay";
 
