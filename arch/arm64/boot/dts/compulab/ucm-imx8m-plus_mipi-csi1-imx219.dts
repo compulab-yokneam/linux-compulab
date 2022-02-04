@@ -12,8 +12,6 @@
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
 };
 
-/delete-node/ &ar1335_af_mipi1;
-
 &i2c5 {
 	imx219_mipi1: imx219_mipi1@10 {
 		compatible = "sony,imx219";
@@ -39,16 +37,25 @@
 	};
 };
 
-&mipi1_sensor_ep {
-	data-lanes = <2>;
-	remote-endpoint = <&imx219_mipi1_ep>;
-};
-
 &imx219_mipi1 {
 	status = "okay";
 };
 
 &mipi_csi_0 {
+	status = "okay";
+	port@0 {
+		reg = <0>;
+		mipi1_sensor_ep: endpoint@1 {
+			remote-endpoint = <&imx219_mipi1_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <23>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+	};
+};
+
+&cameradev {
 	status = "okay";
 };
 
