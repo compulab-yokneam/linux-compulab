@@ -79,6 +79,7 @@
 		regulator-always-on;
 		enable-active-high;
 		startup-delay-us = <500>;
+		regulator-boot-on;
 	};
 
 	usdhc1_pwrseq: usdhc1_pwrseq {
