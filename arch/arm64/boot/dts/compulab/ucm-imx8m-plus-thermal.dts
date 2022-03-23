@@ -15,17 +15,9 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus.dts"
+#include "compulab-imx8m-plus-thermal.dtsi"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus (thermal)";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
 };
-
-&cpu_alert0 {
-	temperature = <125000>;
-};
-
-&cpu_crit0 {
-	temperature = <155000>;
-};
-
