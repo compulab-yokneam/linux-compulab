@@ -20,7 +20,7 @@
 		pinctrl-0 = <&pinctrl_csi_mclk>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		csi_id = <0>;
-		reset-gpios = <&pca9555 12 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
 		mipi_csi;
@@ -28,6 +28,7 @@
 
 		port {
 			imx219_mipi1_ep: endpoint {
+				clock-lanes = <0>;
 				data-lanes = <1 2>;
 				clock-noncontinuous;
 				link-frequencies = /bits/ 64 <456000000>;
