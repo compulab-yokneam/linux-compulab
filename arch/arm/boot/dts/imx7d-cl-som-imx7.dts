@@ -187,7 +187,6 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
 	fsl,magic-packet;
-	phy-reset-gpios = <&pca9555 4 GPIO_ACTIVE_LOW>; /* FEC2 Phy nReset */
 	status = "okay";
 
 	mdio {
@@ -196,12 +195,12 @@
 
 		ethphy0: ethernet-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <0>;
+			reg = <4>;
 		};
 
 		ethphy1: ethernet-phy@1 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <1>;
+			reg = <5>;
 		};
 	};
 };
