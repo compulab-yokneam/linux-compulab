@@ -92,6 +92,7 @@
                 regulator-min-microvolt = <3300000>;
                 regulator-max-microvolt = <3300000>;
                 gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
+                regulator-boot-on;
                 enable-active-high;
                 regulator-always-on;
         };
@@ -867,11 +868,11 @@
 		>;
 	};
 
-        pinctrl_enet_rst: enet1rst {
-                fsl,pins = <
-			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10     0x19
-                >;
-        };
+    pinctrl_enet_rst: enet1rst {
+        fsl,pins = <
+            MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10     0x19
+        >;
+    };
 
 	pinctrl_pwm1: pwm1grp {
 		fsl,pins = <
