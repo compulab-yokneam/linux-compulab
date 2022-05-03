@@ -820,7 +820,7 @@
 	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
 	bus-width = <4>;
 	non-removable;
-	status = "okay";
+	status = "disabled";
 };
 
 &usdhc2 {
