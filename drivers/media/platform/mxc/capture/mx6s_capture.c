@@ -50,7 +50,7 @@
 #define MX6S_CAM_VERSION "0.0.1"
 #define MX6S_CAM_DRIVER_DESCRIPTION "i.MX6S_CSI"
 
-#define MAX_VIDEO_MEM 64
+#define MAX_VIDEO_MEM 160
 
 /* reset values */
 #define CSICR1_RESET_VAL	0x40000800
@@ -340,6 +340,7 @@ struct mx6s_csi_dev {
 
 	bool csi_mipi_mode;
 	bool csi_two_8bit_sensor_mode;
+	bool cam_csi_bridge;
 	const struct mx6s_csi_soc *soc;
 	struct mx6s_csi_mux csi_mux;
 };
@@ -865,7 +866,20 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 
 		switch (csi_dev->fmt->pixelformat) {
 		case V4L2_PIX_FMT_UYVY:
+			if (csi_dev->cam_csi_bridge)
+			{
+				cr18 &= ~BIT_MIPI_DOUBLE_CMPNT;
+				cr18 &= ~BIT_MIPI_YU_SWAP;
+			}
+			cr18 |= BIT_MIPI_DATA_FORMAT_YUV422_8B;
+			break;
 		case V4L2_PIX_FMT_YUYV:
+			if (csi_dev->cam_csi_bridge)
+			{
+				cr18 |= BIT_MIPI_DOUBLE_CMPNT;
+
+				cr18 |= BIT_MIPI_YU_SWAP;
+			}
 			cr18 |= BIT_MIPI_DATA_FORMAT_YUV422_8B;
 			break;
 		case V4L2_PIX_FMT_SBGGR8:
@@ -1132,7 +1146,7 @@ static irqreturn_t mx6s_csi_irq_handler(int irq, void *data)
 		csi_write(csi_dev, cr18, CSI_CSICR18);
 
 		csi_dev->skipframe = 1;
-		pr_debug("base address switching Change Err.\n");
+		pr_info("base address switching Change Err.\n");
 	}
 
 	if ((status & BIT_DMA_TSF_DONE_FB1) &&
@@ -1269,13 +1283,19 @@ static struct v4l2_file_operations mx6s_csi_fops = {
 static int mx6s_vidioc_enum_input(struct file *file, void *priv,
 				 struct v4l2_input *inp)
 {
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
 	if (inp->index != 0)
 		return -EINVAL;
 
 	/* default is camera */
 	inp->type = V4L2_INPUT_TYPE_CAMERA;
 	strcpy(inp->name, "Camera");
-
+	if (csi_dev->cam_csi_bridge){
+		if (!v4l2_subdev_has_op(sd, video, s_std))
+			inp->capabilities &= ~V4L2_IN_CAP_STD;
+	}
 	return 0;
 }
 
@@ -1476,8 +1496,37 @@ static int mx6s_vidioc_g_fmt_vid_cap(struct file *file, void *priv,
 				    struct v4l2_format *f)
 {
 	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+	struct v4l2_subdev_format format = {
+		.which = V4L2_SUBDEV_FORMAT_ACTIVE,
+	};
+	int ret;
 
 	WARN_ON(priv != file->private_data);
+
+	if (csi_dev->cam_csi_bridge){
+	/*
+	 * Get the format information from the subdev
+	 */
+		ret = v4l2_subdev_call(sd, pad, get_fmt, NULL, &format);
+		if (ret) {
+			pr_info("Error in getting format. ret = %d\n", ret);
+			return ret;
+		}
+		else {
+			struct v4l2_pix_format *pix = &csi_dev->pix;
+			struct mx6s_fmt *fmt;
+
+			v4l2_fill_pix_format(pix, &format.format);
+			if (pix->field != V4L2_FIELD_INTERLACED)
+				pix->field = V4L2_FIELD_NONE;
+
+			fmt = format_by_mbus(format.format.code);
+			pix->pixelformat = fmt->pixelformat;
+			pix->sizeimage = fmt->bpp * pix->height * pix->width;
+			pix->bytesperline = fmt->bpp * pix->width;
+		}
+	}
 
 	f->fmt.pix = csi_dev->pix;
 
@@ -1623,6 +1672,10 @@ static int mx6s_vidioc_enum_framesizes(struct file *file, void *priv,
 	int ret;
 
 	fmt = format_by_fourcc(fsize->pixel_format);
+
+	if(fmt == NULL)
+		return -EINVAL;
+
 	if (fmt->pixelformat != fsize->pixel_format)
 		return -EINVAL;
 	fse.code = fmt->mbus_code;
@@ -1665,6 +1718,10 @@ static int mx6s_vidioc_enum_frameintervals(struct file *file, void *priv,
 	int ret;
 
 	fmt = format_by_fourcc(interval->pixel_format);
+
+	if(fmt == NULL)
+		return -EINVAL;
+
 	if (fmt->pixelformat != interval->pixel_format)
 		return -EINVAL;
 	fie.code = fmt->mbus_code;
@@ -1676,6 +1733,102 @@ static int mx6s_vidioc_enum_frameintervals(struct file *file, void *priv,
 	interval->discrete = fie.interval;
 	return 0;
 }
+
+#ifdef CONFIG_VIDEO_ECAM
+static int mx6s_vidioc_queryctrl(struct file *file, void *priv,
+                             struct v4l2_queryctrl *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, queryctrl, a);
+}
+
+static int mx6s_vidioc_query_ext_ctrl(struct file *file, void *priv,
+                             struct v4l2_query_ext_ctrl *qec)
+{
+        struct v4l2_queryctrl qc = {
+                .id = qec->id
+        };
+        int ret;
+
+	ret = mx6s_vidioc_queryctrl(file, priv, &qc);
+
+        if (ret)
+                return ret;
+	
+        qec->id = qc.id;
+        qec->type = qc.type;
+        strlcpy(qec->name, qc.name, sizeof(qec->name));
+        qec->maximum = qc.maximum;
+        qec->minimum = qc.minimum;
+        qec->step = qc.step;
+        qec->default_value = qc.default_value;
+        qec->flags = qc.flags;
+        qec->elem_size = 4;
+        qec->elems = 1;
+        qec->nr_of_dims = 0;
+        memset(qec->dims, 0, sizeof(qec->dims));
+        memset(qec->reserved, 0, sizeof(qec->reserved));
+
+        return 0;
+}
+
+static int mx6s_vidioc_querymenu(struct file *file, void *priv,
+                             struct v4l2_querymenu *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, querymenu, a);
+}
+
+static int mx6s_vidioc_g_ctrl(struct file *file, void *priv,
+                             struct v4l2_control *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, g_ctrl, a);
+}
+
+static int mx6s_vidioc_s_ctrl(struct file *file, void *priv,
+                             struct v4l2_control *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, s_ctrl, a);
+}
+
+static int mx6s_vidioc_g_ext_ctrls(struct file *file, void *priv,
+                             struct v4l2_ext_controls *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, g_ext_ctrls, a);
+}
+
+static int mx6s_vidioc_s_ext_ctrls(struct file *file, void *priv,
+                             struct v4l2_ext_controls *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, s_ext_ctrls, a);
+}
+
+static int mx6s_vidioc_try_ext_ctrls(struct file *file, void *priv,
+                             struct v4l2_ext_controls *a)
+{
+        struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+        struct v4l2_subdev *sd = csi_dev->sd;
+
+        return v4l2_subdev_call(sd, core, try_ext_ctrls, a);
+}
+
+#endif
 
 static const struct v4l2_ioctl_ops mx6s_csi_ioctl_ops = {
 	.vidioc_querycap          = mx6s_vidioc_querycap,
@@ -1703,6 +1856,16 @@ static const struct v4l2_ioctl_ops mx6s_csi_ioctl_ops = {
 	.vidioc_s_parm        = mx6s_vidioc_s_parm,
 	.vidioc_enum_framesizes = mx6s_vidioc_enum_framesizes,
 	.vidioc_enum_frameintervals = mx6s_vidioc_enum_frameintervals,
+#ifdef CONFIG_VIDEO_ECAM
+        .vidioc_queryctrl       = mx6s_vidioc_queryctrl,
+        .vidioc_query_ext_ctrl  = mx6s_vidioc_query_ext_ctrl,
+        .vidioc_querymenu       = mx6s_vidioc_querymenu,
+        .vidioc_g_ctrl          = mx6s_vidioc_g_ctrl,
+        .vidioc_s_ctrl          = mx6s_vidioc_s_ctrl,
+        .vidioc_g_ext_ctrls     = mx6s_vidioc_g_ext_ctrls,
+        .vidioc_s_ext_ctrls     = mx6s_vidioc_s_ext_ctrls,
+        .vidioc_try_ext_ctrls   = mx6s_vidioc_try_ext_ctrls
+#endif
 };
 
 static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
@@ -1890,6 +2053,12 @@ static int mx6s_csi_probe(struct platform_device *pdev)
 
 	mx6s_csi_mode_sel(csi_dev);
 	mx6s_csi_two_8bit_sensor_mode_sel(csi_dev);
+
+	/*
+	* Add a flag to identify the cam device tree
+	*/
+	csi_dev->cam_csi_bridge =
+		of_property_read_bool(csi_dev->dev->of_node, "cam-csi-bridge");
 
 	of_id = of_match_node(mx6s_csi_dt_ids, csi_dev->dev->of_node);
 	if (!of_id)
