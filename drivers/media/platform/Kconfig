@@ -222,6 +222,8 @@ config VIDEO_TI_CAL_MC
 
 endif # VIDEO_TI_CAL
 
+if VIDEO_MX8_CAPTURE
+
 config VIDEO_ECAM
         tristate "e-con camera sensor support"
         depends on I2C && VIDEO_V4L2 && VIDEO_V4L2_SUBDEV_API
@@ -231,6 +233,10 @@ config VIDEO_ECAM
 
           To compile this driver as a module, choose M here: the module
           will be called based on sensor name.
+
+source "drivers/media/platform/imx8/ecam/Kconfig"
+
+endif # VIDEO_MX8_CAPTURE
 
 endif # V4L_PLATFORM_DRIVERS
 
