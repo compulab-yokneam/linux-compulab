@@ -80,6 +80,16 @@
 			regulator-max-microvolt = <3300000>;
 		};
 
+		phy_nreset: regulator-phy-nreset {
+			compatible = "regulator-fixed";
+			regulator-name = "regulator-phy-nreset"
+			regulator-min-microvolt = <3300000>;
+			regulator-max-microvolt = <3300000>;
+			gpio = <&gpio2 8 0>;
+			enable-active-high;
+			regulator-boot-on;
+			regulator-always-on;
+		};
 	};
 
 	pu_dummy: pudummy_reg {
@@ -588,7 +598,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_enet>;
 	phy-mode = "rgmii";
-	phy-reset-gpios = <&gpio2 8 0>;
 	status = "okay";
 };
 
