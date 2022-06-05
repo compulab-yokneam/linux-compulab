@@ -9,6 +9,9 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-nopcie.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-p21.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1.dtb
