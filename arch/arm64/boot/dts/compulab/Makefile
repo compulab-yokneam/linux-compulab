@@ -13,6 +13,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-nopcie.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-p21.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-uart1.dtb
+dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1.dtb
