@@ -800,12 +800,11 @@
 	status = "okay";
 };
 
-&uart1 { /* BT */
+&uart1 { /* console optional */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
-	fsl,uart-has-rtscts;
 	status = "okay";
 };
 
@@ -1136,10 +1135,8 @@
 
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX	0x140
-			MX8MP_IOMUXC_UART1_TXD__UART1_DCE_TX	0x140
-			MX8MP_IOMUXC_UART3_RXD__UART1_DCE_CTS	0x140
-			MX8MP_IOMUXC_UART3_TXD__UART1_DCE_RTS	0x140
+			MX8MP_IOMUXC_SAI2_RXFS__UART1_DCE_TX	0x49 /* P2-88/P20-18 */
+			MX8MP_IOMUXC_SD1_CMD__UART1_DCE_RX	0x49 /* P2-70/P20-17 */
 		>;
 	};
 
