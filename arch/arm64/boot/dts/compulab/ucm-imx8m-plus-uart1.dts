@@ -24,3 +24,7 @@
 		stdout-path = &uart1;
 	};
 };
+
+&uart1 {
+	status = "okay";
+};
