@@ -61,19 +61,19 @@
 };
 
 &cpu_alert0 {
-	temperature = <125000>;
+	temperature = <100000>;
 };
 
 &cpu_crit0 {
-	temperature = <155000>;
+	temperature = <105000>;
 };
 
 &soc_alert0 {
-	temperature = <125000>;
+	temperature = <100000>;
 };
 
 &soc_crit0 {
-	temperature = <155000>;
+	temperature = <105000>;
 };
 
 &gpio1 {
