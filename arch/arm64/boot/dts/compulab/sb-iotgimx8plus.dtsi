@@ -6,6 +6,12 @@
 #include <dt-bindings/leds/common.h>
 
 / {
+
+	aliases {
+		rtc0 = &ab1805_rtc;
+		rtc1 = &snvs_rtc;
+	};
+
 	chosen {
 		stdout-path = &uart2; /* console */
 	};

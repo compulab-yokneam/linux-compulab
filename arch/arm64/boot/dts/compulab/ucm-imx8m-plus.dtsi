@@ -290,7 +290,7 @@
 		pagesize = <16>;
 	};
 
-	rtc@69 {
+	ab1805_rtc: rtc@69 {
 		compatible = "ab1805";
 		reg = <0x69>;
 		pagesize = <16>;
