@@ -7,7 +7,7 @@
 	#size-cells = <0>;
 	status = "okay";
 
-	ar1335_af_mipi1: ar1335_af_mipi1@42 {
+	sensor_mipi1: mipi1@42 {
 		compatible = "econ,ar1335_af", "ar1335_af";
 		reg = <0x42>;
 		pinctrl-names = "default";
@@ -27,7 +27,7 @@
 		status = "okay";
 
 		port {
-			ar1335_af_mipi1_ep: endpoint {
+			mipi1_ep: endpoint {
 				data-lanes = <1 2 3 4>;
 				clock-lanes = <0>;
 				remote-endpoint = <&mipi1_sensor_ep>;
@@ -40,12 +40,12 @@
 	status = "okay";
 	port@0 {
 		reg = <0>;
-		mipi1_sensor_ep: endpoint@1 {
+		mipi1_sensor_ep: endpoint {
 			csis-hs-settle = <23>;
 			csis-clk-settle = <2>;
 			csis-wclk;
 			data-lanes = <4>;
-			remote-endpoint = <&ar1335_af_mipi1_ep>;
+			remote-endpoint = <&mipi1_ep>;
 		};
 	};
 };
