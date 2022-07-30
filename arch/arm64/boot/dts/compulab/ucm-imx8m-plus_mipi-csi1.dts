@@ -16,3 +16,19 @@
 &sensor_mipi1 {
 	compatible = "econ,ar1335_af", "ar1335_af";
 };
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};

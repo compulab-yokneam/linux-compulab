@@ -17,3 +17,19 @@
 	compatible = "econ,ar0234", "ar0234";
 	camera-mipi-clk = <800>;
 };
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};
