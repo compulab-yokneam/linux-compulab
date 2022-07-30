@@ -41,14 +41,6 @@ static int mxc_isi_cap_streamoff(struct file *file, void *priv,
  */
 struct mxc_isi_fmt mxc_isi_src_formats[] = {
 	{
-		.name		= "UYVY-16",
-		.fourcc		= V4L2_PIX_FMT_UYVY,
-		.depth		= { 16 },
-		.color		= MXC_ISI_OUT_FMT_YUV422_1P8P,
-		.memplanes	= 1,
-		.colplanes	= 1,
-		.mbus_code	= MEDIA_BUS_FMT_UYVY8_2X8,
-	}, {
 		.name		= "RGB32",
 		.fourcc		= V4L2_PIX_FMT_RGB32,
 		.depth		= { 32 },
@@ -62,6 +54,14 @@ struct mxc_isi_fmt mxc_isi_src_formats[] = {
 		.memplanes	= 1,
 		.colplanes	= 1,
 		.align		= 2,
+	}, {
+		.name		= "UYVY-16",
+		.fourcc		= V4L2_PIX_FMT_UYVY,
+		.depth		= { 16 },
+		.color		= MXC_ISI_OUT_FMT_YUV422_1P8P,
+		.memplanes	= 1,
+		.colplanes	= 1,
+		.mbus_code	= MEDIA_BUS_FMT_UYVY8_2X8,
 	}
 };
 
