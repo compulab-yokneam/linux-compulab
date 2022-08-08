@@ -13,6 +13,9 @@
 #include <linux/module.h>
 #include <linux/delay.h>
 
+#define RTL821E_PHYCR				0x10
+#define RTL821E_PHYCR_CLK125			BIT(4)
+
 #define RTL821x_PHYSR				0x11
 #define RTL821x_PHYSR_DUPLEX			BIT(13)
 #define RTL821x_PHYSR_SPEED			GENMASK(15, 14)
@@ -434,8 +437,16 @@ static int rtl821x_resume(struct phy_device *phydev)
 
 static int rtl8211e_config_init(struct phy_device *phydev)
 {
+	struct device *dev = &phydev->mdio.dev;
 	int ret = 0, oldpage;
 	u16 val;
+
+	if (of_property_read_bool(dev->of_node, "realtek,clkout-disable")) {
+		 __phy_modify(phydev, RTL821E_PHYCR, RTL821E_PHYCR_CLK125, RTL821E_PHYCR_CLK125);
+	}
+
+	val = __phy_read(phydev, RTL821E_PHYCR) & RTL821E_PHYCR_CLK125;
+	dev_dbg(dev, "CLK125 clock is %s\n",  val ? "disabled" : "enabled");
 
 	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
 	switch (phydev->interface) {
