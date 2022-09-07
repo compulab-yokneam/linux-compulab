@@ -81,6 +81,12 @@ config FB_MXC_MIPI_DSI
 	tristate "MXC MIPI_DSI"
 	depends on FB_MXS
 
+config FB_MXC_SN65DSI8X
+	tristate "MXC SN65DSI8x support"
+	depends on FB_MXC_SYNC_PANEL
+	depends on FB_MXC_MIPI_DSI_SAMSUNG
+	depends on I2C
+
 config FB_MXC_LDB
 	tristate "MXC LDB"
 	depends on FB_MXC_SYNC_PANEL
