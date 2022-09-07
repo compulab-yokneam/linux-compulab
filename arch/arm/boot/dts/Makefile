@@ -714,6 +714,7 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-pico-nymph.dtb \
 	imx7d-pico-pi.dtb \
 	imx7d-sbc-imx7.dtb \
+	imx7d-sbc-imx7-lvds.dtb \
 	imx7d-sbc-imx7-m4.dtb \
 	imx7d-sbc-iot-imx7.dtb \
 	imx7d-sbc-iot-imx7-can.dtb \
