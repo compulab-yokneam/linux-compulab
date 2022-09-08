@@ -8,26 +8,6 @@
  * License. You may obtain a copy of the GNU General Public License
  * Version 2 or later at the following locations:
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
-
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
-
- * You should have received a copy of the GNU General Public License along
- * with this program; if not, write to the Free Software Foundation, Inc.,
- * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
- */
-
-/*
- * The code contained herein is licensed under the GNU General Public
- * License. You may obtain a copy of the GNU General Public License
- * Version 2 or later at the following locations:
- *
  * http://www.opensource.org/licenses/gpl-license.html
  * http://www.gnu.org/copyleft/gpl.html
  */
@@ -77,12 +57,21 @@ struct mipi_dsi_lcd_callback {
 	void (*get_mipi_lcd_videomode)(struct fb_videomode **, int *,
 			struct mipi_lcd_config **);
 	int  (*mipi_lcd_setup)(struct mipi_dsi_info *);
+	int  (*mipi_lcd_start)(struct mipi_dsi_info *);
+	int  (*mipi_lcd_stop)(struct mipi_dsi_info *);
+};
 
+struct mipi_dsi_host_timing {
+	u32 mipi_dsi_pllctrl_pms;
+	u32 mipi_dsi_phytiming;
+	u32 mipi_dsi_phytiming1;
+	u32 mipi_dsi_phytiming2;
 };
 
 struct mipi_dsi_match_lcd {
 	char *lcd_panel;
 	struct mipi_dsi_lcd_callback lcd_callback;
+	struct mipi_dsi_host_timing host_timing;
 };
 
 struct mipi_dsi_bus_mux {
@@ -129,6 +118,8 @@ struct mipi_dsi_info {
 	struct backlight_device		*bl;
 	/* callback for lcd panel operation */
 	struct mipi_dsi_lcd_callback	*lcd_callback;
+	/* mipi front end timings */
+	struct mipi_dsi_host_timing	*host_timing;
 
 	int (*mipi_dsi_pkt_read)(struct mipi_dsi_info *mipi,
 			u8 data_type, u32 *buf, int len);
@@ -162,6 +153,23 @@ int mipid_rm68200_lcd_setup(struct mipi_dsi_info *mipi_dsi);
 void mipid_rm68191_get_lcd_videomode(struct fb_videomode **mode, int *size,
                                      struct mipi_lcd_config **data);
 int mipid_rm68191_lcd_setup(struct mipi_dsi_info *mipi_dsi);
+#endif
+
+#ifdef CONFIG_FB_MXC_SN65DSI8X
+void sn65dsi83_get_lcd_videomode(struct fb_videomode **mode, int *size,
+				 struct mipi_lcd_config **data);
+int sn65dsi83_lcd_setup(struct mipi_dsi_info *mipi_dsi);
+int sn65dsi83_lcd_start(struct mipi_dsi_info *mipi_dsi);
+int sn65dsi83_lcd_stop(struct mipi_dsi_info *mipi_dsi);
+#endif /* CONFIG_FB_MXC_SN65DSI8X */
+
+#if	!defined(CONFIG_FB_MXC_TRULY_WVGA_SYNC_PANEL)  && \
+	!defined(CONFIG_FB_MXC_TRULY_PANEL_TFT3P5079E) && \
+	!defined(CONFIG_FB_MXC_TRULY_PANEL_TFT3P5581E) && \
+	!defined(CONFIG_FB_MXC_RK_PANEL_RK055AHD042) && \
+	!defined(CONFIG_FB_MXC_RK_PANEL_RK055IQH042) && \
+	!defined(CONFIG_FB_MXC_SN65DSI8X)
+#error "Please configure MIPI LCD panel, we cannot find one!"
 #endif
 
 #endif
