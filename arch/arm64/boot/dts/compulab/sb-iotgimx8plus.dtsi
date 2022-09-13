@@ -42,7 +42,7 @@
 		user-led-1-green {
 			label = "Green_1";
 			color = <LED_COLOR_ID_GREEN>;
-			gpios = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 		user-led-1-red {
@@ -113,6 +113,14 @@
 			eee-broken-1000t;
 			realtek,clkout-disable;
 		};
+	};
+};
+
+&i2c2 {
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
 	};
 };
 
@@ -195,6 +203,10 @@
 
 &ecspi2 {
 	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		status = "okay";
+	};
 };
 
 &i2c5 {
@@ -202,6 +214,10 @@
 };
 
 &i2c6 {
+	status = "okay";
+};
+
+&usdhc2 {
 	status = "okay";
 };
 
@@ -256,7 +272,7 @@
 
 	pinctrl_user_leds: userledsgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD2_DATA3__GPIO2_IO18			0x19
+			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12			0x19
 			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x19
 			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x19
 			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28			0x19
