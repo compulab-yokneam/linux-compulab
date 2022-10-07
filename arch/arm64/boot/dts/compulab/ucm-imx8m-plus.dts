@@ -1397,6 +1397,7 @@
 
 &mipi_dsi {
 	status = "okay";
+	backlight = <&dsi_backlight>;
 	panel: panel@0 {
 		compatible = "startek,kd050hdfia020";
 		reg = <0>;
