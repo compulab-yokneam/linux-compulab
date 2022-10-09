@@ -217,8 +217,6 @@ static int tiny_open(struct tty_struct *tty, struct file *file)
         if (tty_dev->sahara) {
             /* for SAHARA fw downloading, without this, TTY chops the data in 2K each */
             set_bit(TTY_NO_WRITE_SPLIT, &tty->flags);
-
-	    tty->port->low_latency = 1;	
         }
 
 		/* this is the first time this port is opened */
@@ -459,8 +457,7 @@ exit:
  *
  * @param[in ]        tty           TTY device
  */
-static int tiny_write_room(struct tty_struct *tty) 
-{
+static unsigned int tiny_write_room(struct tty_struct *tty) {
 	struct mhi_serial *tiny = tty->driver_data;
     struct mhi_device *mhi_dev;
 	struct tty_dev *tty_dev;
@@ -1021,7 +1018,7 @@ static int mhi_tty_probe(struct mhi_device *mhi_dev,
 	ret = tty_register_driver(mhi_tty_driver);
 	if (ret) {
 		MSG_ERR("failed to register tiny tty driver 0x%x", ret);
-		put_tty_driver(mhi_tty_driver);
+		tty_driver_kref_put(mhi_tty_driver);
 		mhi_tty_driver = NULL;
 		tty_dev->mhi_tty_driver = mhi_tty_driver;
 		goto exit2;
