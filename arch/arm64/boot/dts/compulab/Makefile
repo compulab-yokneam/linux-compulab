@@ -1,6 +1,7 @@
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx219.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx477.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0234.dtb

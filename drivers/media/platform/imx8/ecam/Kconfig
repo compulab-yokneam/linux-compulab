@@ -22,6 +22,13 @@ config MXC_CAMERA_AR1335_AF
         help
           Enable support for video4linux camera sensor driver for eCAM136_IMX8
 
+config MXC_CAMERA_AR1335_MCU
+        tristate "AR1335 MCU Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n
+        help
+          Enable support for video4linux camera sensor driver for eCAM130
+
 config MXC_CAMERA_AR0234
         tristate "AR0234 Camera driver support"
         depends on I2C && VIDEO_ECAM
