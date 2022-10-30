@@ -463,6 +463,8 @@
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_1000M>;
+	assigned-clock-rates = <500000000>;
 	status = "disabled";
 };
 
