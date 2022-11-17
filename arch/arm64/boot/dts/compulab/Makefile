@@ -24,6 +24,12 @@ dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi2.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-headless.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-hdmi.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-lvds.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-mipi.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-rpmsg.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-thermal.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-usbdev.dtb
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
