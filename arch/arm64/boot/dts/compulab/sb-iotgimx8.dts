@@ -18,14 +18,15 @@
 	model = "CompuLab SB-IOTGIMX8 board";
 	compatible = "sb-iotgimx8", "cpl,ucm-imx8m-mini", "fsl,imx8mm";
 
-	regulator-usbhub-ena {
+	regulator-usb-ports-pwron {
 		compatible = "regulator-fixed";
-		regulator-name = "usbhub_ena";
+		regulator-name = "usb_ports_pwron";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio4 28 GPIO_ACTIVE_HIGH>;
 		regulator-always-on;
 		enable-active-high;
+		regulator-boot-on;
 	};
 
 	regulator-usbhub-rst {
