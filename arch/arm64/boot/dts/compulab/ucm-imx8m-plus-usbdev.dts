@@ -15,13 +15,9 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus.dts"
+#include "ucm-imx8m-plus-usbdev.dtsi"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus (usbdev)";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
-};
-
-&usb_dwc3_0 {
-	dr_mode = "peripheral";
-	status = "okay";
 };
