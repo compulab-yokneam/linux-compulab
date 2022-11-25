@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2022 CompuLab Ltd
+ */
+
+#include "iot-gate-imx8plus.dts"
+#include "ucm-imx8m-plus-usbdev.dtsi"
+
+/ {
+	model = "CompuLab IOT-GATE-IMX8PLUS (usbdev)";
+	compatible = "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+};
