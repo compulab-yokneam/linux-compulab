@@ -1,0 +1,5 @@
+# SPDX-License-Identifier: GPL-2.0
+config EM9190
+	tristate "EM9190 - Sierra Wireless PCIe Driver"
+	help
+	  This option allows you to enable support for the EM9190 modem
