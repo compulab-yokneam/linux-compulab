@@ -271,6 +271,7 @@ struct csi_state {
 	struct clk *disp_apb;
 	int irq;
 	u32 flags;
+	bool cam_format_change;
 
 	u32 clk_frequency;
 	u32 hs_settle;
@@ -317,6 +318,10 @@ static const struct csis_pix_format mipi_csis_formats[] = {
 		.code = MEDIA_BUS_FMT_VYUY8_2X8,
 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
 		.data_alignment = 16,
+	}, {
+                .code = MEDIA_BUS_FMT_UYVY8_2X8,
+                .fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
+                .data_alignment = 16,
 	}, {
 		.code = MEDIA_BUS_FMT_SBGGR8_1X8,
 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
@@ -508,6 +513,8 @@ static void mipi_csis_set_params(struct csi_state *state)
 		val |= MIPI_CSIS_ISPCFG_ALIGN_32BIT;
 	else /* Normal output */
 		val &= ~MIPI_CSIS_ISPCFG_ALIGN_32BIT;
+	if (state->cam_format_change)
+		val |= 1 << 12; /*Dual Pixel Mode */
 	mipi_csis_write(state, MIPI_CSIS_ISPCONFIG_CH0, val);
 
 	val = (0 << MIPI_CSIS_ISPSYNC_HSYNC_LINTV_OFFSET) |
@@ -667,13 +674,16 @@ static int mipi_csis_s_power(struct v4l2_subdev *mipi_sd, int on)
 {
 	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
 	struct device *dev = &state->pdev->dev;
+	int ret = 0;
 
-	v4l2_subdev_call(state->sensor_sd, core, s_power, on);
-
+	ret = v4l2_subdev_call(state->sensor_sd, core, s_power, on);
+#if 0
 	if (on)
 		return pm_runtime_get_sync(dev);
 
 	return pm_runtime_put_sync(dev);
+#endif
+	return ret;
 }
 
 static int mipi_csis_s_stream(struct v4l2_subdev *mipi_sd, int enable)
@@ -840,6 +850,65 @@ static int mipi_csis_enum_frameintervals(struct v4l2_subdev *mipi_sd,
 	return v4l2_subdev_call(sensor_sd, pad, enum_frame_interval, NULL, fie);
 }
 
+#ifdef CONFIG_VIDEO_ECAM
+
+static int mipi_csis_queryctrl(struct v4l2_subdev *mipi_sd, struct v4l2_queryctrl *qc)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+	return v4l2_subdev_call(sensor_sd, core, queryctrl, qc);
+}
+
+static int mipi_csis_g_ctrl(struct v4l2_subdev *mipi_sd, struct v4l2_control *ctrl)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, g_ctrl, ctrl);
+}
+
+static int mipi_csis_s_ctrl(struct v4l2_subdev *mipi_sd, struct v4l2_control *ctrl)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, s_ctrl, ctrl);
+}
+
+static int mipi_csis_g_ext_ctrls(struct v4l2_subdev *mipi_sd, struct v4l2_ext_controls *ctrls)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, g_ext_ctrls, ctrls);
+}
+
+static int mipi_csis_s_ext_ctrls(struct v4l2_subdev *mipi_sd, struct v4l2_ext_controls *ctrls)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, s_ext_ctrls, ctrls);
+}
+
+static int mipi_csis_try_ext_ctrls(struct v4l2_subdev *mipi_sd, struct v4l2_ext_controls *ctrls)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, try_ext_ctrls, ctrls);
+}
+
+static int mipi_csis_querymenu(struct v4l2_subdev *mipi_sd, struct v4l2_querymenu *qm)
+{
+        struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
+        struct v4l2_subdev *sensor_sd = state->sensor_sd;
+
+        return v4l2_subdev_call(sensor_sd, core, querymenu, qm);
+}
+#endif
+
 static int mipi_csis_log_status(struct v4l2_subdev *mipi_sd)
 {
 	struct csi_state *state = mipi_sd_to_csi_state(mipi_sd);
@@ -855,6 +924,15 @@ static int mipi_csis_log_status(struct v4l2_subdev *mipi_sd)
 static struct v4l2_subdev_core_ops mipi_csis_core_ops = {
 	.s_power = mipi_csis_s_power,
 	.log_status = mipi_csis_log_status,
+#ifdef CONFIG_VIDEO_ECAM
+	.queryctrl = mipi_csis_queryctrl,
+        .g_ctrl = mipi_csis_g_ctrl,
+        .s_ctrl = mipi_csis_s_ctrl,
+        .g_ext_ctrls = mipi_csis_g_ext_ctrls,
+        .s_ext_ctrls = mipi_csis_s_ext_ctrls,
+        .try_ext_ctrls = mipi_csis_try_ext_ctrls,
+        .querymenu = mipi_csis_querymenu,
+#endif
 };
 
 static struct v4l2_subdev_video_ops mipi_csis_video_ops = {
@@ -961,6 +1039,7 @@ static int mipi_csis_parse_dt(struct platform_device *pdev,
 	}
 
 	/* Get MIPI CSI-2 bus configration from the endpoint node. */
+	state->cam_format_change = of_property_read_bool(node, "cam-format-change");
 	of_property_read_u32(node, "csis-hs-settle",
 					&state->hs_settle);
 
@@ -1163,7 +1242,8 @@ static int mipi_csis_probe(struct platform_device *pdev)
 			goto e_sd_host;
 	}
 
-	mipi_csis_clk_disable(state);
+	if (!(state->cam_format_change))
+		mipi_csis_clk_disable(state);
 	dev_info(&pdev->dev,
 			"lanes: %d, hs_settle: %d, clk_settle: %d, wclk: %d, freq: %u\n",
 		 state->num_lanes, state->hs_settle, state->clk_settle,

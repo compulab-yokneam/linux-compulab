@@ -1031,6 +1031,93 @@ static const struct media_entity_operations mipi_csi2_sd_media_ops = {
 /*
  * V4L2 subdev operations
  */
+#ifdef CONFIG_VIDEO_ECAM
+static int mipi_csi2_querymenu(struct v4l2_subdev *sd, struct v4l2_querymenu *qm)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, querymenu, qm);
+}
+
+static int mipi_csi2_queryctrl(struct v4l2_subdev *sd, struct v4l2_queryctrl *qc)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, queryctrl, qc);
+}
+
+static int mipi_csi2_g_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, g_ctrl, ctrl);
+}
+
+static int mipi_csi2_s_ctrl(struct v4l2_subdev *sd, struct v4l2_control *ctrl)
+{
+
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, s_ctrl, ctrl);
+}
+
+static int mipi_csi2_g_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, g_ext_ctrls, ctrls);
+}
+
+static int mipi_csi2_try_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, try_ext_ctrls, ctrls);
+}
+
+static int mipi_csi2_s_ext_ctrls(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
+	struct v4l2_subdev *sen_sd;
+
+	sen_sd = mxc_get_remote_subdev(csi2dev, __func__);
+	if (!sen_sd)
+		return -EINVAL;
+
+	return v4l2_subdev_call(sen_sd, core, s_ext_ctrls, ctrls);
+}
+#endif
+
 static int mipi_csi2_s_power(struct v4l2_subdev *sd, int on)
 {
 	struct mxc_mipi_csi2_dev *csi2dev = sd_to_mxc_mipi_csi2_dev(sd);
@@ -1182,6 +1269,15 @@ static struct v4l2_subdev_pad_ops mipi_csi2_pad_ops = {
 
 static struct v4l2_subdev_core_ops mipi_csi2_core_ops = {
 	.s_power = mipi_csi2_s_power,
+#ifdef CONFIG_VIDEO_ECAM
+	.queryctrl = mipi_csi2_queryctrl,
+	.g_ctrl = mipi_csi2_g_ctrl,
+	.s_ctrl = mipi_csi2_s_ctrl,
+	.g_ext_ctrls = mipi_csi2_g_ext_ctrls,
+	.s_ext_ctrls = mipi_csi2_s_ext_ctrls,
+	.try_ext_ctrls = mipi_csi2_try_ext_ctrls,
+	.querymenu = mipi_csi2_querymenu,
+#endif
 };
 
 static struct v4l2_subdev_video_ops mipi_csi2_video_ops = {

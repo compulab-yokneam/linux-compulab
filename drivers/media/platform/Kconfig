@@ -10,8 +10,6 @@ menuconfig V4L_PLATFORM_DRIVERS
 
 if V4L_PLATFORM_DRIVERS
 
-source "drivers/media/platform/nxp/Kconfig"
-
 source "drivers/media/platform/marvell-ccic/Kconfig"
 
 config VIDEO_VIA_CAMERA
@@ -27,7 +25,6 @@ config VIDEO_VIA_CAMERA
 #
 # Platform multimedia device configuration
 #
-source "drivers/media/platform/amphion/Kconfig"
 source "drivers/media/platform/cadence/Kconfig"
 
 source "drivers/media/platform/davinci/Kconfig"
@@ -224,6 +221,22 @@ config VIDEO_TI_CAL_MC
 	  module parameter 'mc_api'.
 
 endif # VIDEO_TI_CAL
+
+if VIDEO_MX8_CAPTURE
+
+config VIDEO_ECAM
+        tristate "e-con camera sensor support"
+        depends on I2C && VIDEO_V4L2 && VIDEO_V4L2_SUBDEV_API
+        help
+          This config is used to enable codes which are used to
+          support econ camera and to disable ISI control codes.
+
+          To compile this driver as a module, choose M here: the module
+          will be called based on sensor name.
+
+source "drivers/media/platform/imx8/ecam/Kconfig"
+
+endif # VIDEO_MX8_CAPTURE
 
 endif # V4L_PLATFORM_DRIVERS
 
