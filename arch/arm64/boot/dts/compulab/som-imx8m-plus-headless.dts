@@ -15,6 +15,7 @@
 /dts-v1/;
 
 #include "som-imx8m-plus.dts"
+#include "compulab-imx8m-plus-headless.dtsi"
 
 / {
 	model = "CompuLab SOM-iMX8M-Plus (headless)";
