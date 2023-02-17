@@ -1,0 +1,14 @@
+/* mipi dsi */
+&lcdif1 {
+	status = "disabled";
+};
+
+/* lvds */
+&lcdif2 {
+	status = "disabled";
+};
+
+/* hdmi */
+&lcdif3 {
+	status = "disabled";
+};
