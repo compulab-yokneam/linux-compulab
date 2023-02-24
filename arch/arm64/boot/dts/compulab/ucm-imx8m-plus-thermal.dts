@@ -16,8 +16,9 @@
 
 #include "ucm-imx8m-plus.dts"
 #include "compulab-imx8m-plus-thermal.dtsi"
+#include "compulab-imx8m-plus-headless.dtsi"
 
 / {
-	model = "CompuLab UCM-iMX8M-Plus (thermal)";
+	model = "CompuLab UCM-iMX8M-Plus (thermal+headless)";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
 };
