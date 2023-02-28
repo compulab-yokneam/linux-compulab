@@ -79,18 +79,6 @@
 		off-on-delay-us = <12000>;
 	};
 
-	reg_reset: regulator-reset {
-                compatible = "regulator-fixed";
-                regulator-name = "enet_rst";
-                pinctrl-names = "default";
-                pinctrl-0 = <&pinctrl_enet_rst>;
-                regulator-min-microvolt = <3300000>;
-                regulator-max-microvolt = <3300000>;
-                gpio = <&gpio1 10 GPIO_ACTIVE_HIGH>;
-                enable-active-high;
-                regulator-always-on;
-        };
-
 	sound-hdmi {
 		compatible = "fsl,imx-audio-hdmi";
 		model = "audio-hdmi";
@@ -830,12 +818,6 @@
 			MX8MP_IOMUXC_HDMI_CEC__HDMIMIX_HDMI_CEC		0x40000019
 		>;
 	};
-
-        pinctrl_enet_rst: enet1rst {
-                fsl,pins = <
-			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10     0x19
-                >;
-        };
 
 	pinctrl_pwm1: pwm1grp {
 		fsl,pins = <
