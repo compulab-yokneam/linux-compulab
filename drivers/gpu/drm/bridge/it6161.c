@@ -12,7 +12,7 @@
 #include <linux/i2c.h>
 #include <linux/interrupt.h>
 #include <sound/hdmi-codec.h>
-
+#include <linux/gpio/consumer.h>
 #include "it6161.h"
 
 #define AUX_WAIT_TIMEOUT_MS 100
