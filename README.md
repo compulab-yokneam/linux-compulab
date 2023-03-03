@@ -10,7 +10,6 @@ It is up to developers to prepare the host machine; it requires:
 * WorkDir:
 ```
 mkdir -p compulab-kernel/build && cd compulab-kernel
-export BUILD=$(pwd)/build
 ```
 
 * Set a CompuLab machine:
@@ -24,22 +23,22 @@ export BUILD=$(pwd)/build
 * Clone the source code:
 ```
 git clone -b linux-compulab_v5.15.32 https://github.com/compulab-yokneam/linux-compulab.git
-cd u-boot-compulab
+cd linux-compulab
 ```
 
 ## Compile the Kernel
 
 * Apply the default CompuLab config:
 ```
-make O=${BUILD} ${MACHINE}_defconfig compulab.config
+make ${MACHINE}_defconfig compulab.config
 ```
 
 * Ussue menuconfig on order to change the default CompuLab configuration:
 ```
-make O=${BUILD} menuconfig
+make menuconfig
 ```
 
 * Build the kernel
 ```
-nice make -j`nproc` O=${BUILD}
+nice make -j`nproc`
 ```
