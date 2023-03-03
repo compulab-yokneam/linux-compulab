@@ -1,4 +1,4 @@
-# Disclaimer
+# Kernel Build Manual
 
 ## Prerequisites
 It is up to developers to prepare the host machine; it requires:
