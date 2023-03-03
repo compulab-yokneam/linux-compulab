@@ -1,17 +1,11 @@
 # Disclaimer
 
-| !IMPORTANT! | This is a development branch, that is not relelased by CompuLab yet|
-|---|---|
-
-
-# Configuring the build
-
 ## Prerequisites
 It is up to developers to prepare the host machine; it requires:
 
 * [Setup Cross Compiler](https://github.com/compulab-yokneam/meta-bsp-imx8mp/blob/kirkstone/Documentation/toolchain.md#linaro-toolchain-how-to)
 
-## Setup U-Boot environment
+## CompuLab Linux Kernel setup
 
 * WorkDir:
 ```
@@ -33,7 +27,7 @@ git clone -b linux-compulab_v5.15.32 https://github.com/compulab-yokneam/linux-c
 cd u-boot-compulab
 ```
 
-## Create U-boot binary
+## Compile the Kernel
 
 * Apply the default CompuLab config:
 ```
