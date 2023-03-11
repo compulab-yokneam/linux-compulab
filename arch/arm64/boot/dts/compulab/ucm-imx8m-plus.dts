@@ -691,7 +691,7 @@
 
 &xcvr {
 	#sound-dai-cells = <0>;
-	status = "okay";
+	status = "disabled";
 };
 
 &sdma2 {
@@ -726,16 +726,6 @@
 &usb3_phy0 {
 	fsl,phy-tx-preemp-amp-tune = <3>;
 	status = "okay";
-#if 0
-	vbus-power-supply = <&ptn5110>;
-	fsl,phy-tx-vref-tune = <6>;
-	fsl,phy-tx-rise-tune = <0>;
-	fsl,phy-tx-preemp-amp-tune = <3>;
-	fsl,phy-comp-dis-tune = <7>;
-	fsl,pcs-tx-deemph-3p5db = <0x21>;
-	fsl,phy-pcs-tx-swing-full = <0x7f>;
-	status = "okay";
-#endif
 };
 
 &usb3_0 {
