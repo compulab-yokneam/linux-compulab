@@ -183,7 +183,8 @@ static int max11108_probe(struct spi_device *spi)
 		return ret;
 	}
 	/* Create default trigger */
-	state->trig = devm_iio_trigger_alloc(&spi->dev, "max11108-trigger");
+	state->trig = devm_iio_trigger_alloc(&spi->dev, "%s-dev%d",
+			indio_dev->name, iio_device_id(indio_dev));
 	if (state->trig == NULL) {
 		ret = -ENOMEM;
 		dev_err(&indio_dev->dev, "Failed to allocate iio trigger\n");
