@@ -720,6 +720,8 @@
 };
 
 &uart1 { /* BT */
+	/delete-property/dma-names;
+	/delete-property/dmas;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
