@@ -23,7 +23,9 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-usbdev.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi2.dtb
+dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi2-ar1335-mcu.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-headless.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-hdmi.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-lvds.dtb
