@@ -102,7 +102,7 @@
 	};
 
 	sound-hdmi {
-		compatible = "fsl,imx-audio-cdnhdmi";
+		compatible = "fsl,imx-audio-hdmi";
 		model = "audio-hdmi";
 		audio-cpu = <&aud2htx>;
 		hdmi-out;
@@ -117,16 +117,26 @@
 	};
 
 	sound-micfil {
-		compatible = "fsl,imx-audio-micfil";
+		compatible = "fsl,imx-audio-card";
 		model = "imx-audio-micfil";
-		cpu-dai = <&micfil>;
-		status = "disabled";
+		pri-dai-link {
+			link-name = "micfil hifi";
+			format = "i2s";
+			cpu {
+				sound-dai = <&micfil>;
+			};
+		};
 	};
 
 	sound-xcvr {
-		compatible = "fsl,imx-audio-xcvr";
+		compatible = "fsl,imx-audio-card";
 		model = "imx-audio-xcvr";
-		cpu-dai = <&xcvr>;
+		pri-dai-link {
+			link-name = "XCVR PCM";
+			cpu {
+				sound-dai = <&xcvr>;
+			};
+		};
 	};
 
 	dsi_backlight: dsi_backlight {
@@ -641,6 +651,7 @@
 };
 
 &micfil {
+	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pdm>;
 	assigned-clocks = <&clk IMX8MP_CLK_PDM>;
@@ -712,7 +723,7 @@
 
 &xcvr {
 	#sound-dai-cells = <0>;
-	status = "okay";
+	status = "disabled";
 };
 
 &sdma2 {
@@ -732,6 +743,8 @@
 	/* console */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart2>;
+	assigned-clocks = <&clk IMX8MP_CLK_UART2>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
 	status = "okay";
 };
 
@@ -759,7 +772,8 @@
 };
 
 &usb3_phy1 {
-	fsl,phy-tx-preemp-amp-tune = <2>;
+	fsl,phy-tx-preemp-amp-tune = <3>;
+	fsl,phy-tx-vref-tune = <0xb>;
 	status = "okay";
 };
 
@@ -1150,7 +1164,7 @@
 			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d0
 			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d0
 			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d0
-			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT	0xc0
+			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT	0xc1
 		>;
 	};
 
@@ -1162,7 +1176,7 @@
 			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d4
 			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d4
 			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d4
-			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc0
+			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc1
 		>;
 	};
 
@@ -1174,7 +1188,7 @@
 			MX8MP_IOMUXC_SD2_DATA1__USDHC2_DATA1	0x1d6
 			MX8MP_IOMUXC_SD2_DATA2__USDHC2_DATA2	0x1d6
 			MX8MP_IOMUXC_SD2_DATA3__USDHC2_DATA3	0x1d6
-			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc0
+			MX8MP_IOMUXC_GPIO1_IO04__USDHC2_VSELECT 0xc1
 		>;
 	};
 
@@ -1275,6 +1289,10 @@
 	status = "okay";
 };
 
+&vpu_v4l2 {
+	status = "okay";
+};
+
 &gpu_3d {
 	status = "okay";
 };
@@ -1327,10 +1345,6 @@
 	};
 };
 
-&dsp {
-	status = "okay";
-};
-
 &resmem {
 	/* global autoconfigured region for contiguous allocations */
 	linux,cma {
@@ -1344,6 +1358,7 @@
 
 &mipi_dsi {
 	status = "okay";
+	backlight = <&dsi_backlight>;
 	panel: panel@0 {
 		compatible = "startek,kd050hdfia020";
 		reg = <0>;
