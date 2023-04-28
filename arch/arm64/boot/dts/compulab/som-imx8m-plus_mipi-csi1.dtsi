@@ -27,7 +27,7 @@
 		status = "okay";
 
 		port {
-			ar1335_af_mipi1_ep: endpoint {
+			mipi1_ep: endpoint {
 				data-lanes = <1 2 3 4>;
 				clock-lanes = <0>;
 				remote-endpoint = <&mipi1_sensor_ep>;
@@ -40,12 +40,12 @@
 	status = "okay";
 	port@0 {
 		reg = <0>;
-		mipi1_sensor_ep: endpoint@1 {
-			csis-hs-settle = <13>;
+		mipi1_sensor_ep: endpoint {
+			csis-hs-settle = <23>;
 			csis-clk-settle = <2>;
 			csis-wclk;
 			data-lanes = <4>;
-			remote-endpoint = <&ar1335_af_mipi1_ep>;
+			remote-endpoint = <&mipi1_ep>;
 		};
 	};
 };

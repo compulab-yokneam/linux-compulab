@@ -18,6 +18,14 @@
 	pwdn-gpios = <&pca9555 8 GPIO_ACTIVE_LOW>;
 };
 
+&mipi1_ep {
+	data-lanes = <1 2>;
+};
+
+&mipi1_sensor_ep {
+	data-lanes = <2>;
+};
+
 &cameradev {
 	status = "okay";
 };
