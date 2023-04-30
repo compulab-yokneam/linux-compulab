@@ -110,4 +110,6 @@ source "drivers/staging/fsl_ppfe/Kconfig"
 
 source "drivers/staging/em9190/Kconfig"
 
+source "drivers/staging/gasket-1.0/Kconfig"
+
 endif # STAGING

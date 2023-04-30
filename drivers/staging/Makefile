@@ -45,3 +45,4 @@ obj-$(CONFIG_QLGE)		+= qlge/
 obj-$(CONFIG_WFX)		+= wfx/
 obj-$(CONFIG_FSL_PPFE)		+= fsl_ppfe/
 obj-$(CONFIG_EM9190)		+= em9190/
+obj-y				+= gasket-1.0/
