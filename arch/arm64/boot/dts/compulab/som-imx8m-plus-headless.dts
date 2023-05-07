@@ -14,24 +14,12 @@
 
 /dts-v1/;
 
-#include "som-imx8m-plus.dts"
+#include <dt-bindings/usb/pd.h>
+#include "../freescale/imx8mp.dtsi"
+#include "som-imx8m-plus-pinctrl.dtsi"
+#include "som-imx8m-plus.dtsi"
 
 / {
 	model = "CompuLab SOM-iMX8M-Plus (headless)";
 	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
-};
-
-/* mipi dsi */
-&lcdif1 {
-	status = "disabled";
-};
-
-/* lvds */
-&lcdif2 {
-	status = "disabled";
-};
-
-/* hdmi */
-&lcdif3 {
-	status = "disabled";
 };

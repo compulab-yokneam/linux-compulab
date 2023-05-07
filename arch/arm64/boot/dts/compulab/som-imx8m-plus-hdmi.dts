@@ -14,24 +14,10 @@
 
 /dts-v1/;
 
-#include "som-imx8m-plus.dts"
+#include "som-imx8m-plus-headless.dts"
+#include "som-imx8m-plus-hdmi.dtsi"
 
 / {
 	model = "CompuLab SOM-iMX8M-Plus (hdmi)";
 	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
-};
-
-/* mipi dsi */
-&lcdif1 {
-	status = "disabled";
-};
-
-/* lvds */
-&lcdif2 {
-	status = "disabled";
-};
-
-/* hdmi */
-&lcdif3 {
-	status = "okay";
 };
