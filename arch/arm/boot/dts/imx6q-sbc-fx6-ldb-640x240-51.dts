@@ -14,6 +14,10 @@
 #include "imx6q-sbc-fx6.dts"
 #include "imx6q-display-settings.dtsi"
 
+/ {
+	model = "CompuLab CM-FX6 on SBC-FX6 fb1=ldb;fb2=hdmi";
+};
+
 &mxcfb1 {
 	LDB
 	mode_str ="640x240M-18@60";
