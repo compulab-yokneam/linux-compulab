@@ -14,10 +14,15 @@
 #include "imx6q-sbc-fx6.dts"
 #include "imx6q-display-settings.dtsi"
 
+/ {
+	model = "CompuLab CM-FX6 on SBC-FX6 fb1=ldb24;fb2=hdmi";
+};
+
 &mxcfb1 {
 	LDB24
 	mode_str ="640x240M-18@51";
 	default_bpp = <24>;
+	status = "okay";
 };
 
 &lvds0 {
@@ -26,6 +31,7 @@
 
 &mxcfb2 {
 	HDMI
+	status = "okay";
 };
 
 &mxcfb3 {
