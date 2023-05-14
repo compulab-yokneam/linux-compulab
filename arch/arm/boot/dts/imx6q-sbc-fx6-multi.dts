@@ -1,0 +1,64 @@
+#include "imx6q-sbc-fx6.dts"
+#include "imx6q-display-settings.dtsi"
+
+/* lvds 1-st port timing */
+&timing01 {
+	clock-frequency = <10390000>;
+        hactive = <640>;
+        vactive = <240>;
+        hback-porch = <10>;
+        hfront-porch = <10>;
+        vback-porch = <10>;
+        vfront-porch = <10>;
+        hsync-len = <77>;
+        vsync-len = <14>;
+};
+
+/* lvds 2-nd port timing */
+&timing12 {
+	clock-frequency = <10390000>;
+        hactive = <640>;
+        vactive = <240>;
+        hback-porch = <10>;
+        hfront-porch = <10>;
+        vback-porch = <10>;
+        vfront-porch = <10>;
+        hsync-len = <77>;
+        vsync-len = <14>;
+};
+
+&lvds0 {
+	crtc = "ipu1-di0";
+};
+
+&lvds1 {
+	crtc = "ipu1-di1";
+};
+
+&hdmi_core {
+	ipu_id = <1>;
+	disp_id = <0>;
+	status = "okay";
+};
+
+&mxcfb1 {
+	/* lcd paralle output managed by ldb driver */
+	LDB24
+	default_bpp = <24>;
+};
+
+&mxcfb2 {
+	/* ldb */
+	LDB
+	default_bpp = <24>;
+};
+
+&mxcfb3 {
+	HDMI
+	/* hdmi driver ignores this */
+	mode_str ="640x240M-18@51";
+};
+
+&mxcfb4 {
+	status = "disabled";
+};
