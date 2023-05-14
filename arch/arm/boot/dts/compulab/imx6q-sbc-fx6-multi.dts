@@ -27,38 +27,29 @@
         vsync-len = <14>;
 };
 
-&lvds0 {
-	crtc = "ipu1-di0";
-};
-
-&lvds1 {
-	crtc = "ipu1-di1";
-};
-
-&hdmi_core {
-	ipu_id = <1>;
-	disp_id = <0>;
+&mxcfb1 {
+	/* lcd paralle output */
+	LCD
+	mode_str ="640x240M-18@51";
+	default_bpp = <24>;
 	status = "okay";
 };
 
-&mxcfb1 {
-	/* lcd paralle output managed by ldb driver */
-	LDB24
-	default_bpp = <24>;
-};
-
 &mxcfb2 {
-	/* ldb */
-	LDB
-	default_bpp = <24>;
+	/* hdmi */
+	HDMI
+	mode_str ="640x480M@60";
+	status = "okay";
 };
 
 &mxcfb3 {
-	HDMI
-	/* hdmi driver ignores this */
-	mode_str ="640x240M-18@51";
+	/* ldb */
+	LDB
+	default_bpp = <24>;
+	status = "okay";
 };
 
 &mxcfb4 {
 	status = "disabled";
 };
+
