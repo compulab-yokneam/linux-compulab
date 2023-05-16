@@ -1,33 +1,13 @@
+&lvds_backlight {
+	status = "okay";
+};
+
+&lvds_panel {
+	status = "okay";
+};
+
 &ldb {
 	status = "okay";
-
-	lvds0_panel {
-		compatible = "boe,hv070wsa-100";
-		backlight = <&lvds_backlight>;
-		enable-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
-
-		port {
-			panel_lvds_in: endpoint {
-				remote-endpoint = <&lvds_out>;
-			};
-		};
-	};
-
-	lvds-channel@0 {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		fsl,data-mapping = "spwg";
-		fsl,data-width = <24>;
-		status = "okay";
-
-		port@1 {
-			reg = <1>;
-
-			lvds_out: endpoint {
-				remote-endpoint = <&panel_lvds_in>;
-			};
-		};
-	};
 };
 
 &ldb_phy {

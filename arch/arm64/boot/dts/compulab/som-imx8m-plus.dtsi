@@ -176,7 +176,20 @@
 					225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240
 					241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
 		default-brightness-level = <222>;
-		status = "okay";
+		status = "disabled";
+	};
+
+	lvds_panel: lvds_panel {
+		compatible = "boe,hv070wsa-100";
+		backlight = <&lvds_backlight>;
+		enable-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+
+		port {
+			panel_lvds_in: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
 	};
 
 	simple_sound: sound {
@@ -865,5 +878,22 @@
 		size = <0 0x2c000000>;
 		alloc-ranges = <0 0x40000000 0 0x80000000>;
 		linux,cma-default;
+	};
+};
+
+&ldb {
+	status = "disabled";
+	lvds-channel@0 {
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&panel_lvds_in>;
+			};
+		};
 	};
 };
