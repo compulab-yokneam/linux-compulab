@@ -1,0 +1,261 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2022 CompuLab Ltd
+ */
+
+#include <dt-bindings/leds/common.h>
+
+/ {
+
+	aliases {
+		rtc0 = &ab1805_rtc;
+		rtc1 = &snvs_rtc;
+	};
+
+	chosen {
+		stdout-path = &uart2; /* console */
+	};
+
+	usb_hub_reset: usb-hub-reset {
+		compatible = "gpio-reset";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usb_hub_reset>;
+		reset-gpios = <&gpio2 10 GPIO_ACTIVE_HIGH>;
+		#reset-cells = <0>;
+		initially-in-reset;
+	};
+
+	usb2_vbus_en: usb2-vbus-en {
+		compatible = "gpio-reset";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_usb2_vbus_en>;
+		reset-gpios = <&gpio4 20 GPIO_ACTIVE_HIGH>;
+		#reset-cells = <0>;
+		initially-in-reset;
+	};
+
+	user-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_user_leds>;
+
+		user-led-1-green {
+			label = "Green_1";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+		user-led-1-red {
+			label = "Red_1";
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio5 5 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+		user-led-2-green {
+			label = "Green_2";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+		user-led-2-red {
+			label = "Red_2";
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+	};
+};
+
+&cpu_alert0 {
+	temperature = <100000>;
+};
+
+&cpu_crit0 {
+	temperature = <105000>;
+};
+
+&soc_alert0 {
+	temperature = <100000>;
+};
+
+&soc_crit0 {
+	temperature = <105000>;
+};
+
+&gpio1 {
+	gpio-line-names = "", "", "", "PMIC IRQ", "",
+			"", "", "", "", "",
+			"ECOS PHY Reset", "", "Heartbeat LED", "", "",
+			"USB MUX Sel", "", "", "", "",
+			"", "", "", "", "",
+			"", "", "", "", "";
+	status = "okay";
+};
+
+&fec {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phy_reset>;
+	phy-mode = "rgmii-id";
+	phy-handle = <&fecphy>;
+	fsl,magic-packet;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		fecphy: fec-phy@0 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <0>;
+			reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
+			eee-broken-1000t;
+			realtek,clkout-disable;
+		};
+	};
+};
+
+&i2c3 {
+	status = "okay";
+
+	pca9555_sb:pca9555-sb@21 {
+		compatible = "nxp,pca9555";
+		gpio-controller;
+		#gpio-cells = <2>;
+		reg = <0x21>;
+		gpio-line-names =
+			"POD1_DET1", "POD1_DET2", "POD1_DET3", 
+			"POD2_DET1", "POD2_DET2", "POD2_DET3",
+			"POD3_DET1", "POD3_DET2", "POD3_DET3",
+			"POD4_DET1", "POD4_DET2", "POD4_DET3",
+			"GPIO_IE_A", "GPIO_IE_B", "GPIO_IE_C",
+			"RF_KILL#";
+	};
+};
+
+&flexcan2 {
+	status = "okay";
+};
+
+&pcie {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie>;
+	reset-gpio = <&gpio5 2 GPIO_ACTIVE_LOW>;
+	ext_osc = <0>;
+	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
+		 <&clk IMX8MP_CLK_PCIE_AUX>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>,
+		 <&clk IMX8MP_CLK_PCIE_ROOT>;
+	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
+			  <&clk IMX8MP_CLK_PCIE_AUX>;
+	assigned-clock-rates = <500000000>, <10000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
+				 <&clk IMX8MP_SYS_PLL2_50M>;
+	status = "okay";
+};
+
+&pcie_phy {
+	ext_osc = <0>;
+	status = "okay";
+};
+
+&uart1 {
+	/* IE-RS232/RS485 slot A */
+	status = "okay";
+};
+
+&uart3 {
+	/* IE-RS232/RS485 slot B */
+	status = "okay";
+};
+
+&uart4 {
+	/* IE-RS232/RS485 slot C */
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	dr_mode = "host";
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_usb_mux_sel>;
+	status = "okay";
+};
+
+/***** EXPANSION CONNECTOR - Begin *****/
+
+&ecspi2 {
+	status = "okay";
+};
+
+&i2c5 {
+	status = "okay";
+};
+
+&i2c6 {
+	status = "okay";
+};
+
+/***** EXPANSION CONNECTOR - End *****/
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ie_di4o4>;
+
+	pinctrl_fec_phy_reset: fecphyrstgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24			0x19
+		>;
+	};
+
+	pinctrl_ie_di4o4: iedi4o4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_TX__GPIO5_IO03			0x00  /* DI4O4 IN0 */
+			MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00			0x00  /* DI4O4 IN1 */
+			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31			0x00  /* DI4O4 IN2 */
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29			0x00  /* DI4O4 IN3 */
+			MX8MP_IOMUXC_SAI3_RXD__GPIO4_IO30			0x100 /* DI4O4 OUT0 */
+			MX8MP_IOMUXC_SPDIF_RX__GPIO5_IO04			0x100 /* DI4O4 OUT1 */
+			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01			0x100 /* DI4O4 OUT2 */
+			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12			0x100 /* DI4O4 OUT3 */
+		>;
+	};
+
+	pinctrl_pcie: pciegrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02			0x41
+		>;
+	};
+
+	pinctrl_usb_hub_reset: usbhubrst {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10			0x19
+		>;
+	};
+
+	pinctrl_usb_mux_sel: usbmuxselgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO15__GPIO1_IO15			0x114
+		>;
+	};
+
+	pinctrl_usb2_vbus_en: usb2vbusengrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20			0x154
+		>;
+	};
+
+	pinctrl_user_leds: userledsgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_DATA3__GPIO2_IO18			0x19
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x19
+			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x19
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28			0x19
+		>;
+	};
+};

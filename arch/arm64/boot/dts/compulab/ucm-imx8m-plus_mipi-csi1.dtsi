@@ -1,0 +1,51 @@
+/*
+ * Copyright 2022 CompuLab
+ */
+
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	sensor_mipi1: mipi1@42 {
+		compatible = "econ,ar1335_af", "ar1335_af";
+		reg = <0x42>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		csi_id = <0>;
+		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 9 GPIO_ACTIVE_LOW>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		camera_mipi_lanes = <4>;
+		status = "okay";
+
+		port {
+			mipi1_ep: endpoint {
+				data-lanes = <1 2 3 4>;
+				clock-lanes = <0>;
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	status = "okay";
+	port@0 {
+		reg = <0>;
+		mipi1_sensor_ep: endpoint {
+			csis-hs-settle = <23>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+			data-lanes = <4>;
+			remote-endpoint = <&mipi1_ep>;
+		};
+	};
+};
