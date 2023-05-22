@@ -1,0 +1,36 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2021 CompuLab
+ */
+
+/dts-v1/;
+
+#include "som-imx8m-plus.dts"
+#include "som-imx8m-plus_mipi-csi1.dtsi"
+
+/ {
+	model = "CompuLab SOM-iMX8M-Plus with ar0234 mipi csi1 enabled";
+	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
+};
+
+&sensor_mipi1 {
+	compatible = "econ,ar0234", "ar0234";
+	camera-mipi-clk = <800>;
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};
+

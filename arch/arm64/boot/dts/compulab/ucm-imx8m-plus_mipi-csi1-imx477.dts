@@ -1,0 +1,65 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2021 CompuLab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus.dts"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+&i2c5 {
+	imx477_mipi1: imx477_mipi1@1a {
+		compatible = "sony,imx477";
+		reg = <0x1a>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		csi_id = <0>;
+		reset-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		status = "disabled";
+
+		port {
+			imx477_mipi1_ep: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2 3 4>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <450000000>;
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+&imx477_mipi1 {
+	status = "okay";
+};
+
+&mipi_csi_0 {
+	status = "okay";
+	port@0 {
+		reg = <0>;
+		mipi1_sensor_ep: endpoint@1 {
+			remote-endpoint = <&imx477_mipi1_ep>;
+			data-lanes = <4>;
+			csis-hs-settle = <16>;
+			/*csis-clk-settle = <2>;*/
+			csis-wclk;
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+};
