@@ -1,0 +1,74 @@
+/*
+ * Copyright 2022 CompuLab
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus.dts"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus (gpio-hog)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+&iomuxc {
+	pinctrl_gpio4: gpio4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x19 /* P21-23; GPIO=(32*(4-1)+28)=124 */
+			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29	0x19 /* P21-19; GPIO=(32*(4-1)+29)=125 */
+			MX8MP_IOMUXC_SAI3_RXD__GPIO4_IO30	0x19 /* P21-17; GPIO=(32*(4-1)+30)=126 */
+			MX8MP_IOMUXC_SAI3_TXFS__GPIO4_IO31	0x19 /* P21-21; GPIO=(32*(4-1)+31)=127 */
+		>;
+	};
+
+	pinctrl_gpio5: gpio5grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00	0x19 /* P21-13; GPIO=(32*(5-1)+0)=128 */
+			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01	0x19 /* P21-11; GPIO=(32*(5-1)+1)=129 */
+			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02	0x19 /* P21-15; GPIO=(32*(5-1)+2)=130 */
+		>;
+	};
+};
+
+&gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio4>;
+
+	gpio4_io28 {
+		gpio-hog;
+		gpios = <28 GPIO_ACTIVE_HIGH>;
+		input;
+		lane-mapping = "gpio4_io28";
+	};
+
+	gpio4_io29 {
+		gpio-hog;
+		gpios = <29 GPIO_ACTIVE_HIGH>;
+		input;
+		lane-mapping = "gpio4_io29";
+	};
+
+	gpio4_io30 {
+		gpio-hog;
+		gpios = <30 GPIO_ACTIVE_HIGH>;
+		output-high;
+		lane-mapping = "gpio4_io30";
+	};
+
+	gpio4_io31 {
+		gpio-hog;
+		gpios = <31 GPIO_ACTIVE_LOW>;
+		output-low;
+		lane-mapping = "gpio4_io31";
+	};
+};
