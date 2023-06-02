@@ -421,6 +421,21 @@
                 #gpio-cells = <2>;
                 reg = <0x20>;
         };
+
+	goodix911_mipi: goodix@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchscreen1_pins>;
+
+		interrupt-parent = <&gpio2>;
+		interrupts = <21 IRQ_TYPE_LEVEL_HIGH>;
+		irq-gpios = <&gpio2 21 GPIO_ACTIVE_HIGH>;
+
+		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
 };
 
 &lpuart1 { /* console */
