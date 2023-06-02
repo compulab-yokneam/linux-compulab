@@ -99,3 +99,7 @@
 &dphy {
 	status = "okay";
 };
+
+&goodix911_mipi {
+    status = "okay";
+};
