@@ -202,7 +202,19 @@
 
 	pinctrl_pmic: pmicirq {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO24__GPIO2_IO24			0x31e
+			MX93_PAD_GPIO_IO24__GPIO2_IO24		0x31e
+		>;
+	};
+
+	pinctrl_tpm5: tmp5grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO22__TPM5_CH1		0x31e
+		>;
+	};
+
+	touchscreen1_pins: ts1grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO21__GPIO2_IO21		0x31e
 		>;
 	};
 };
