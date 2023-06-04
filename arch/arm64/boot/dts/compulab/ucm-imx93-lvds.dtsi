@@ -78,3 +78,7 @@
 &ldb_phy {
 	status = "okay";
 };
+
+&goodix911_lvds {
+    status = "okay";
+};
