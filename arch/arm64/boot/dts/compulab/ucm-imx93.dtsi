@@ -91,7 +91,7 @@
 		regulator-name = "can2-stby";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		/*gpio = <&adp5585gpio 5 GPIO_ACTIVE_LOW>;*/
+		gpio = <&pca9555 12 GPIO_ACTIVE_LOW>;
 		enable-active-low;
 	};
 
@@ -186,7 +186,7 @@
 	assigned-clocks = <&clk IMX93_CLK_SAI1>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
-	status = "okay";
+	status = "disable";
 };
 
 &sai3 {
@@ -206,7 +206,7 @@
 	assigned-clocks = <&clk IMX93_CLK_PDM>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <49152000>;
-	status = "okay";
+	status = "disable";
 };
 
 &xcvr {
@@ -224,7 +224,7 @@
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>,
 			 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 	assigned-clock-rates = <12288000>, <200000000>;
-	status = "okay";
+	status = "disable";
 };
 	
 &adc1 {
@@ -422,6 +422,21 @@
                 reg = <0x20>;
         };
 
+	goodix911_lvds: goodix@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchscreen0_pins>;
+
+		interrupt-parent = <&gpio2>;
+		interrupts = <20 IRQ_TYPE_LEVEL_HIGH>;
+		irq-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
+
+		reset-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+
 	goodix911_mipi: goodix@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
@@ -433,7 +448,7 @@
 		interrupts = <21 IRQ_TYPE_LEVEL_HIGH>;
 		irq-gpios = <&gpio2 21 GPIO_ACTIVE_HIGH>;
 
-		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
 };
@@ -444,11 +459,23 @@
 	status = "okay";
 };
 
+&lpuart2 { /* RS232/DB9/P17 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2>;
+	status = "okay";
+};
+
 &lpuart5 {
 	/* BT */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart5>;
 	/*fsl,uart-has-rtscts;*/
+	status = "okay";
+};
+
+&lpuart7 { /* RS485/_/J22 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart7>;
 	status = "okay";
 };
 
