@@ -22,18 +22,11 @@
 
 #include <linux/of_device.h>
 #include <linux/of_gpio.h>
+#include <video/of_display_timing.h>
 
 #include <video/mipi_display.h>
-
-#define   LCD_XSIZE_TFT   720
-#define   LCD_YSIZE_TFT   1280
-#define   PCLOCK          62000
-#define   LCD_VBPD        20
-#define   LCD_VFPD        10
-#define   LCD_VSPW        10
-#define   LCD_HBPD        30
-#define   LCD_HFPD        10
-#define   LCD_HSPW        20
+#include <video/display_timing.h>
+#include <video/videomode.h>
 
 struct ili9881c {
     struct drm_panel	panel;
@@ -285,6 +278,9 @@ static const u32 ili_bus_formats[] = {
         MEDIA_BUS_FMT_RGB565_1X16,
 };
 
+static const u32 ili_bus_flags = DRM_BUS_FLAG_DE_LOW |
+				 DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE;
+
 static inline struct ili9881c *panel_to_ili9881c(struct drm_panel *panel)
 {
     return container_of(panel, struct ili9881c, panel);
@@ -299,7 +295,7 @@ static int color_format_from_dsi_format(enum mipi_dsi_pixel_format format)
     case MIPI_DSI_FMT_RGB666_PACKED:
         return 0x66;
     case MIPI_DSI_FMT_RGB888:
-        return 0x7;
+        return 0x77;
     default:
         return 0x77;
     }
@@ -446,10 +442,10 @@ static int ili9881c_prepare(struct drm_panel *panel)
 
     /* And reset it */
     gpio_set_value_cansleep(ctx->rst_gpio, 0);
-    msleep(120);
+    msleep(20);
 
     gpio_set_value_cansleep(ctx->rst_gpio, 1);
-    msleep(120);
+    msleep(20);
 
     ctx->prepared = true;
 
@@ -497,52 +493,50 @@ static int ili9881c_unprepare(struct drm_panel *panel)
     return 0;
 }
 
-static const struct drm_display_mode bananapi_default_mode = {
-    .clock	= PCLOCK,
+static struct display_timing banana_timing = {
+    .pixelclock = { 60000000, 60000000, 60000000 },
+    .hactive = { 720, 720, 720 },
+    .hfront_porch = { 20, 20, 20 },
+    .hback_porch = { 10, 10, 10 },
+    .hsync_len = { 10, 10, 10 },
+    .vactive = { 1280, 1280, 1280 },
+    .vfront_porch = { 10, 10, 10 },
+    .vback_porch = { 30, 30, 30 },
+    .vsync_len = { 20, 20, 20 },
+    .flags = DISPLAY_FLAGS_VSYNC_LOW | DISPLAY_FLAGS_HSYNC_LOW | DISPLAY_FLAGS_DE_LOW,
+};
 
-    .hdisplay	= LCD_XSIZE_TFT,
-    .hsync_start= LCD_XSIZE_TFT + LCD_HFPD,
-    .hsync_end	= LCD_XSIZE_TFT + LCD_HFPD + LCD_HSPW,
-    .htotal	= LCD_XSIZE_TFT + LCD_HFPD + LCD_HSPW + LCD_HBPD,
-
-    .vdisplay	= LCD_YSIZE_TFT,
-    .vsync_start= LCD_YSIZE_TFT + LCD_VFPD,
-    .vsync_end	= LCD_YSIZE_TFT + LCD_VFPD + LCD_VSPW,
-    .vtotal	= LCD_YSIZE_TFT + LCD_VFPD + LCD_VSPW + LCD_VBPD,
+static struct drm_display_mode default_mode = {
+	.width_mm = 63,
+	.height_mm = 115,
+	.flags = DRM_MODE_FLAG_NHSYNC | DRM_MODE_FLAG_NVSYNC,
 };
 
 static int ili9881c_get_modes(struct drm_panel *panel,
-		struct drm_connector *connector)
+			       struct drm_connector *connector)
 {
-    struct ili9881c *ctx = panel_to_ili9881c(panel);
-    struct drm_display_mode *mode;
-    int ret;
+	struct drm_display_mode *mode;
 
-    mode = drm_mode_duplicate(connector->dev, &bananapi_default_mode);
-    if (!mode) {
-        dev_err(&ctx->dsi->dev, "failed to add mode %ux%ux@%u\n",
-            bananapi_default_mode.hdisplay,
-            bananapi_default_mode.vdisplay,
-            drm_mode_vrefresh(&bananapi_default_mode));
-        return -ENOMEM;
-    }
+	mode = drm_mode_duplicate(connector->dev, &default_mode);
+	if (!mode) {
+		dev_err(panel->dev, "failed to add mode %ux%u@%u\n",
+			default_mode.hdisplay, default_mode.vdisplay,
+			drm_mode_vrefresh(&default_mode));
+		return -ENOMEM;
+	}
 
-    drm_mode_set_name(mode);
+	drm_mode_set_name(mode);
+	mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
+	drm_mode_probed_add(connector, mode);
 
-    connector->display_info.width_mm = 62;
-    connector->display_info.height_mm = 110;
+	connector->display_info.width_mm = mode->width_mm;
+	connector->display_info.height_mm = mode->height_mm;
+	connector->display_info.bus_flags = ili_bus_flags;
 
-    dev_dbg(&ctx->dsi->dev, "calling bus format set function ili9881c\n");
-    connector->display_info.bus_flags = DRM_BUS_FLAG_DE_LOW | DRM_BUS_FLAG_PIXDATA_DRIVE_NEGEDGE;
-    ret = drm_display_info_set_bus_formats(&connector->display_info,
-                    ili_bus_formats, ARRAY_SIZE(ili_bus_formats));
-    if (ret)
-        return -EINVAL;
-
-    mode->type = DRM_MODE_TYPE_DRIVER | DRM_MODE_TYPE_PREFERRED;
-    drm_mode_probed_add(connector, mode);
-
-    return 1;
+	drm_display_info_set_bus_formats(&connector->display_info,
+					 ili_bus_formats,
+					 ARRAY_SIZE(ili_bus_formats));
+	return 1;
 }
 
 static const struct drm_panel_funcs ili9881c_funcs = {
@@ -553,11 +547,17 @@ static const struct drm_panel_funcs ili9881c_funcs = {
     .get_modes	= ili9881c_get_modes,
 };
 
+static void ili9881c_dt_to_drm(struct display_timing *dt, struct drm_display_mode *mode)
+{
+    struct videomode vm;
+    videomode_from_timing(dt, &vm);
+    drm_display_mode_from_videomode(&vm, mode);
+}
+
 static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
 {
     struct device_node *np;
     struct ili9881c *ctx;
-    int ret;
 	int lanes = 4;
 
     ctx = devm_kzalloc(&dsi->dev, sizeof(*ctx), GFP_KERNEL);
@@ -575,18 +575,13 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
         return PTR_ERR(ctx->power);
     }
 
-    ctx->rst_gpio = of_get_named_gpio(dsi->dev.of_node, "reset-gpio", 0);
-    if (!gpio_is_valid(ctx->rst_gpio)) {
-        dev_err(&dsi->dev, "Couldn't get panel reset pin available 0\n");
-        return -EINVAL;
-    }
-
-    ret = devm_gpio_request_one(&dsi->dev, ctx->rst_gpio,
-                GPIOF_OUT_INIT_LOW, "ili_reset");
-
-    if (ret < 0) {
-        dev_err(&dsi->dev, "Couldn't get panel reset pin available 1\n");
-        return ret;
+    np = of_parse_phandle(dsi->dev.of_node, "reset-gpio", 0);
+    if (np) {
+        ctx->rst_gpio = of_get_named_gpio(dsi->dev.of_node, "reset-gpio", 0);
+        if (!gpio_is_valid(ctx->rst_gpio)) {
+            dev_notice(&dsi->dev, "Couldn't get panel reset pin available\n");
+            return -EPROBE_DEFER;
+        }
     }
 
     np = of_parse_phandle(dsi->dev.of_node, "backlight", 0);
@@ -598,6 +593,11 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
             return -EPROBE_DEFER;
     }
 
+    if (of_get_display_timing(dsi->dev.of_node, "panel-timing", &banana_timing))
+        dev_notice(&dsi->dev, "Couldn't get panel timing from dtb, use driver settings\n");
+    else
+        dev_notice(&dsi->dev, "Use panel timing from dtb\n");
+
     of_property_read_u32(dsi->dev.of_node, "dsi-lanes", &lanes);
     drm_panel_add(&ctx->panel);
 
@@ -605,6 +605,8 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
     dsi->mode_flags |= MIPI_DSI_MODE_VIDEO;
     dsi->format = MIPI_DSI_FMT_RGB888;
     dsi->lanes = lanes;
+
+    ili9881c_dt_to_drm(&banana_timing,&default_mode);
 
     return mipi_dsi_attach(dsi);
 }
