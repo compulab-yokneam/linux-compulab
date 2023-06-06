@@ -295,6 +295,12 @@
 	pinctrl-1 = <&pinctrl_lpi2c1>;
 	status = "okay";
 
+	eeprom@50 {
+		compatible = "atmel,24c08";
+		reg = <0x50>;
+		pagesize = <16>;
+	};
+
 	rtc@69 {
 		compatible = "ab1805";
 		reg = <0x69>;
@@ -421,6 +427,12 @@
                 #gpio-cells = <2>;
                 reg = <0x20>;
         };
+
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
 
 	goodix911_lvds: goodix@5d {
 		compatible = "goodix,gt911";
