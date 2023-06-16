@@ -286,6 +286,17 @@
 	status = "okay";
 };
 
+&gpio1 {
+	regulator-gpioexp {
+		gpio-hog;
+		gpios = <8 GPIO_ACTIVE_HIGH>;
+		line-name = "exp_npwren";
+		output-high;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpioexp>;
+	};
+};
+
 &lpi2c1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
