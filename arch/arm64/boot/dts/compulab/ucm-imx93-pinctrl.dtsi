@@ -236,4 +236,10 @@
 			MX93_PAD_GPIO_IO21__GPIO2_IO21		0x31e
 		>;
 	};
+
+	pinctrl_gpioexp: gpioexp {
+		fsl,pins = <
+			MX93_PAD_PDM_CLK__GPIO1_IO08			0x31e
+		>;
+	};
 };
