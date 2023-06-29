@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include "ucm-imx8m-plus.dts"
+#include "ucm-imx8m-plus-hdmi.dts"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
@@ -45,8 +45,7 @@
 &mipi_csi_0 {
 	status = "okay";
 	port@0 {
-		reg = <0>;
-		mipi1_sensor_ep: endpoint@1 {
+		mipi1_sensor_ep: endpoint {
 			remote-endpoint = <&imx219_mipi1_ep>;
 			data-lanes = <2>;
 			csis-hs-settle = <23>;
@@ -61,5 +60,11 @@
 };
 
 &isi_0 {
+	interface = <2 0 2>;
+	status = "okay";
+};
+
+&isi_1 {
+	interface = <2 0 2>;
 	status = "okay";
 };
