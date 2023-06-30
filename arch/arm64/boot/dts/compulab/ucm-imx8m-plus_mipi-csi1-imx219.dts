@@ -19,10 +19,15 @@
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_csi_mclk>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
 		csi_id = <0>;
-		reset-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
+
 		mipi_csi;
 		status = "disabled";
 
@@ -60,11 +65,19 @@
 };
 
 &isi_0 {
-	interface = <2 0 2>;
-	status = "okay";
+	status = "disabled";
+
 };
 
 &isi_1 {
-	interface = <2 0 2>;
+	status = "disabled";
+
+};
+
+&isp_0 {
+	status = "okay";
+};
+
+&dewarp {
 	status = "okay";
 };
