@@ -1,0 +1,88 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2019-2020 NXP
+*/
+
+/dts-v1/;
+
+
+#include "imx8mp-evk.dts"
+
+/delete-node/ &ov5640_0;
+
+&i2c2 {
+
+
+	imx219: imx219@10 {
+		compatible = "sony,imx219";
+		reg = <0x10>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi0_rst> ,<&pinctrl_csi0_pwn>; 
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		csi_id = <0>;
+		pwn-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&gpio1 6 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		
+		mipi_csi;
+		status = "okay";
+	/*	
+		VANA-supply = <&imx219_vana_2v8>;
+		VDIG-supply = <&imx219_vdig_1v8>;
+		VDDL-supply = <&imx219_vddl_1v2>;
+*/
+		port {
+			imx219_mipi_0_ep: endpoint {
+				remote-endpoint = <&mipi_csi0_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <456000000>;
+	
+			};
+		};
+	};
+
+
+};
+
+&mipi_csi_0 { 
+    
+    port@0 {
+        mipi_csi0_ep: endpoint {
+        ///delete-property/ remote-endpoint;
+         remote-endpoint = <&imx219_mipi_0_ep>;
+        };
+    };
+
+};
+
+&cameradev {
+
+        /delete-node/ mipi_csi_1;
+};
+
+&isi_0 {
+	status = "disabled";
+
+};
+
+&isi_1 {
+	status = "disabled";
+
+};
+
+
+&isp_0 {
+	status = "okay";
+};
+
+&dewarp {
+	status = "okay";
+};
+

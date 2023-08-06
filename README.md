@@ -19,6 +19,7 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 |ucm-imx8m-plus|```export MACHINE=ucm-imx8m-plus```|
 |som-imx8m-plus|```export MACHINE=som-imx8m-plus```|
 |iot-gate-imx8plus|```export MACHINE=iot-gate-imx8plus```|
+|ucm-imx93|```export MACHINE=ucm-imx93```|
 
 * Clone the source code:
 ```
