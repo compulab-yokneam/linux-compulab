@@ -48,6 +48,7 @@
 	}
 
 #define to_ar1335(sd) container_of(sd, struct ar1335, sd)
+#define AR1335_MCU_CLK	24000000
 
 struct i2c_client *io_expander;
 
@@ -2755,8 +2756,8 @@ static int ar1335_probe(struct i2c_client *client,
 	}
 
 	xclk_freq = clk_get_rate(sensor->xclk);
-	if (xclk_freq != 24000000) {
-		debug_printk("Unsupported clock frequency: %u\n", xclk_freq);
+	if (xclk_freq != AR1335_MCU_CLK) {
+		debug_printk("Unsupported clock frequency: %u, only %d is supported\n", xclk_freq, AR1335_MCU_CLK);
 		return -EINVAL;
 	}
 
