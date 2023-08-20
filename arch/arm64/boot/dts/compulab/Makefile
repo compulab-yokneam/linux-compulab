@@ -51,6 +51,7 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds.dtb
 DTC_FLAGS := -@
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth-overlay.dtbo
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
