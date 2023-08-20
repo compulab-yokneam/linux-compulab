@@ -281,9 +281,9 @@
 		#size-cells = <0>;
 		clock-frequency = <5000000>;
 
-		ethphy2: ethernet-phy@2 {
+		ethphy2: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <2>;
+			reg = <5>;
 			eee-broken-1000t;
 		};
 	};
