@@ -37,6 +37,9 @@ dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-thermal.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-usbdev.dtb
 
+# overlays
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rtc-overlay.dtbo
+
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
 clean-files    := *.dtb

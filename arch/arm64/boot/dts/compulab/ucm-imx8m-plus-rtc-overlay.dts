@@ -1,0 +1,6 @@
+/dts-v1/;
+/plugin/;
+
+&ab1805_rtc {
+    xt-frequency = <32770750>;
+};
