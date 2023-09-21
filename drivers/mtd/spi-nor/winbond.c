@@ -71,6 +71,8 @@ static const struct flash_info winbond_nor_parts[] = {
 		NO_SFDP_FLAGS(SECT_4K) },
 	{ "w25q20ew", INFO(0xef6012, 0, 64 * 1024,  4)
 		NO_SFDP_FLAGS(SECT_4K) },
+	{ "w25q16", INFO(0xef4015, 0, 64 * 1024,  32)
+		NO_SFDP_FLAGS(SECT_4K) },
 	{ "w25q32", INFO(0xef4016, 0, 64 * 1024,  64)
 		NO_SFDP_FLAGS(SECT_4K) },
 	{ "w25q32dw", INFO(0xef6016, 0, 64 * 1024,  64)
