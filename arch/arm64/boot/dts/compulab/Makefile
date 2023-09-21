@@ -1,5 +1,8 @@
 DTC_FLAGS := -@
 
+# i.MX8M-mini
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-mini.dtb
+# i.MX8M-plus
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2.dtb
@@ -39,7 +42,7 @@ dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-mipi.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-thermal.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-usbdev.dtb
-# overlays
+# i.MX8M-plus overlays
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-mipi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-lvds-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-hdmi-overlay.dtbo
