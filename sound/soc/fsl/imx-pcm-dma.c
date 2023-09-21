@@ -37,6 +37,7 @@ static const struct snd_dmaengine_pcm_config imx_dmaengine_pcm_config = {
 int imx_pcm_dma_init(struct platform_device *pdev)
 {
 	struct snd_dmaengine_pcm_config *config;
+	int ret;
 
 	config = devm_kzalloc(&pdev->dev,
 			sizeof(struct snd_dmaengine_pcm_config), GFP_KERNEL);
@@ -44,9 +45,11 @@ int imx_pcm_dma_init(struct platform_device *pdev)
 		return -ENOMEM;
 	*config = imx_dmaengine_pcm_config;
 
-	return devm_snd_dmaengine_pcm_register(&pdev->dev,
-		config,
-		SND_DMAENGINE_PCM_FLAG_COMPAT);
+	ret = devm_snd_dmaengine_pcm_register(&pdev->dev, config,
+			SND_DMAENGINE_PCM_FLAG_COMPAT);
+	if(ret)
+		devm_kfree(&pdev->dev, config);
+	return ret;
 }
 EXPORT_SYMBOL_GPL(imx_pcm_dma_init);
 
