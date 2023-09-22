@@ -12,6 +12,11 @@ dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-rs485.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-spidev.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-input.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-mini.dtb
+dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8.dtb
+dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-can.dtb
+dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-ied.dtb
 # i.MX8M-plus
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
