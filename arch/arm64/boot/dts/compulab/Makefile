@@ -20,6 +20,7 @@ dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-ied.dtb
 dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-ied-m4.dtb
 dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-poed.dtb
 dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-poedv2.dtb
++dtb-$(CONFIG_ARCH_MXC) += sb-iotgimx8-ied-wakeup.dtb
 # i.MX8M-plus
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
