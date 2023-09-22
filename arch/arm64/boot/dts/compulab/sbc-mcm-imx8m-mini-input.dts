@@ -1,6 +1,6 @@
 /dts-v1/;
 
-#include "mcm-imx8m-mini.dts"
+#include "mcm-imx8m-mini.dtsi"
 #include "mcm-imx8m-mini-input.dtsi"
 #include "sb-mcm-imx8-rev1.dtsi"
 

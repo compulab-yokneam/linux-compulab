@@ -12,9 +12,13 @@
  * GNU General Public License for more details.
  */
 
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+* This DT is intended for lab purposes ONLY
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
 /dts-v1/;
 
-#include "mcm-imx8m-mini.dts"
+#include "mcm-imx8m-mini.dtsi"
 
 / {
 	model = "CompuLab MCM i.MX8MM board (thermal)";

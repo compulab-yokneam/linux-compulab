@@ -12,7 +12,9 @@
  * GNU General Public License for more details.
  */
 
-#include "mcm-imx8m-mini.dts"
+/dts-v1/;
+
+#include "mcm-imx8m-mini.dtsi"
 
 &rpmsg{
 	/*

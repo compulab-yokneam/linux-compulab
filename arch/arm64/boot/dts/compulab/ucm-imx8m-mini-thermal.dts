@@ -12,6 +12,10 @@
  * GNU General Public License for more details.
  */
 
+/* !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+* This DT is intended for lab purposes ONLY
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+
 /dts-v1/;
 
 #include "ucm-imx8m-mini.dts"
