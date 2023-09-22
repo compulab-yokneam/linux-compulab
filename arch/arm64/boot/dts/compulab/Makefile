@@ -2,6 +2,13 @@ DTC_FLAGS := -@
 
 # i.MX8M-mini
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-mini.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-mini.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-mini-m4.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-mini-thermal.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-rs485.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-spidev.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm-imx8m-mini-input.dtb
 # i.MX8M-plus
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
