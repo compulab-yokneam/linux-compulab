@@ -14,10 +14,8 @@
 
 /dts-v1/;
 
-#include "../freescale/imx8mm.dtsi"
-#include "sb-ucm-imx8-rev2.dtsi"
-#include "../freescale/imx8mm-pinfunc.h"
 #include "ucm-imx8m-mini.dtsi"
+#include "sb-ucm-imx8-rev2.dtsi"
 
 / {
 	model = "CompuLab UCM i.MX8MM board";

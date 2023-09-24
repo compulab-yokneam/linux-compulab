@@ -163,6 +163,10 @@
 	status = "okay";
 };
 
+&uart4 {
+	/delete-node/ bluetooth;
+};
+
 &usbotg1 {
 	dr_mode = "host";
 	disable-over-current;
@@ -201,6 +205,7 @@
 	pinctrl-0 = <&pinctrl_usdhc2>;
 	bus-width = <4>;
 	mmc-ddr-1_8v;
+	no-mmc-hs400;
 	non-removable;
 	vmmc-supply = <&reg_usdhc2_rst>;
 	status = "okay";
