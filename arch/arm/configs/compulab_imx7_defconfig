@@ -949,3 +949,5 @@ CONFIG_DEBUG_FS=y
 # CONFIG_SCHED_DEBUG is not set
 # CONFIG_DEBUG_PREEMPT is not set
 # CONFIG_FTRACE is not set
+CONFIG_EXTRA_FIRMWARE="imx/sdma/sdma-imx7d.bin"
+CONFIG_EXTRA_FIRMWARE_DIR="lib/firmware"
