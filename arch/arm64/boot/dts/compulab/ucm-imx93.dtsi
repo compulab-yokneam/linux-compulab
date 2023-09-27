@@ -21,6 +21,17 @@
 		stdout-path = &lpuart1;
 	};
 
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_led>;
+
+		heartbeat-led {
+			gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+		};
+	};
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
@@ -30,14 +41,14 @@
 			compatible = "shared-dma-pool";
 			reusable;
 			alloc-ranges = <0 0x80000000 0 0x95ffffff>;
-			size = <0 0x10000000>;
+			size = <0 0x16000000>;
 			linux,cma-default;
 		};
 
 		ethosu_mem: ethosu_region@C0000000 {
 			compatible = "shared-dma-pool";
 			reusable;
-			reg = <0x0 0x98000000 0x0 0x7ffffff>;
+			reg = <0x0 0x98000000 0x0 0x8000000>;
 		};
 
 		vdev0vring0: vdev0vring0@a4000000 {
@@ -65,15 +76,15 @@
 			no-map;
 		};
 
-		vdevbuffer: vdevbuffer@a4020000 {
+		vdevbuffer: vdevbuffer@84020000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0xa4020000 0 0x100000>;
+			reg = <0 0x84020000 0 0x100000>;
 			no-map;
 		};
 
-		ele_reserved: ele-reserved@a4120000 {
+		ele_reserved: ele-reserved@84120000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0xa4120000 0 0x100000>;
+			reg = <0 0x84120000 0 0x100000>;
 			no-map;
 		};
 	};
@@ -255,7 +266,7 @@
 		#size-cells = <0>;
 		clock-frequency = <5000000>;
 
-		ethphy1: ethernet-phy@4 {
+		ethphy1: ethernet-phy-eqos@4 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reset-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <10000>;
@@ -281,7 +292,7 @@
 		#size-cells = <0>;
 		clock-frequency = <5000000>;
 
-		ethphy2: ethernet-phy@5 {
+		ethphy2: ethernet-phy-fec@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <5>;
 			eee-broken-1000t;
