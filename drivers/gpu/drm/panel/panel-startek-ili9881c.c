@@ -495,7 +495,7 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 }
 
 static struct display_timing banana_timing = {
-    .pixelclock = { 60000000, 60000000, 60000000 },
+    .pixelclock = { 62000000, 62000000, 62000000 },
     .hactive = { 720, 720, 720 },
     .hfront_porch = { 20, 20, 20 },
     .hback_porch = { 10, 10, 10 },
