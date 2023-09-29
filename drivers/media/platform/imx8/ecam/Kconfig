@@ -1,0 +1,41 @@
+if VIDEO_ECAM
+menu "IMX8 eCon Camera ISI/MIPI Features support"
+
+config MXC_CAMERA_AR0521
+        tristate "AR0521 Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n
+        help
+          Enable support for video4linux camera sensor driver for eCAM50_CUIMX8
+
+config MXC_CAMERA_AR1335
+        tristate "AR1335 Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n
+        help
+          Enable support for video4linux camera sensor driver for eCAM131_CUIMX8
+
+config MXC_CAMERA_AR1335_AF
+        tristate "AR1335 Auto focus Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n
+        help
+          Enable support for video4linux camera sensor driver for eCAM136_IMX8
+
+config MXC_CAMERA_AR1335_MCU
+        tristate "AR1335 MCU Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n
+        help
+          Enable support for video4linux camera sensor driver for eCAM130
+
+config MXC_CAMERA_AR0234
+        tristate "AR0234 Camera driver support"
+        depends on I2C && VIDEO_ECAM
+        default n 
+        help
+          Enable support for video4linux camera sensor driver for eCAM21_CUIMX8
+
+endmenu
+endif #VIDEO_ECAM
+
