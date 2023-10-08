@@ -3,6 +3,8 @@
  * Copyright 2021 CompuLab
  */
 
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+
 / {
 	aliases {
 		ethphy0 = &ethphy0;
@@ -220,6 +222,12 @@
 			system-clock-direction = "in";
 			system-clock-type = "mclk";
 		};
+	};
+
+	pcie0_refclk: pcie0-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
 	};
 };
 
@@ -619,27 +627,21 @@
 
 &pcie {
 	reset-gpio = <&pca9555 0 GPIO_ACTIVE_LOW>;
-	ext_osc = <0>;
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-		 <&clk IMX8MP_CLK_PCIE_AUX>,
-		 <&clk IMX8MP_CLK_HSIO_AXI>,
-		 <&clk IMX8MP_CLK_PCIE_ROOT>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
-	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
-			  <&clk IMX8MP_CLK_PCIE_AUX>;
-	assigned-clock-rates = <500000000>, <10000000>;
-	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
-				 <&clk IMX8MP_SYS_PLL2_50M>;
+		 <&clk IMX8MP_CLK_PCIE_ROOT>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>;
+	clock-names = "pcie", "pcie_aux", "pcie_bus";
+	assigned-clocks = <&clk IMX8MP_CLK_PCIE_AUX>;
+	assigned-clock-rates = <500000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_50M>;
 	status = "okay";
 };
 
-&pcie_ep {
-	ext_osc = <0>;
+&pcie_ep{
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-		 <&clk IMX8MP_CLK_PCIE_AUX>,
-		 <&clk IMX8MP_CLK_HSIO_AXI>,
-		 <&clk IMX8MP_CLK_PCIE_ROOT>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+		 <&clk IMX8MP_CLK_PCIE_ROOT>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>;
+	clock-names = "pcie", "pcie_aux", "pcie_bus";
 	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
 			  <&clk IMX8MP_CLK_PCIE_AUX>;
 	assigned-clock-rates = <500000000>, <10000000>;
@@ -649,7 +651,10 @@
 };
 
 &pcie_phy {
-	ext_osc = <0>;
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
+	clocks = <&pcie0_refclk>;
+	fsl,clkreq-unsupported;
+	clock-names = "ref";
 	status = "okay";
 };
 
