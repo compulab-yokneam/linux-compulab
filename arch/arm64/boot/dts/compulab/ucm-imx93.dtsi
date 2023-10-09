@@ -41,7 +41,7 @@
 			compatible = "shared-dma-pool";
 			reusable;
 			alloc-ranges = <0 0x80000000 0 0x95ffffff>;
-			size = <0 0x16000000>;
+			size = <0 0x8000000>;
 			linux,cma-default;
 		};
 
@@ -502,6 +502,46 @@
 		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
+
+	sensor_mipi2: mipi2@42 {
+		compatible = "aptina,ar1335_mcu";
+		reg = <0x42>;
+		clocks = <&clk IMX93_CLK_MIPI_PHY_CFG>;
+		clock-names = "xclk";
+		pwdn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 9 GPIO_ACTIVE_LOW>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		camera_mipi_lanes = <2>;
+		status = "okay";
+
+		port {
+			ar1335_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_csi_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+			};
+		};
+	};
+};
+
+&mipi_csi {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        status = "okay";
+
+        port@0 {
+                reg = <0>;
+                mipi_csi_ep: endpoint {
+                        remote-endpoint = <&ar1335_mipi_ep>;
+                        data-lanes = <2>;
+                        cfg-clk-range = <28>;
+                        hs-clk-range = <0x2b>;
+                        bus-type = <4>;
+                };
+        };
 };
 
 &lpuart1 { /* console */
