@@ -44,6 +44,7 @@ dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-thermal.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-usbdev.dtb
 # overlays
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rtc-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-mipi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-lvds-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-hdmi-overlay.dtbo
