@@ -39,10 +39,46 @@
 			no-map;
 		};
 
-		rsc_table: rsc-table@550ff000 {
+		rsc_table: rsc_table@550ff000 {
 			reg = <0 0x550ff000 0 0x1000>;
 			no-map;
 		};
+
+		audio_reserved: audio@81000000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x81000000 0 0x10000000>;
+		};
+
+		micfil_reserved: mic_rpmsg@91000000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x91000000 0 0x100000>;
+		};
+	};
+
+	sound-micfil {
+		status = "disabled";
+	};
+
+	rpmsg_micfil: rpmsg_micfil {
+		compatible = "fsl,imx8mp-rpmsg-audio";
+		model = "micfil-audio";
+		fsl,platform = "rpmsg-micfil-channel";
+		fsl,enable-lpa;
+		fsl,rpmsg-in;
+		assigned-clocks = <&clk IMX8MP_CLK_PDM>;
+		assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
+		assigned-clock-rates = <196608000>;
+		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_PDM_IPG>,
+			 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_PDM_ROOT>,
+			 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SDMA3_ROOT>,
+			 <&clk IMX8MP_AUDIO_PLL1_OUT>,
+			 <&clk IMX8MP_AUDIO_PLL2_OUT>;
+		clock-names = "ipg", "mclk", "dma", "pll8k", "pll11k";
+		memory-region = <&micfil_reserved>;
+		power-domains = <&audiomix_pd>;
+		status = "okay";
 	};
 
 	imx8mp-cm7 {
@@ -56,6 +92,18 @@
 		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
 		status = "okay";
 	};
+};
+
+&flexcan1 {
+	status = "disabled";
+};
+
+&flexcan2 {
+	status = "disabled";
+};
+
+&flexspi {
+	status = "disabled";
 };
 
 &pwm4{
@@ -72,6 +120,10 @@
 
 &sdma3{
 	status = "disabled";
+};
+
+&uart3 {
+    status = "disabled";
 };
 
 &uart4 {
