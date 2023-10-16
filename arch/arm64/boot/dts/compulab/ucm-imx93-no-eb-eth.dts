@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 CompuLab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx93.dtsi"
+#include "ucm-imx93-mipi.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 with FEC ethernet disabled";
+	compatible = "compulab,ucm-imx93", "fsl,imx93";
+};
+
+&fec {
+	status = "disabled";
+};
