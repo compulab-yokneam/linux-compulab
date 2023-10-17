@@ -295,7 +295,7 @@
 		reg = <0x69>;
 		pagesize = <16>;
 		sqw = "32768_Hz";
-		xt-frequency = <32773300>;
+		xt-frequency = <32772300>;
 		status = "okay";
 	};
 };
