@@ -154,7 +154,7 @@
 					225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240
 					241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
 		default-brightness-level = <222>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	lvds_backlight: lvds_backlight {
@@ -250,7 +250,7 @@
 &pwm1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm2 {
@@ -885,6 +885,21 @@
 		size = <0 0x2c000000>;
 		alloc-ranges = <0 0x40000000 0 0x80000000>;
 		linux,cma-default;
+	};
+};
+
+&mipi_dsi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "disabled";
+	backlight = <&dsi_backlight>;
+
+	mipi_panel: panel@0 {
+		compatible = "startek,kd050hdfia020";
+		reg = <0>;
+		reset-gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
+		dsi-lanes = <4>;
+		status = "disabled";
 	};
 };
 
