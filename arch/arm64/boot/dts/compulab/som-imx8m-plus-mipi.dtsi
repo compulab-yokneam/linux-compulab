@@ -1,15 +1,17 @@
-&mipi_dsi {
-	#address-cells = <1>;
-	#size-cells = <0>;
+&pwm1 {
 	status = "okay";
-	backlight = <&dsi_backlight>;
-	panel: panel@0 {
-		compatible = "startek,kd050hdfia020";
-		reg = <0>;
-		reset-gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
-		dsi-lanes = <4>;
+};
+
+&dsi_backlight {
+	status = "okay";
+};
+
+&mipi_dsi {
+	status = "okay";
+};
+
+&mipi_panel {
 		status = "okay";
-	};
 };
 
 &lcdif1 {

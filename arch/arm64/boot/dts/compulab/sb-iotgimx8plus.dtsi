@@ -158,7 +158,6 @@
 	clock-names = "ref";
 	fsl,clkreq-unsupported;
 	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
-	hsio-cfg = <PCIEAX2SATA>;
 	status = "okay";
 };
 

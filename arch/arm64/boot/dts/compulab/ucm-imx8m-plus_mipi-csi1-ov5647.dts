@@ -1,0 +1,85 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2021 CompuLab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus.dts"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+&i2c5 {
+	ov5647_mipi1: ov5647_mipi1@36 {
+		compatible = "ovti,ov5647";
+		reg = <0x36>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		csi_id = <0>;
+		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+
+		mipi_csi;
+		status = "disabled";
+
+		port {
+			ov5647_mipi1_ep: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <500000000>;
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+&ov5647_mipi1 {
+	status = "okay";
+};
+
+&mipi_csi_0 {
+	status = "okay";
+	port@0 {
+		mipi1_sensor_ep: endpoint {
+			remote-endpoint = <&ov5647_mipi1_ep>;
+			data-lanes = <2>;
+#if 0
+			csis-hs-settle = <23>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+#endif
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "disabled";
+
+};
+
+&isi_1 {
+	status = "disabled";
+
+};
+
+&isp_0 {
+	status = "okay";
+};
+
+&dewarp {
+	status = "okay";
+};
