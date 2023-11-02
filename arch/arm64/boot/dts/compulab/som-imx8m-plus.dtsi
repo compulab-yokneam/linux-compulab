@@ -680,7 +680,9 @@
 
 &xcvr {
 	#sound-dai-cells = <0>;
-	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spdif>;
+	status = "okay";
 };
 
 &sdma2 {

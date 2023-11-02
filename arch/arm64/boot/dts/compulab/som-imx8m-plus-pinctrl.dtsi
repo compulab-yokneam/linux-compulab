@@ -225,6 +225,13 @@
 		>;
 	};
 
+	pinctrl_spdif: spdif1grp {
+		fsl,pins = <
+			/*MX8MP_IOMUXC_SPDIF_RX__AUDIOMIX_SPDIF1_IN	0x116*/
+			MX8MP_IOMUXC_SPDIF_TX__AUDIOMIX_SPDIF1_OUT	0x116
+		>;
+	};
+
 	pinctrl_i2c2_synaptics_dsx_io: synaptics_dsx_iogrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO09__GPIO1_IO09		0x16
