@@ -686,7 +686,9 @@
 
 &xcvr {
 	#sound-dai-cells = <0>;
-	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spdif>;
+	status = "okay";
 };
 
 &sdma2 {
@@ -988,6 +990,13 @@
 			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0xd6
 			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28		0xd6
 			MX8MP_IOMUXC_SAI3_RXC__GPIO4_IO29		0xd6
+		>;
+	};
+
+	pinctrl_spdif: spdif1grp {
+		fsl,pins = <
+			/*MX8MP_IOMUXC_SPDIF_RX__AUDIOMIX_SPDIF1_IN	0x116*/
+			MX8MP_IOMUXC_SPDIF_TX__AUDIOMIX_SPDIF1_OUT	0x116
 		>;
 	};
 
