@@ -515,7 +515,7 @@
 		mclk_source = <0>;
 		mipi_csi;
 		camera_mipi_lanes = <2>;
-		status = "okay";
+		status = "disabled";
 
 		port {
 			ar1335_mipi_ep: endpoint {
