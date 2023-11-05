@@ -24,3 +24,7 @@
 		status = "okay";
 	};
 };
+
+&sensor_mipi2 {
+	status = "okay";
+};
