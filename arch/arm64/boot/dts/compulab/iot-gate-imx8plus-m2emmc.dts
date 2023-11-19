@@ -38,7 +38,6 @@
 	non-removable;
 	no-1-8-v;
 	keep-power-in-suspend;
-	/*fixed-emmc-driver-type = <0>;*/
 	vqmmc-supply = <&reg_usdhc2_vsel>;
 	status = "okay";
 };
