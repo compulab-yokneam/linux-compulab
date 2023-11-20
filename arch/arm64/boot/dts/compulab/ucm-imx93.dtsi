@@ -78,13 +78,13 @@
 
 		vdevbuffer: vdevbuffer@84020000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0x84020000 0 0x100000>;
+			reg = <0 0xa4020000 0 0x100000>;
 			no-map;
 		};
 
-		ele_reserved: ele-reserved@84120000 {
+		ele_reserved: ele-reserved@a4120000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0x84120000 0 0x100000>;
+			reg = <0 0xa4120000 0 0x100000>;
 			no-map;
 		};
 	};
