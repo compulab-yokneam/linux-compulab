@@ -8,9 +8,9 @@
 /* IOT-GATE-IMX8PLUS with ADS1015 A2DC + SLB9670 TPM extension module in M.2 Expansion Connector */
 
 &i2c5 {
-	ads1015: adc@49 {
+	ads1015: adc@48 {
 		compatible = "ti,ads1015";
-		reg = <0x49>;
+		reg = <0x48>;
 		#address-cells = <1>;
 		#size-cells = <0>;
 
