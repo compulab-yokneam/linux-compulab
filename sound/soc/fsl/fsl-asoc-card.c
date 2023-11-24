@@ -823,6 +823,14 @@ static int fsl_asoc_card_probe(struct platform_device *pdev)
 		priv->codec_priv.pll_id = WM8962_FLL;
 		priv->dai_fmt |= SND_SOC_DAIFMT_CBP_CFP;
 		priv->card_type = CARD_WM8962;
+	} else if (of_device_is_compatible(np, "fsl,imx-audio-wm8962x")) {
+		codec_dai_name = "wm8962";
+		priv->codec_priv.mclk_id = WM8962_SYSCLK_FLL;
+		priv->codec_priv.fll_id = WM8962_SYSCLK_FLL;
+		priv->codec_priv.pll_id = 4;
+		priv->codec_priv.mclk_freq = (12288000 << 0);
+		priv->dai_fmt |= SND_SOC_DAIFMT_CBC_CFC;
+		priv->card_type = CARD_WM8962;
 	} else if (of_device_is_compatible(np, "fsl,imx-audio-wm8960")) {
 		codec_dai_name = "wm8960-hifi";
 		priv->codec_priv.fll_id = WM8960_SYSCLK_AUTO;
@@ -1189,6 +1197,7 @@ static const struct of_device_id fsl_asoc_card_dt_ids[] = {
 	{ .compatible = "fsl,imx-audio-tlv320aic31xx", },
 	{ .compatible = "fsl,imx-audio-sgtl5000", },
 	{ .compatible = "fsl,imx-audio-wm8962", },
+	{ .compatible = "fsl,imx-audio-wm8962x", },
 	{ .compatible = "fsl,imx-audio-wm8960", },
 	{ .compatible = "fsl,imx-audio-mqs", },
 	{ .compatible = "fsl,imx-audio-wm8524", },
