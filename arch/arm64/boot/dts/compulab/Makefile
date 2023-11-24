@@ -57,11 +57,13 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-headless.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-csi.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9.dtb
 # i.MX9 overlays
 DTC_FLAGS := -@
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9-overlay.dtbo
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
