@@ -207,7 +207,7 @@
 	assigned-clocks = <&clk IMX93_CLK_SAI1>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
-	status = "disable";
+	status = "disabled";
 };
 
 &sai3 {
@@ -217,7 +217,7 @@
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
 	fsl,sai-mclk-direction-output;
-	status = "disable";
+	status = "disabled";
 };
 
 &micfil {
@@ -227,7 +227,7 @@
 	assigned-clocks = <&clk IMX93_CLK_PDM>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <49152000>;
-	status = "disable";
+	status = "disabled";
 };
 
 &xcvr {
@@ -245,7 +245,7 @@
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>,
 			 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 	assigned-clock-rates = <12288000>, <200000000>;
-	status = "disable";
+	status = "disabled";
 };
 	
 &adc1 {
@@ -553,7 +553,7 @@
 &mipi_csi {
         #address-cells = <1>;
         #size-cells = <0>;
-        status = "okay";
+        status = "disabled";
 
         port@0 {
                 reg = <0>;
