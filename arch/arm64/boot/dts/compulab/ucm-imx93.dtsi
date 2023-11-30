@@ -553,7 +553,7 @@
 &mipi_csi {
         #address-cells = <1>;
         #size-cells = <0>;
-        status = "disabled";
+        status = "okay";
 
         port@0 {
                 reg = <0>;
@@ -678,7 +678,7 @@
 };
 
 &cameradev {
-	status = "okay";
+	status = "disabled";
 };
 
 &isi_0 {
