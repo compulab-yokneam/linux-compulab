@@ -401,7 +401,7 @@
 
 	touchscreen_pins: tsgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12	0x00
+			MX8MP_IOMUXC_SAI5_RXD1__GPIO3_IO22	0x00
 		>;
 	};
 
