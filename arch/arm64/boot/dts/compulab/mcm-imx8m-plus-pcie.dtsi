@@ -1,0 +1,7 @@
+&pcie {
+	status = "okay";
+};
+
+&pcie_phy {
+	status = "okay";
+};
