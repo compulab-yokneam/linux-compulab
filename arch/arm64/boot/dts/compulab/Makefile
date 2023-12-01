@@ -71,6 +71,7 @@ dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi.dtb
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds.dtb
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi.dtb
 
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-eb-eth-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi-overlay.dtbo
