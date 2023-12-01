@@ -548,13 +548,13 @@
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
 
-		interrupt-parent = <&gpio4>;
-		interrupts = <12 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-parent = <&gpio3>;
+		interrupts = <22 IRQ_TYPE_LEVEL_HIGH>;
 
 		pinctrl-names = "default";
 		pinctrl-0 = <&touchscreen_pins>;
 
-		irq-gpios = <&gpio4 12 GPIO_ACTIVE_HIGH>;
+		irq-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
 		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
 		status = "okay";
 	};
