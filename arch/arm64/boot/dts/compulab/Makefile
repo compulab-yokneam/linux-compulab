@@ -65,6 +65,16 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9-overlay.dtbo
 
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-headless.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi-overlay.dtbo
+
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
 clean-files    := *.dtb
