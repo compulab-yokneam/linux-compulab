@@ -1,0 +1,19 @@
+&pwm1 {
+	status = "okay";
+};
+
+&dsi_backlight {
+	status = "okay";
+};
+
+&mipi_dsi {
+	status = "okay";
+};
+
+&mipi_panel {
+		status = "okay";
+};
+
+&lcdif1 {
+	status = "okay";
+};
