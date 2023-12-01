@@ -169,9 +169,8 @@
 
 	pinctrl_pcie: pciegrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_I2C4_SCL__PCIE_CLKREQ_B		0x61 /* open drain, pull up */
-			MX8MP_IOMUXC_SD1_DATA4__GPIO2_IO06		0x41
-			MX8MP_IOMUXC_SD1_DATA5__GPIO2_IO07		0x41
+			MX8MP_IOMUXC_I2C4_SCL__PCIE_CLKREQ_B		0x61
+			MX8MP_IOMUXC_I2C4_SDA__GPIO5_IO21		0x19
 		>;
 	};
 
