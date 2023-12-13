@@ -16,14 +16,13 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 
 | Machine | Command Line |
 |---|---|
-|ucm-imx8m-plus|```export MACHINE=ucm-imx8m-plus```|
-|som-imx8m-plus|```export MACHINE=som-imx8m-plus```|
-|iot-gate-imx8plus|```export MACHINE=iot-gate-imx8plus```|
-|ucm-imx93|```export MACHINE=ucm-imx93```|
+|ucm-imx8m-plus|```export MACHINE=ucm-imx8m-mini```|
+|mcm-imx8m-plus|```export MACHINE=mcm-imx8m-mini``` |
+|iot-gate-imx8|```export MACHINE=iot-gate-imx8```|
 
 * Clone the source code:
 ```
-git clone -b linux-compulab_v6.1.1 https://github.com/compulab-yokneam/linux-compulab.git
+git clone -b linux-compulab_v6.1.1-experiment https://github.com/compulab-yokneam/linux-compulab.git
 cd linux-compulab
 ```
 
@@ -31,7 +30,7 @@ cd linux-compulab
 
 * Apply the default CompuLab config:
 ```
-make ${MACHINE}_defconfig compulab.config
+make cl-imx8m-mini_defconfig ${MACHINE}.config
 ```
 
 * Ussue menuconfig on order to change the default CompuLab configuration:
