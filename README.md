@@ -12,6 +12,14 @@ It is up to developers to prepare the host machine; it requires:
 mkdir -p compulab-kernel/build && cd compulab-kernel
 ```
 
+* Clone the source code:
+```
+git clone -b linux-compulab_v6.1.36 https://github.com/compulab-yokneam/linux-compulab.git
+cd linux-compulab
+```
+
+## Compile the Kernel
+
 * Set a CompuLab machine:
 
 | Machine | Command Line |
@@ -21,20 +29,12 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 |iot-gate-imx8plus|```export MACHINE=compulab_v8```|
 |ucm-imx93|```export MACHINE=ucm-imx93```|
 
-* Clone the source code:
-```
-git clone -b linux-compulab_v6.1.36 https://github.com/compulab-yokneam/linux-compulab.git
-cd linux-compulab
-```
-
-## Compile the Kernel
-
 * Apply the default CompuLab config:
 ```
 make ${MACHINE}_defconfig compulab.config
 ```
 
-* Ussue menuconfig on order to change the default CompuLab configuration:
+* Issue menuconfig on order to change the default CompuLab configuration:
 ```
 make menuconfig
 ```
