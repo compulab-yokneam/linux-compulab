@@ -42,7 +42,7 @@
 		user-led-1-green {
 			label = "Green_1";
 			color = <LED_COLOR_ID_GREEN>;
-			gpios = <&gpio2 18 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio2 12 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
 		user-led-1-red {
@@ -116,6 +116,14 @@
 	};
 };
 
+&i2c2 {
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
 &i2c3 {
 	status = "okay";
 
@@ -134,6 +142,10 @@
 	};
 };
 
+&flexcan1 {
+	status = "okay";
+};
+
 &flexcan2 {
 	status = "okay";
 };
@@ -142,22 +154,10 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pcie>;
 	reset-gpio = <&gpio5 2 GPIO_ACTIVE_LOW>;
-	ext_osc = <0>;
-	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-		 <&clk IMX8MP_CLK_PCIE_AUX>,
-		 <&clk IMX8MP_CLK_HSIO_AXI>,
-		 <&clk IMX8MP_CLK_PCIE_ROOT>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
-	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
-			  <&clk IMX8MP_CLK_PCIE_AUX>;
-	assigned-clock-rates = <500000000>, <10000000>;
-	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
-				 <&clk IMX8MP_SYS_PLL2_50M>;
 	status = "okay";
 };
 
 &pcie_phy {
-	ext_osc = <0>;
 	status = "okay";
 };
 
@@ -191,6 +191,10 @@
 
 &ecspi2 {
 	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		status = "okay";
+	};
 };
 
 &i2c5 {
@@ -252,7 +256,7 @@
 
 	pinctrl_user_leds: userledsgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD2_DATA3__GPIO2_IO18			0x19
+			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12			0x19
 			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x19
 			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x19
 			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28			0x19

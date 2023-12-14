@@ -3,6 +3,8 @@
  * Copyright 2021 CompuLab
  */
 
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+
 / {
 	aliases {
 		ethphy0 = &ethphy0;
@@ -152,7 +154,7 @@
 					225 226 227 228 229 230 231 232 233 234 235 236 237 238 239 240
 					241 242 243 244 245 246 247 248 249 250 251 252 253 254 255>;
 		default-brightness-level = <222>;
-		status = "okay";
+		status = "disabled";
 	};
 
 	lvds_backlight: lvds_backlight {
@@ -221,6 +223,12 @@
 			system-clock-type = "mclk";
 		};
 	};
+
+	pcie0_refclk: pcie0-refclk {
+		compatible = "fixed-clock";
+		#clock-cells = <0>;
+		clock-frequency = <100000000>;
+	};
 };
 
 &A53_0 {
@@ -242,7 +250,7 @@
 &pwm1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pwm1>;
-	status = "okay";
+	status = "disabled";
 };
 
 &pwm2 {
@@ -619,27 +627,21 @@
 
 &pcie {
 	reset-gpio = <&pca9555 0 GPIO_ACTIVE_LOW>;
-	ext_osc = <0>;
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-		 <&clk IMX8MP_CLK_PCIE_AUX>,
-		 <&clk IMX8MP_CLK_HSIO_AXI>,
-		 <&clk IMX8MP_CLK_PCIE_ROOT>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
-	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
-			  <&clk IMX8MP_CLK_PCIE_AUX>;
-	assigned-clock-rates = <500000000>, <10000000>;
-	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_500M>,
-				 <&clk IMX8MP_SYS_PLL2_50M>;
+		 <&clk IMX8MP_CLK_PCIE_ROOT>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>;
+	clock-names = "pcie", "pcie_aux", "pcie_bus";
+	assigned-clocks = <&clk IMX8MP_CLK_PCIE_AUX>;
+	assigned-clock-rates = <500000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_50M>;
 	status = "okay";
 };
 
-&pcie_ep {
-	ext_osc = <0>;
+&pcie_ep{
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>,
-		 <&clk IMX8MP_CLK_PCIE_AUX>,
-		 <&clk IMX8MP_CLK_HSIO_AXI>,
-		 <&clk IMX8MP_CLK_PCIE_ROOT>;
-	clock-names = "pcie", "pcie_aux", "pcie_phy", "pcie_bus";
+		 <&clk IMX8MP_CLK_PCIE_ROOT>,
+		 <&clk IMX8MP_CLK_HSIO_AXI>;
+	clock-names = "pcie", "pcie_aux", "pcie_bus";
 	assigned-clocks = <&clk IMX8MP_CLK_HSIO_AXI>,
 			  <&clk IMX8MP_CLK_PCIE_AUX>;
 	assigned-clock-rates = <500000000>, <10000000>;
@@ -649,7 +651,10 @@
 };
 
 &pcie_phy {
-	ext_osc = <0>;
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
+	clocks = <&pcie0_refclk>;
+	fsl,clkreq-unsupported;
+	clock-names = "ref";
 	status = "okay";
 };
 
@@ -880,6 +885,21 @@
 		size = <0 0x2c000000>;
 		alloc-ranges = <0 0x40000000 0 0x80000000>;
 		linux,cma-default;
+	};
+};
+
+&mipi_dsi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "disabled";
+	backlight = <&dsi_backlight>;
+
+	mipi_panel: panel@0 {
+		compatible = "startek,kd050hdfia020";
+		reg = <0>;
+		reset-gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
+		dsi-lanes = <4>;
+		status = "disabled";
 	};
 };
 

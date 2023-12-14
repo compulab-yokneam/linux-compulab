@@ -13,9 +13,9 @@
 };
 
 &i2c5 {
-	imx219_mipi1: imx219_mipi1@10 {
-		compatible = "sony,imx219";
-		reg = <0x10>;
+	ov5647_mipi1: ov5647_mipi1@36 {
+		compatible = "ovti,ov5647";
+		reg = <0x36>;
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_csi_mclk>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
@@ -32,18 +32,18 @@
 		status = "disabled";
 
 		port {
-			imx219_mipi1_ep: endpoint {
+			ov5647_mipi1_ep: endpoint {
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
 				clock-noncontinuous;
-				link-frequencies = /bits/ 64 <456000000>;
+				link-frequencies = /bits/ 64 <500000000>;
 				remote-endpoint = <&mipi1_sensor_ep>;
 			};
 		};
 	};
 };
 
-&imx219_mipi1 {
+&ov5647_mipi1 {
 	status = "okay";
 };
 
@@ -51,11 +51,13 @@
 	status = "okay";
 	port@0 {
 		mipi1_sensor_ep: endpoint {
-			remote-endpoint = <&imx219_mipi1_ep>;
+			remote-endpoint = <&ov5647_mipi1_ep>;
 			data-lanes = <2>;
+#if 0
 			csis-hs-settle = <23>;
 			csis-clk-settle = <2>;
 			csis-wclk;
+#endif
 		};
 	};
 };

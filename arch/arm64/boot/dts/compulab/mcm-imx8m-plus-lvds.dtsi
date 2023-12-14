@@ -1,19 +1,19 @@
-&pwm1 {
+&lvds_backlight {
 	status = "okay";
 };
 
-&dsi_backlight {
+&lvds_panel {
 	status = "okay";
 };
 
-&mipi_dsi {
+&ldb {
 	status = "okay";
 };
 
-&mipi_panel {
-		status = "okay";
+&ldb_phy {
+	status = "okay";
 };
 
-&lcdif1 {
+&lcdif2 {
 	status = "okay";
 };

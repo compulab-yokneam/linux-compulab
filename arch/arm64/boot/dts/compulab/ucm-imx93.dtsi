@@ -41,14 +41,14 @@
 			compatible = "shared-dma-pool";
 			reusable;
 			alloc-ranges = <0 0x80000000 0 0x95ffffff>;
-			size = <0 0x16000000>;
+			size = <0 0x8000000>;
 			linux,cma-default;
 		};
 
 		ethosu_mem: ethosu_region@C0000000 {
 			compatible = "shared-dma-pool";
 			reusable;
-			reg = <0x0 0x98000000 0x0 0x8000000>;
+			reg = <0x0 0xC0000000 0x0 0x10000000>;
 		};
 
 		vdev0vring0: vdev0vring0@a4000000 {
@@ -78,13 +78,13 @@
 
 		vdevbuffer: vdevbuffer@84020000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0x84020000 0 0x100000>;
+			reg = <0 0xa4020000 0 0x100000>;
 			no-map;
 		};
 
-		ele_reserved: ele-reserved@84120000 {
+		ele_reserved: ele-reserved@a4120000 {
 			compatible = "shared-dma-pool";
-			reg = <0 0x84120000 0 0x100000>;
+			reg = <0 0xa4120000 0 0x100000>;
 			no-map;
 		};
 	};
@@ -139,6 +139,30 @@
 		reset-gpios = <&gpio2 17 GPIO_ACTIVE_LOW>;
 	};
 
+	reg_audio_pwr: regulator-audio-pwr {
+		compatible = "regulator-fixed";
+		regulator-name = "audio-pwr";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	sound-wm8962 {
+		compatible = "fsl,imx-audio-wm8962x";
+		model = "wm8962-audio";
+		audio-cpu = <&sai1>;
+		audio-codec = <&codec>;
+		audio-routing =
+			"Headphone Jack", "HPOUTL",
+			"Headphone Jack", "HPOUTR",
+			"Ext Spk", "SPKOUTL",
+			"Ext Spk", "SPKOUTR",
+			"AMIC", "MICBIAS",
+			"IN3R", "AMIC",
+			"IN1R", "AMIC";
+	};
+
 	sound-micfil {
 		compatible = "fsl,imx-audio-card";
 		model = "imx-audio-micfil";
@@ -148,30 +172,6 @@
 			cpu {
 				sound-dai = <&micfil>;
 			};
-		};
-	};
-
-	bt_sco_codec: bt_sco_codec {
-		#sound-dai-cells = <1>;
-		compatible = "linux,bt-sco";
-	};
-
-	sound-bt-sco {
-		compatible = "simple-audio-card";
-		simple-audio-card,name = "bt-sco-audio";
-		simple-audio-card,format = "dsp_a";
-		simple-audio-card,bitclock-inversion;
-		simple-audio-card,frame-master = <&btcpu>;
-		simple-audio-card,bitclock-master = <&btcpu>;
-
-		btcpu: simple-audio-card,cpu {
-			sound-dai = <&sai1>;
-			dai-tdm-slot-num = <2>;
-			dai-tdm-slot-width = <16>;
-		};
-
-		simple-audio-card,codec {
-			sound-dai = <&bt_sco_codec 1>;
 		};
 	};
 
@@ -207,7 +207,7 @@
 	assigned-clocks = <&clk IMX93_CLK_SAI1>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
-	status = "disable";
+	status = "disabled";
 };
 
 &sai3 {
@@ -217,7 +217,7 @@
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
 	fsl,sai-mclk-direction-output;
-	status = "disable";
+	status = "disabled";
 };
 
 &micfil {
@@ -227,7 +227,7 @@
 	assigned-clocks = <&clk IMX93_CLK_PDM>;
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <49152000>;
-	status = "disable";
+	status = "disabled";
 };
 
 &xcvr {
@@ -245,7 +245,7 @@
 	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>,
 			 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 	assigned-clock-rates = <12288000>, <200000000>;
-	status = "disable";
+	status = "disabled";
 };
 	
 &adc1 {
@@ -460,6 +460,29 @@
 	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
+	codec: wm8962@1a {
+		compatible = "wlf,wm8962";
+		reg = <0x1a>;
+		clocks = <&clk IMX93_CLK_SAI1_GATE>;
+		DCVDD-supply = <&reg_audio_pwr>;
+		DBVDD-supply = <&reg_audio_pwr>;
+		AVDD-supply = <&reg_audio_pwr>;
+		CPVDD-supply = <&reg_audio_pwr>;
+		MICVDD-supply = <&reg_audio_pwr>;
+		PLLVDD-supply = <&reg_audio_pwr>;
+		SPKVDD1-supply = <&reg_audio_pwr>;
+		SPKVDD2-supply = <&reg_audio_pwr>;
+		gpio-cfg = <
+			0x0000 /* 0:Default */
+			0x0000 /* 1:Default */
+			0x0000 /* 2:FN_DMICCLK */
+			0x0000 /* 3:Default */
+			0x0000 /* 4:FN_DMICCDAT */
+			0x0000 /* 5:Default */
+		>;
+		status = "disabled";
+	};
+
         pca9555:pca9555@20 {
                 compatible = "nxp,pca9555";
                 gpio-controller;
@@ -502,6 +525,46 @@
 		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
 		status = "disabled";
 	};
+
+	sensor_mipi2: mipi2@42 {
+		compatible = "aptina,ar1335_mcu";
+		reg = <0x42>;
+		clocks = <&clk IMX93_CLK_MIPI_PHY_CFG>;
+		clock-names = "xclk";
+		pwdn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 9 GPIO_ACTIVE_LOW>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		camera_mipi_lanes = <2>;
+		status = "disabled";
+
+		port {
+			ar1335_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_csi_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+			};
+		};
+	};
+};
+
+&mipi_csi {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        status = "okay";
+
+        port@0 {
+                reg = <0>;
+                mipi_csi_ep: endpoint {
+                        remote-endpoint = <&ar1335_mipi_ep>;
+                        data-lanes = <2>;
+                        cfg-clk-range = <28>;
+                        hs-clk-range = <0x2b>;
+                        bus-type = <4>;
+                };
+        };
 };
 
 &lpuart1 { /* console */
@@ -615,7 +678,7 @@
 };
 
 &cameradev {
-	status = "okay";
+	status = "disabled";
 };
 
 &isi_0 {

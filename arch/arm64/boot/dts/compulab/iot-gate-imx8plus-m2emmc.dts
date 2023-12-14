@@ -1,0 +1,51 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 CompuLab Ltd
+ */
+
+#include "iot-gate-imx8plus-m2tpm.dts"
+
+/* IOT-GATE-IMX8PLUS with eMMC/TPM extension module in M.2 Expansion Connector */
+
+/ {
+	reg_usdhc2_vsel: regulator-usdhc2-vsel {
+		compatible = "regulator-gpio";
+		regulator-name = "sd-vsel";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+		states = <1800000 0x1 3300000 0x0>;
+	};
+};
+
+&i2c5 {
+	pca9555_m2:pca9555-m2emmc@20 {
+		compatible = "nxp,pca9555";
+		gpio-controller;
+		#gpio-cells = <2>;
+		reg = <0x20>;
+		gpio-line-names =
+			"16G", "32G", "64G", "128G",
+			"", "", "", "", "", "",
+			"", "", "", "", "", "";
+	};
+};
+
+&usdhc2 {
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	non-removable;
+	no-1-8-v;
+	keep-power-in-suspend;
+	vqmmc-supply = <&reg_usdhc2_vsel>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x101
+		>;
+	};
+};

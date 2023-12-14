@@ -1,18 +1,22 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2021 CompuLab
+ * Copyright 2023 CompuLab
  */
 
 /dts-v1/;
 
-#include "ucm-imx8m-plus.dts"
+#include "som-imx8m-plus.dts"
 
 / {
-	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
-	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+	model = "CompuLab SOM-iMX8M-Plus with ISP imx219 mipi csi1 enabled";
+	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
 };
 
-&i2c5 {
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
 	imx219_mipi1: imx219_mipi1@10 {
 		compatible = "sony,imx219";
 		reg = <0x10>;
@@ -24,12 +28,12 @@
 		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
 		assigned-clock-rates = <24000000>;
 		csi_id = <0>;
-		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 11 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
-
 		mipi_csi;
-		status = "disabled";
+		camera_mipi_lanes = <2>;
+		status = "okay";
 
 		port {
 			imx219_mipi1_ep: endpoint {
@@ -41,10 +45,6 @@
 			};
 		};
 	};
-};
-
-&imx219_mipi1 {
-	status = "okay";
 };
 
 &mipi_csi_0 {

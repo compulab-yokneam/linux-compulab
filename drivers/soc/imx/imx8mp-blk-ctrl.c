@@ -22,6 +22,19 @@
 #define  USB_CLOCK_MODULE_EN	BIT(1)
 #define  PCIE_PHY_APB_RST	BIT(4)
 #define  PCIE_PHY_INIT_RST	BIT(5)
+#define GPR_REG1		0x4
+#define PM_EN_CORE_CLK		BIT(0)
+#define PLL_LOCK		BIT(13)
+#define GPR_REG2		0x8
+#define P_PLL_MASK		GENMASK(5, 0)
+#define M_PLL_MASK		GENMASK(15, 6)
+#define S_PLL_MASK		GENMASK(18, 16)
+#define P_PLL			(0xc << 0)
+#define M_PLL			(0x320 << 6)
+#define S_PLL			(0x4 << 16)
+#define GPR_REG3		0xc
+#define PLL_CKE		BIT(17)
+#define PLL_RESETB		BIT(31)
 
 struct imx8mp_blk_ctrl_domain;
 
@@ -61,7 +74,7 @@ struct imx8mp_blk_ctrl_domain_data {
 	const unsigned int flags;
 };
 
-#define DOMAIN_MAX_CLKS 3
+#define DOMAIN_MAX_CLKS 2
 
 struct imx8mp_blk_ctrl_domain {
 	struct generic_pm_domain genpd;
@@ -117,11 +130,37 @@ static int imx8mp_qos_set(struct imx8mp_blk_ctrl_domain *domain)
 static void imx8mp_hsio_blk_ctrl_power_on(struct imx8mp_blk_ctrl *bc,
 					  struct imx8mp_blk_ctrl_domain *domain)
 {
+	unsigned int val;
+	int ret;
+
 	switch (domain->id) {
 	case IMX8MP_HSIOBLK_PD_USB:
 		regmap_set_bits(bc->regmap, GPR_REG0, USB_CLOCK_MODULE_EN);
 		break;
 	case IMX8MP_HSIOBLK_PD_PCIE:
+		/* Set P=12,M=800,S=4 and must set ICP=2'b01. */
+		regmap_set_bits(bc->regmap, GPR_REG2,
+				(P_PLL & P_PLL_MASK) |
+				(M_PLL & M_PLL_MASK) |
+				(S_PLL & S_PLL_MASK));
+		/* wait greater than 1/F_FREF =1/2MHZ=0.5us */
+		udelay(1);
+
+		/* Set 1 to pll_resetb of GPR_REG3 */
+		regmap_set_bits(bc->regmap, GPR_REG3, PLL_RESETB);
+		udelay(10);
+
+		/* Set 1 to pll_cke of GPR_REG3 */
+		regmap_set_bits(bc->regmap, GPR_REG3, PLL_CKE);
+
+		/* Lock time should be greater than 300cycle=300*0.5us=150us */
+		ret = regmap_read_poll_timeout(bc->regmap, GPR_REG1,
+					 val, val & PLL_LOCK, 10, 20000);
+		if (ret)
+			dev_err(bc->dev, "PCIe PHY PLL clock is not locked.\n");
+		else
+			dev_info(bc->dev, "PCIe PHY PLL clock is locked.\n");
+
 		regmap_set_bits(bc->regmap, GPR_REG0, PCIE_CLOCK_MODULE_EN);
 		break;
 	case IMX8MP_HSIOBLK_PD_PCIE_PHY:
@@ -131,8 +170,6 @@ static void imx8mp_hsio_blk_ctrl_power_on(struct imx8mp_blk_ctrl *bc,
 	default:
 		break;
 	}
-
-	imx8mp_qos_set(domain);
 }
 
 static void imx8mp_hsio_blk_ctrl_power_off(struct imx8mp_blk_ctrl *bc,
@@ -438,8 +475,8 @@ static const struct imx8mp_blk_ctrl_domain_data imx8mp_hdmi_domain_data[] = {
 	},
 	[IMX8MP_HDMIBLK_PD_LCDIF] = {
 		.name = "hdmiblk-lcdif",
-		.clk_names = (const char *[]){ "axi", "apb", "fdcc" },
-		.num_clks = 3,
+		.clk_names = (const char *[]){ "axi", "apb" },
+		.num_clks = 2,
 		.gpc_name = "lcdif",
 		.hurry_data = &imx8mp_hdmi_hurry_data[IMX8MP_HDMIBLK_LCDIF],
 		.noc_data = {
@@ -466,8 +503,8 @@ static const struct imx8mp_blk_ctrl_domain_data imx8mp_hdmi_domain_data[] = {
 	},
 	[IMX8MP_HDMIBLK_PD_HDMI_TX] = {
 		.name = "hdmiblk-hdmi-tx",
-		.clk_names = (const char *[]){ "apb", "ref_266m", "fdcc" },
-		.num_clks = 3,
+		.clk_names = (const char *[]){ "apb", "ref_266m" },
+		.num_clks = 2,
 		.gpc_name = "hdmi-tx",
 	},
 	[IMX8MP_HDMIBLK_PD_HDMI_TX_PHY] = {

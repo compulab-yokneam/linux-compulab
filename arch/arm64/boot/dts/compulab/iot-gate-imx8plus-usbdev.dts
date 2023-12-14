@@ -9,34 +9,4 @@
 / {
 	model = "CompuLab IOT-GATE-IMX8PLUS (usbdev)";
 	compatible = "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
-
-	pinctrl_gpio_keys: gpio_keys {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01	0x19 /* P21-11; GPIO=(32*(5-1)+1)=129 */
-			MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00	0x19 /* P21-13; GPIO=(32*(5-1)+0)=128 */
-		>;
-	};
-
-	buttons0 {
-		compatible = "gpio-keys";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpio_keys>;
-
-		power-button {
-			gpios = <&gpio5 1 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_POWER>;
-			label = "Power";
-			wakeup-source;
-			interrupt-parent = <&gpio5>;
-			interrupts = <1 IRQ_TYPE_LEVEL_LOW>;
-		};
-
-		sleep-button {
-			gpios = <&gpio5 0 GPIO_ACTIVE_LOW>;
-			linux,code = <KEY_SLEEP>;
-			label = "Sleep";
-			interrupt-parent = <&gpio5>;
-			interrupts = <0 IRQ_TYPE_LEVEL_LOW>;
-		};
-	};
 };
