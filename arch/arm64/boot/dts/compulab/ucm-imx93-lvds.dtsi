@@ -79,6 +79,11 @@
 	status = "okay";
 };
 
-&goodix911_lvds {
-    status = "okay";
+&goodix_ts {
+	pinctrl-0 = <&touchscreen0_pins>;
+	interrupt-parent = <&gpio2>;
+	interrupts = <20 IRQ_TYPE_LEVEL_HIGH>;
+	irq-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
+	reset-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
+	status = "okay";
 };
