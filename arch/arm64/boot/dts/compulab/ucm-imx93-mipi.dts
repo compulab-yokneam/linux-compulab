@@ -6,9 +6,9 @@
 /dts-v1/;
 
 #include "ucm-imx93.dtsi"
-#include "ucm-imx93-lvds.dtsi"
+#include "ucm-imx93-mipi.dtsi"
 
 / {
-	model = "CompuLab UCM-i.MX93 board, build-in-lvds";
+	model = "CompuLab UCM-i.MX93 board, build-in-mipi";
 	compatible = "compulab,ucm-imx93", "fsl,imx93";
 };

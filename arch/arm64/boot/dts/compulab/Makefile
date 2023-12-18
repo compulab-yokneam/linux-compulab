@@ -48,7 +48,7 @@ dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus-hdmi-overlay.dtbo
 # i.MX9
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-headless.dtb
-dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-csi.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9.dtb
