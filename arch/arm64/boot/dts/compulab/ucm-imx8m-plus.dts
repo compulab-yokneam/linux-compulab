@@ -16,9 +16,13 @@
 
 #include "ucm-imx8m-plus.dtsi"
 #include "ucm-imx8m-plus-can.dtsi"
+#include "ucm-imx8m-plus-pcie.dtsi"
+#include "ucm-imx8m-plus-mipi.dtsi"
+#include "ucm-imx8m-plus-hdmi.dtsi"
+#include "ucm-imx8m-plus-lvds.dtsi"
 #include "sb-ucm-imx8m-plus.dtsi"
 
 / {
-	model = "CompuLab UCM-iMX8M-Plus (headless)";
+	model = "CompuLab UCM-iMX8M-Plus";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
 };

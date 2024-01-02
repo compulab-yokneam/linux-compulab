@@ -22,6 +22,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-p21.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-uart1.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-headless.dtb
+
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-usbdev.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2adc.dtb
@@ -78,6 +79,11 @@ dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-pcie-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi-overlay.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie-overlay.dtbo
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
