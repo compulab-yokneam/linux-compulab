@@ -15,7 +15,10 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus.dtsi"
+#include "ucm-imx8m-plus-mmc.dtsi"
 #include "ucm-imx8m-plus-can.dtsi"
+#include "ucm-imx8m-plus-pcie.dtsi"
+#include "ucm-imx8m-plus-mmc.dtsi"
 #include "sb-ucm-imx8m-plus.dtsi"
 
 / {
