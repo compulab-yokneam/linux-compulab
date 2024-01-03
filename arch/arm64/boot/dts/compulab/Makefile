@@ -1,6 +1,7 @@
 DTC_FLAGS := -@
 
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
@@ -61,7 +62,6 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-thermal.dtb
 # i.MX9 overlays
-DTC_FLAGS := -@
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth-overlay.dtbo
@@ -84,6 +84,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc-overlay.dtbo
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
