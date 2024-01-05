@@ -32,6 +32,10 @@
 	};
 };
 
+&gpu_reserved {
+	reg = <0x0 0x58000000 0 0x10000000>;
+};
+
 &A53_0 {
 	cpu-supply = <&buck2>;
 };
