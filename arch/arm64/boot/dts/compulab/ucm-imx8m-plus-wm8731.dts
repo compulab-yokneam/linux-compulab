@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 CompuLab
+ * Copyright 2024 CompuLab
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License
@@ -15,12 +15,9 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus.dts"
+#include "ucm-imx8m-plus-wm8731.dtsi"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus (wm8731)";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
-};
-
-&wm8731 {
-    status = "okay";
 };
