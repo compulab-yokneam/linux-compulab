@@ -88,6 +88,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731-overlay.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev-overlay.dtbo
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
