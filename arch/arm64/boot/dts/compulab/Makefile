@@ -15,7 +15,6 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-nogpc.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rpmsg.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-nopcie.dtb
