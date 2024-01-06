@@ -39,6 +39,8 @@
 };
 
 &i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c5>;
@@ -89,6 +91,8 @@
 };
 
 &mipi_dsi {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 	backlight = <&dsi_backlight>;
 	mipi_panel: panel@0 {
