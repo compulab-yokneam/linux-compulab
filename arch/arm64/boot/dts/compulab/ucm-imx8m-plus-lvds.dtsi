@@ -52,6 +52,8 @@
 };
 
 &i2c6 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	clock-frequency = <400000>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_i2c6>;
@@ -110,9 +112,13 @@
 };
 
 &ldb {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	status = "okay";
 
 	lvds-channel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
 		fsl,data-mapping = "spwg";
 		fsl,data-width = <24>;
 		status = "okay";
