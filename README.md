@@ -19,6 +19,7 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 |ucm-imx8m-plus|```export MACHINE=compulab_v8```|
 |som-imx8m-plus|```export MACHINE=compulab_v8```|
 |iot-gate-imx8plus|```export MACHINE=compulab_v8```|
+|iotdin-imx8p|```export MACHINE=compulab_v8```|
 |ucm-imx93|```export MACHINE=ucm-imx93```|
 |mcm-imx93|```export MACHINE=mcm-imx93```|
 
