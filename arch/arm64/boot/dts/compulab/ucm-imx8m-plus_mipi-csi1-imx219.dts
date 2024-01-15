@@ -1,18 +1,16 @@
-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-/*
- * Copyright 2021 CompuLab
- */
-
 /dts-v1/;
+/plugin/;
 
-#include "ucm-imx8m-plus.dts"
+#include "overlay.h"
 
-/ {
+&{/} {
 	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
 };
 
 &i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	imx219_mipi1: imx219_mipi1@10 {
 		compatible = "sony,imx219";
 		reg = <0x10>;

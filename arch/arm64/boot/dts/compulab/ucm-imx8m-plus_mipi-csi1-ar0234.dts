@@ -1,11 +1,7 @@
-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-/*
- * Copyright 2021 CompuLab
- */
-
 /dts-v1/;
+/plugin/;
 
-#include "ucm-imx8m-plus.dts"
+#include "overlay.h"
 #include "ucm-imx8m-plus_mipi-csi1.dtsi"
 
 / {
@@ -16,20 +12,4 @@
 &sensor_mipi1 {
 	compatible = "econ,ar0234", "ar0234";
 	camera-mipi-clk = <800>;
-};
-
-&cameradev {
-	status = "okay";
-};
-
-&isi_0 {
-	status = "okay";
-
-	cap_device {
-		status = "okay";
-	};
-
-	m2m_device {
-		status = "okay";
-	};
 };

@@ -2,15 +2,6 @@ DTC_FLAGS := -@
 
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-som.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx219.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ov5647.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx477.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0234.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0521.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-dual.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtb
@@ -89,6 +80,27 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731-overlay.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev-overlay.dtbo
+
+ucm-imx8m-plus_mipi-csi1-ar1335-af.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-af.dtb
+
+ucm-imx8m-plus_mipi-csi2-ar1335-af.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi2-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2-ar1335-af.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
+
+ucm-imx8m-plus_mipi-csi1-imx219.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx219.dtb
+
+ucm-imx8m-plus_mipi-csi1-ov5647.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ov5647.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ov5647.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar0521.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar0521.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0521.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar0234.dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar0234.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0234.dtb
 
 always-y       := $(dtb-y)
 subdir-y       := $(dts-dirs)
