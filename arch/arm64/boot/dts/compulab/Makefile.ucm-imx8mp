@@ -17,6 +17,9 @@ sbc-ucm-imx8m-plus-dtbs := sbc-ucm-imx8m-plus-empty.dtb \
 		ucm-imx8m-plus-hdmi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbc-ucm-imx8m-plus.dtb
 
+ucm-imx8m-plus-thermal-dtbs := ucm-imx8m-plus-headless.dtb ucm-imx8m-plus-thermal.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-thermal.dtb
+
 ucm-imx8m-plus-mipi-dtbs := ucm-imx8m-plus-headless.dtb ucm-imx8m-plus-mipi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtb
 
