@@ -1,23 +1,13 @@
-/*
- * Copyright 2024 CompuLab
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- */
-
 /dts-v1/;
+/plugin/;
 
-#include "ucm-imx8m-plus.dts"
+#include <dt-bindings/clock/imx8mp-clock.h>
+#include <dt-bindings/power/imx8mp-power.h>
+#include <dt-bindings/reset/imx8mp-reset.h>
+#include <dt-bindings/power/imx8mp-power.h>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input.h>
+#include <dt-bindings/interrupt-controller/arm-gic.h>
+#include <dt-bindings/thermal/thermal.h>
+#include "../freescale/imx8mp-pinfunc.h"
 #include "ucm-imx8m-plus-wm8731.dtsi"
-
-/ {
-	model = "CompuLab UCM-iMX8M-Plus (wm8731)";
-	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
-};

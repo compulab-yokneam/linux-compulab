@@ -14,7 +14,7 @@
 
 /dts-v1/;
 
-#include "ucm-imx8m-plus.dtsi"
+#include "ucm-imx8m-plus-som.dts"
 #include "ucm-imx8m-plus-mmc.dtsi"
 #include "ucm-imx8m-plus-can.dtsi"
 #include "ucm-imx8m-plus-pcie.dtsi"
@@ -24,4 +24,20 @@
 / {
 	model = "CompuLab UCM-iMX8M-Plus (headless)";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+&flexcan1 {
+	status = "okay";
+};
+
+&flexcan2 {
+	status = "okay";
+};
+
+&pcie {
+	status = "okay";
+};
+
+&pcie_phy {
+	status = "okay";
 };
