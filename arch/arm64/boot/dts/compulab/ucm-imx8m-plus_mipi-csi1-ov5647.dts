@@ -8,6 +8,8 @@
 &i2c5 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	status = "okay";
+
 	ov5647_mipi1: ov5647_mipi1@36 {
 		compatible = "ovti,ov5647";
 		reg = <0x36>;
@@ -22,9 +24,8 @@
 		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
-
 		mipi_csi;
-		status = "disabled";
+		status = "okay";
 
 		port {
 			ov5647_mipi1_ep: endpoint {
