@@ -8,6 +8,8 @@
 &i2c5 {
 	#address-cells = <1>;
 	#size-cells = <0>;
+	status = "okay";
+
 	imx219_mipi1: imx219_mipi1@10 {
 		compatible = "sony,imx219";
 		reg = <0x10>;
@@ -22,9 +24,8 @@
 		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
-
 		mipi_csi;
-		status = "disabled";
+		status = "okay";
 
 		port {
 			imx219_mipi1_ep: endpoint {
