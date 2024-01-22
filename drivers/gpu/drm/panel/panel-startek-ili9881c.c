@@ -33,9 +33,9 @@ struct ili9881c {
     struct drm_panel	panel;
     struct mipi_dsi_device	*dsi;
 
+    struct gpio_desc *reset;
     struct backlight_device *backlight;
     struct regulator	*power;
-    int rst_gpio;
 
     bool prepared;
     bool enabled;
@@ -441,12 +441,12 @@ static int ili9881c_prepare(struct drm_panel *panel)
     if (ret)
         return ret;
 
-    /* And reset it */
-    gpio_set_value_cansleep(ctx->rst_gpio, 0);
-    msleep(20);
+    usleep_range(10000, 12000);
 
-    gpio_set_value_cansleep(ctx->rst_gpio, 1);
-    msleep(20);
+    if (ctx->reset) {
+        gpiod_set_value_cansleep(ctx->reset, 0);
+        msleep(50);
+    }
 
     ctx->prepared = true;
 
@@ -487,8 +487,11 @@ static int ili9881c_unprepare(struct drm_panel *panel)
 
     mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
     regulator_disable(ctx->power);
-    gpio_set_value_cansleep(ctx->rst_gpio, 0);
-
+    if (ctx->reset) {
+        gpiod_set_value_cansleep(ctx->reset, 1);
+        usleep_range(15000, 17000);
+        gpiod_set_value_cansleep(ctx->reset, 0);
+    }
     ctx->prepared = false;
 
     return 0;
@@ -576,14 +579,15 @@ static int ili9881c_dsi_probe(struct mipi_dsi_device *dsi)
         return PTR_ERR(ctx->power);
     }
 
-    np = of_parse_phandle(dsi->dev.of_node, "reset-gpio", 0);
-    if (np) {
-        ctx->rst_gpio = of_get_named_gpio(dsi->dev.of_node, "reset-gpio", 0);
-        if (!gpio_is_valid(ctx->rst_gpio)) {
-            dev_notice(&dsi->dev, "Couldn't get panel reset pin available\n");
-            return -EPROBE_DEFER;
-        }
-    }
+	ctx->reset = devm_gpiod_get_optional(&dsi->dev, "reset",
+					       GPIOD_OUT_LOW |
+					       GPIOD_FLAGS_BIT_NONEXCLUSIVE);
+	if (IS_ERR(ctx->reset)) {
+		int ret = PTR_ERR(ctx->reset);
+		dev_err(&dsi->dev, "Failed to get reset gpio (%d)\n", ret);
+		return ret;
+	}
+	gpiod_set_value_cansleep(ctx->reset, 1);
 
     np = of_parse_phandle(dsi->dev.of_node, "backlight", 0);
     if (np) {
