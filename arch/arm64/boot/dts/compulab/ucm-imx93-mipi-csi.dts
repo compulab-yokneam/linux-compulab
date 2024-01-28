@@ -6,7 +6,7 @@
 /dts-v1/;
 
 #include "ucm-imx93.dtsi"
-#include "ucm-imx93-mipi.dtsi"
+#include "ucm-imx93-lvds.dtsi"
 
 / {
 	model = "CompuLab UCM-i.MX93 with mipi csi enabled";
