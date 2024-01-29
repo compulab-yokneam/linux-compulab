@@ -30,7 +30,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi.dtb
 ucm-imx8m-plus-lvds-dtbs := ucm-imx8m-plus-headless.dtb ucm-imx8m-plus-lvds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtb
 
-ucm-imx8m-plus-usbdev-dbs := ucm-imx8m-plus.dtb ucm-imx8m-plus-usbdev.dtbo
+ucm-imx8m-plus-usbdev-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus-usbdev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev.dtb
 
 ucm-imx8m-plus-wm8731-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus-wm8731.dtbo
