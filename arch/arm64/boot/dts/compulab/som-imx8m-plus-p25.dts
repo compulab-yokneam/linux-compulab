@@ -1,0 +1,39 @@
+/*
+ * Copyright 2024 CompuLab
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+/dts-v1/;
+
+#include "som-imx8m-plus.dts"
+
+/ {
+	model = "CompuLab SOM-iMX8M-Plus (p25)";
+	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
+};
+
+&ecspi2 {
+	status = "disabled";
+};
+
+&iomuxc {
+	pinctrl-0 = <&pinctrl_hog>, <&pinctrl_p25>;
+
+	pinctrl_p25: p25grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_SCLK__GPIO5_IO10		0x19 /* P25-31 GPIO=(32*(5-1)+10)=138 */
+			MX8MP_IOMUXC_ECSPI2_MOSI__GPIO5_IO11		0x19 /* P25-27 GPIO=(32*(5-1)+11)=139 */
+			MX8MP_IOMUXC_ECSPI2_MISO__GPIO5_IO12		0x19 /* P25-29 GPIO=(32*(5-1)+12)=140 */
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13		0x19 /* P25-25 GPIO=(32*(5-1)+13)=141 */
+		>;
+	};
+};
