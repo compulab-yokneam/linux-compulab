@@ -5,7 +5,6 @@
 
 /dts-v1/;
 
-#include "mcm-imx8m-plus-pinctrl.dtsi"
 #include "mcm-imx8m-plus.dtsi"
 
 / {
