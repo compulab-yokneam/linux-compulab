@@ -1,0 +1,11 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-pcie.dtsi"
+
+&pcie {
+    status = "okay";
+};
+
+&pcie_phy {
+    status = "okay";
+};
+
