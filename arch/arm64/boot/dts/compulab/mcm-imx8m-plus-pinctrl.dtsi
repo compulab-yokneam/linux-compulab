@@ -14,12 +14,6 @@
 		>;
 	};
 
-	pinctrl_pwm2: pwm2grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SPDIF_RX__PWM2_OUT		0x116
-		 >;
-	};
-
 	pinctrl_ecspi2: ecspi2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_ECSPI2_SCLK__ECSPI2_SCLK		0x82
@@ -389,12 +383,6 @@
 	pinctrl_csi_mclk: csi_mclk_grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2	0x59
-		>;
-	};
-
-	touchscreen1_pins: ts1grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20		0x00
 		>;
 	};
 };

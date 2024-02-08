@@ -1,11 +1,4 @@
-// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-/*
- * Copyright 2021 CompuLab
- */
-
-/dts-v1/;
-
-#include "mcm-imx8m-plus-headless.dts"
+#include "overlay.h"
 #include "mcm-imx8m-plus-lvds.dtsi"
 
 / {
