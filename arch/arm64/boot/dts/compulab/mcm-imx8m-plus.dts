@@ -1,13 +1,15 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2021 CompuLab
+ * Copyright 2024 CompuLab
  */
 
 /dts-v1/;
 
-#include "mcm-imx8m-plus-headless.dts"
+#include "mcm-imx8m-plus-som.dts"
+#include "mcm-imx8m-plus-can.dtsi"
 #include "mcm-imx8m-plus-pcie.dtsi"
 #include "mcm-imx8m-plus-eb-eth.dtsi"
+#include "mcm-imx8m-plus-eb-audimx9.dtsi"
 #include "mcm-imx8m-plus-mipi.dtsi"
 #include "mcm-imx8m-plus-lvds.dtsi"
 #include "mcm-imx8m-plus-hdmi.dtsi"

@@ -1,7 +1,7 @@
 #include "overlay.h"
-#include "mcm-imx8m-plus-pcie.dtsi"
+#include "mcm-imx8m-plus-eb-eth.dtsi"
 
 / {
-	model = "CompuLab MCM-iMX8M-Plus (pice)";
+	model = "CompuLab MCM-iMX8M-Plus (eb-eth)";
 	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
 };

@@ -23,13 +23,13 @@
 	assigned-clocks = <&clk IMX8MP_CLK_PCIE_AUX>;
 	assigned-clock-rates = <10000000>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL2_50M>;
-	status = "disabled";
+	status = "okay";
 };
 
 &pcie_phy {
 	clocks = <&clk IMX8MP_CLK_HSIO_ROOT>;
 	clock-names = "ref";
 	fsl,clkreq-unsupported;
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
-	status = "disabled";
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+	status = "okay";
 };
