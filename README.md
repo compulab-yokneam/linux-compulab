@@ -44,4 +44,12 @@ make menuconfig
 nice make -j`nproc`
 ```
 
+* Builds' targets
+  
+| target | make command |
+|---|---|
+|Uncompressed kernel image|```make -j`nproc` Image```|
+|Build all modules|```make -j`nproc` modules```|
+|Build device tree blobs|```make -j`nproc` dtbs```|
+
 * [Deploy the CompuLab Linux Kernel to CompuLab devices](https://github.com/compulab-yokneam/Documentation/blob/master/etc/linux_kernel_deployment.md#create-deb-package)
