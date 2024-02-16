@@ -9,7 +9,7 @@ It is up to developers to prepare the host machine; it requires:
 
 * WorkDir:
 ```
-mkdir -p compulab-kernel/build && cd compulab-kernel
+mkdir -p compulab-bsp/linux-compulab && cd compulab-bsp/linux-compulab
 ```
 
 * Set a CompuLab machine:
@@ -23,8 +23,7 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 
 * Clone the source code:
 ```
-git clone -b linux-compulab_v5.15.71 https://github.com/compulab-yokneam/linux-compulab.git
-cd linux-compulab
+git clone -b linux-compulab_v5.15.71 https://github.com/compulab-yokneam/linux-compulab.git .
 ```
 
 ## Compile the Kernel
