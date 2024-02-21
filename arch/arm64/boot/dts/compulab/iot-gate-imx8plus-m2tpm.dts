@@ -54,7 +54,7 @@
 &iomuxc {
 	pinctrl_tpm_nrst: tpmnrstgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20			0x19
+			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20			0x110
 		>;
 	};
 };
