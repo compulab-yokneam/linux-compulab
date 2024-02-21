@@ -213,7 +213,7 @@
 
 	pinctrl_fec_phy_reset: fecphyrstgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24			0x19
+			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24			0x10
 		>;
 	};
 
@@ -232,13 +232,13 @@
 
 	pinctrl_pcie: pciegrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02			0x41
+			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02			0x40
 		>;
 	};
 
 	pinctrl_usb_hub_reset: usbhubrst {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10			0x19
+			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10			0x100
 		>;
 	};
 
@@ -256,10 +256,10 @@
 
 	pinctrl_user_leds: userledsgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12			0x19
-			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x19
-			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x19
-			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28			0x19
+			MX8MP_IOMUXC_SD2_CD_B__GPIO2_IO12			0x110
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x110
+			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x110
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28			0x110
 		>;
 	};
 };

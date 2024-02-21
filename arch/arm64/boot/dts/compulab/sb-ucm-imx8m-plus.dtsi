@@ -1,7 +1,7 @@
 &iomuxc {
 	pinctrl_csi_mclk: csi_mclk_grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2	0x59
+			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2	0x50
 		>;
 	};
 };
