@@ -6,10 +6,11 @@
 /dts-v1/;
 /plugin/;
 
+#include "../freescale/imx93-pinfunc.h"
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/interrupt-controller/arm-gic.h>
 #include "ucm-imx93-lvds.dtsi"
 
 / {
-	model = "CompuLab UCM-i.MX93 board, lvds-overalay";
+	model = "CompuLab UCM-i.MX93 board, lvds-overlay";
 };

@@ -10,5 +10,5 @@
 #include "ucm-imx93-thermal.dtsi"
 
 / {
-	model = "CompuLab UCM-i.MX93 board, thermal-overalay";
+	model = "CompuLab UCM-i.MX93 board, thermal-overlay";
 };

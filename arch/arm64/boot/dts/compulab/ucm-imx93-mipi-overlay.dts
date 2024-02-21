@@ -11,5 +11,5 @@
 #include "ucm-imx93-mipi.dtsi"
 
 / {
-	model = "CompuLab UCM-i.MX93 board, mipi-overalay";
+	model = "CompuLab UCM-i.MX93 board, mipi-overlay";
 };
