@@ -1,0 +1,11 @@
+/* This is a way of disabling regulator
+ delete-node does not work in overlays
+*/
+
+&ldo4 {
+    /delete-property/ regulator-name;
+    /delete-property/ regulator-min-microvolt;
+    /delete-property/ regulator-max-microvolt;
+    /delete-property/ regulator-boot-on;
+    /delete-property/ regulator-always-on;
+};
