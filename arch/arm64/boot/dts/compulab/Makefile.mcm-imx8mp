@@ -32,3 +32,15 @@ dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-lvds.dtb
 mcm-imx8m-plus-hdmi-dtbs := mcm-imx8m-plus-headless.dtb \
 	mcm-imx8m-plus-hdmi.dtbo mcm-imx8m-plus-hdmi-header.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-hdmi.dtb
+
+mcm-imx8m-plus_mipi-csi1-ar1335-af-dtbs := mcm-imx8m-plus.dtb mcm-imx8m-plus_mipi-csi1-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus_mipi-csi1-ar1335-af.dtb
+
+mcm-imx8m-plus_mipi-csi2-ar1335-af-dtbs := mcm-imx8m-plus.dtb mcm-imx8m-plus_mipi-csi2-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus_mipi-csi2-ar1335-af.dtb
+
+mcm-imx8m-plus_mipi-csi1-ar1335-mcu-dtbs := mcm-imx8m-plus.dtb mcm-imx8m-plus_mipi-csi1-ar1335-mcu.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
+
+mcm-imx8m-plus_mipi-csi2-ar1335-mcu-dtbs := mcm-imx8m-plus.dtb mcm-imx8m-plus_mipi-csi2-ar1335-mcu.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus_mipi-csi2-ar1335-mcu.dtb
