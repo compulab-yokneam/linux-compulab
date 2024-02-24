@@ -63,11 +63,6 @@
 		regulator-always-on;
 	};
 
-	usdhc1_pwrseq: usdhc1_pwrseq {
-		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&pca9555 1 GPIO_ACTIVE_LOW>;
-	};
-
 	sound-xcvr {
 		compatible = "fsl,imx-audio-card";
 		model = "imx-audio-xcvr";
@@ -449,33 +444,6 @@
 &usb_dwc3_1 {
 	dr_mode = "host";
 	status = "okay";
-};
-
-&usdhc1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	assigned-clocks = <&clk IMX8MP_CLK_USDHC1>;
-	assigned-clock-rates = <400000000>;
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc1>;
-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>;
-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>;
-	mmc-pwrseq = <&usdhc1_pwrseq>;
-	bus-width = <4>;
-	non-removable;
-	keep-power-in-suspend;
-	no-1-8-v;
-	status = "okay";
-
-	mwifiex: wifi@1 {
-		compatible = "marvell,sd8997";
-		reg = <1>;
-	};
-
-	btmrvl: btmrvl@2 {
-		compatible = "marvell,sd8897-bt";
-		reg = <2>;
-	};
 };
 
 &usdhc2 {

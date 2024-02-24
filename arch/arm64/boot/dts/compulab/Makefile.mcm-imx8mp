@@ -9,12 +9,14 @@ dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-usbdev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-ldo4.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-spidev.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-sd8997.dtbo
 
 mcm-imx8m-plus-headless-dtbs := mcm-imx8m-plus-som.dtb \
 		mcm-imx8m-plus-can.dtbo \
 		mcm-imx8m-plus-pcie.dtbo \
 		mcm-imx8m-plus-eb-eth.dtbo \
 		mcm-imx8m-plus-eb-audimx9.dtbo \
+		mcm-imx8m-plus-sd8997.dtbo \
 		mcm-imx8m-plus-headless-header.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-headless.dtb
 
