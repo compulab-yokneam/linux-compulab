@@ -16,7 +16,6 @@
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
-		ranges;
 
 		m4_reserved: m4@80000000 {
 			no-map;
