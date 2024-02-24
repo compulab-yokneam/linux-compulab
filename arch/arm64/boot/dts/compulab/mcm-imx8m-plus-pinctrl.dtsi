@@ -3,20 +3,6 @@
 
 &iomuxc {
 
-	pinctrl_ecspi2: ecspi2grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_ECSPI2_SCLK__ECSPI2_SCLK		0x82
-			MX8MP_IOMUXC_ECSPI2_MOSI__ECSPI2_MOSI		0x82
-			MX8MP_IOMUXC_ECSPI2_MISO__ECSPI2_MISO		0x82
-		>;
-	};
-
-	pinctrl_ecspi2_cs: ecspi2cs {
-		fsl,pins = <
-			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13		0x40000
-		>;
-	};
-
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_ENET_MDC__ENET_QOS_MDC	0x3
