@@ -74,7 +74,7 @@
 	mipi_panel: panel@0 {
 		compatible = "startek,kd050hdfia020";
 		reg = <0>;
-		reset-gpio = <&pca9555 4 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&pca9555 4 GPIO_ACTIVE_LOW>;
 		dsi-lanes = <4>;
 		status = "okay";
 	};
