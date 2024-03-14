@@ -83,3 +83,37 @@
 &lcdif1 {
 	status = "okay";
 };
+
+#define MIPI_DSI_BACKLIGHT_GPIO
+#ifdef MIPI_DSI_BACKLIGHT_GPIO
+&dsi_backlight {
+	status = "disabled";
+};
+
+&pwm1 {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	/delete-property/ backlight;
+};
+
+&iomuxc {
+	pinctrl_mipibl: pwm1mpipbl {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05  0x41
+		>;
+	};
+};
+
+&gpio5 {
+	regulator-mipi-gpio-blcklight {
+		gpio-hog;
+		gpios = <5 GPIO_ACTIVE_HIGH>;
+		line-name = "mipi-gpio-backlight";
+		output-high;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipibl>;
+	};
+};
+#endif
