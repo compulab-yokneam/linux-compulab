@@ -295,6 +295,9 @@
 
 	pca9555:pca9555@20 {
 		compatible = "nxp,pca9555";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pca9555_poweron>;
+		reset-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
 		gpio-controller;
 		#gpio-cells = <2>;
 		reg = <0x20>;

@@ -225,4 +225,10 @@
 			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2	0x59
 		>;
 	};
+
+	pinctrl_pca9555_poweron: pca9555_poweron {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO08__GPIO1_IO08	0x41
+		>;
+	};
 };
