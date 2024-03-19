@@ -28,6 +28,10 @@ mcm-imx8m-plus-full-dtbs := mcm-imx8m-plus-headless.dtb \
 		mcm-imx8m-plus-full-header.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-full.dtb
 
+mcm-imx8m-plus-thermal-dtbs := mcm-imx8m-plus-headless.dtb \
+		mcm-imx8m-plus-thermal.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-thermal.dtb
+
 mcm-imx8m-plus-mipi-dtbs := mcm-imx8m-plus-headless.dtb \
 	mcm-imx8m-plus-mipi.dtbo mcm-imx8m-plus-mipi-header.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mipi.dtb
