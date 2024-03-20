@@ -4,13 +4,14 @@
 		model = "wm8962-audio";
 		audio-cpu = <&sai3>;
 		audio-codec = <&codec>;
+		hp-det-gpio = <&gpio4 28 0>;
 		audio-routing =
 			"Headphone Jack", "HPOUTL",
 			"Headphone Jack", "HPOUTR",
 			"Ext Spk", "SPKOUTL",
 			"Ext Spk", "SPKOUTR",
 			"AMIC", "MICBIAS",
-			"IN3R", "AMIC",
+			"IN1L", "AMIC",
 			"IN1R", "AMIC";
 	};
 };
@@ -45,6 +46,9 @@
 };
 
 &sai3 {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sai3>;
 	assigned-clocks = <&clk IMX8MP_CLK_SAI3>;
 	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
 	assigned-clock-rates = <12288000>;
@@ -52,5 +56,19 @@
 		 <&audio_blk_ctrl IMX8MP_CLK_AUDIO_BLK_CTRL_SAI3_MCLK1>, <&clk IMX8MP_CLK_DUMMY>,
 		 <&clk IMX8MP_CLK_DUMMY>;
 	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+	fsl,sai-mclk-direction-output;
 	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sai3: sai3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_TXFS__AUDIOMIX_SAI3_TX_SYNC	0xd6
+			MX8MP_IOMUXC_SAI3_TXC__AUDIOMIX_SAI3_TX_BCLK	0xd6
+			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0xd6
+			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0xd6
+			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0xd6
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28		0xd6
+		>;
+	};
 };
