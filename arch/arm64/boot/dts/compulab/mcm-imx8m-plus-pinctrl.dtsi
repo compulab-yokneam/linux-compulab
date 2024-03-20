@@ -121,24 +121,10 @@
 		>;
 	};
 
-	pinctrl_uart1: uart1grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI2_RXFS__UART1_DCE_TX	0x49 /* P2-88/P20-18 */
-			MX8MP_IOMUXC_SD1_CMD__UART1_DCE_RX	0x49 /* P2-70/P20-17 */
-		>;
-	};
-
 	pinctrl_uart2: uart2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_UART2_RXD__UART2_DCE_RX	0x49
 			MX8MP_IOMUXC_UART2_TXD__UART2_DCE_TX	0x49
-		>;
-	};
-
-	pinctrl_uart3: uart3grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_UART3_RXD__UART3_DCE_RX	0x49
-			MX8MP_IOMUXC_UART3_TXD__UART3_DCE_TX	0x49
 		>;
 	};
 

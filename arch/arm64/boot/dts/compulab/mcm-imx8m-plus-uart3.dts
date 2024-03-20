@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-uart3.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (uart3)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};
