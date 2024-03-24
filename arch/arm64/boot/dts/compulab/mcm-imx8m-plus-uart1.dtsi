@@ -9,8 +9,8 @@
 &iomuxc {
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI2_RXFS__UART1_DCE_TX	0x49 /* P2-88/P20-18 */
-			MX8MP_IOMUXC_SD1_CMD__UART1_DCE_RX	0x49 /* P2-70/P20-17 */
+			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX	0x49
+			MX8MP_IOMUXC_UART1_TXD__UART1_DCE_TX	0x49
 		>;
 	};
 };
