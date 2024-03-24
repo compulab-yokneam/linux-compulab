@@ -1,4 +1,8 @@
-&uart1 { /* console optional */
+/*
+ * P13[1-TXD,3-RXD] as RS232
+ */
+
+&uart1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
