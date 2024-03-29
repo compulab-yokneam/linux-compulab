@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx93.dtsi"
+#include "ucm-imx93-eb-audimx9.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 board, eb-audimx9-support";
+	compatible = "compulab,ucm-imx93", "fsl,imx93";
+};
