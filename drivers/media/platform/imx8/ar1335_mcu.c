@@ -2696,8 +2696,7 @@ static const struct media_entity_operations ar1335_sd_media_ops = {
 	.link_setup = ar1335_link_setup,
 };
 
-static int ar1335_probe(struct i2c_client *client,
-			const struct i2c_device_id *id)
+static int ar1335_probe(struct i2c_client *client)
 {
 
     struct camera_common_data *common_data;
