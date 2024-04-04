@@ -1,0 +1,29 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx93.dtsi"
+#include "ucm-imx93-lvds.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 board, build-in-lvds";
+	compatible = "compulab,ucm-imx93", "fsl,imx93";
+};
+
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_my_gpio>;
+
+	pinctrl_my_gpio: my_gpiogrp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO00__GPIO2_IO00                          0x31  /* GPIO_IO00 P3-3 Out */
+			MX93_PAD_GPIO_IO01__GPIO2_IO01                          0x31  /* GPIO_IO01 P3-1 Out */
+			MX93_PAD_GPIO_IO02__GPIO2_IO02                          0x31  /* GPIO_IO02 P3-5 Out */
+			MX93_PAD_GPIO_IO03__GPIO2_IO03                          0x31  /* GPIO_IO03 P3-7 Out */
+		>;
+	};
+};
