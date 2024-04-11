@@ -1,5 +1,7 @@
 # i.MX9
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lpspi.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lpspi-slave.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-headless.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-csi.dtb
