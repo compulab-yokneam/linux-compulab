@@ -62,6 +62,8 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-csi.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9.dtb
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-thermal.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lpspi.dtb
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lpspi-slave.dtb
 # i.MX9 overlays
 DTC_FLAGS := -@
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-lvds-overlay.dtbo
