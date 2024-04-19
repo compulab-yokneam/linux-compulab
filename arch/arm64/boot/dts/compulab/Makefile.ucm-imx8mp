@@ -3,7 +3,8 @@
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-headless.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-falcon.dtb
+dtb-$(CONFIG_ARCH_MXC) += mmc1_ucm-imx8m-plus-falcon.dtb
+dtb-$(CONFIG_ARCH_MXC) += mmc2_ucm-imx8m-plus-falcon.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
 dtb-$(CONFIG_ARCH_MXC) += sb-ucm-imx8m-plus.dtbo
 

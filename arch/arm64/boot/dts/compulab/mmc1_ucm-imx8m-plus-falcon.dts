@@ -1,0 +1,7 @@
+#include "ucm-imx8m-plus-falcon.dts"
+
+/ {
+    chosen {
+        bootargs = "console=ttymxc1,115200 root=/dev/mmcblk1p2 rootwait rw quiet";
+    };
+};
