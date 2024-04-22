@@ -5,6 +5,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-headless.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-falcon.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-uart.dtb
 
 sbc-ucm-imx8m-plus-empty-dtbs := ucm-imx8m-plus-som.dtb \
 		sb-ucm-imx8m-plus.dtbo
