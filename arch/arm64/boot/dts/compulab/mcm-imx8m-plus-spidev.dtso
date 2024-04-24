@@ -1,5 +1,5 @@
 #include "overlay.h"
-#include "mcm-imx8m-plus-spidev.dtsi"
+#include "compulab-imx8m-plus-spidev.dtsi"
 
 / {
 	model = "CompuLab MCM-iMX8M-Plus (spidev)";
