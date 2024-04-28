@@ -425,6 +425,8 @@ static int ili9881c_enable(struct drm_panel *panel)
             "%s: Set %d-lane mode ; Color %d\n",__func__,
             ctx->dsi->lanes,color_format);
 
+    backlight_enable(ctx->backlight);
+
     return 0;
 }
 
@@ -461,7 +463,7 @@ static int ili9881c_disable(struct drm_panel *panel)
     if (!ctx->enabled)
         return 0;
 
-    /* backlight_disable(ctx->backlight); */
+    backlight_disable(ctx->backlight);
     ret = mipi_dsi_dcs_enter_sleep_mode(ctx->dsi);
     if (ret < 0) {
         dev_err(&ctx->dsi->dev, "Failed to enter sleep mode (%d)\n", ret);
