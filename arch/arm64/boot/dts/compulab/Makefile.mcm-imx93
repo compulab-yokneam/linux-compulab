@@ -1,0 +1,16 @@
+# i.MX9
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lpspi.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lpspi-slave.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-headless.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-mipi.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-mipi-csi.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-eb-eth.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-eb-audimx9.dtb
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-thermal.dtb
+# i.MX9 overlays
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lvds-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-mipi-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-eb-eth-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-eb-audimx9-overlay.dtbo
+dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-thermal-overlay.dtbo
