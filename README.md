@@ -14,12 +14,11 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 
 * Set a CompuLab machine:
 
-| Machine | Command Line |
-|---|---|
-|ucm-imx8m-plus|```export MACHINE=compulab_v8```|
-|som-imx8m-plus|```export MACHINE=compulab_v8```|
-|iot-gate-imx8plus|```export MACHINE=compulab_v8```|
-|ucm-imx93|```export MACHINE=ucm-imx93```|
+```export MACHINE=compulab_v8```
+```export MACHINE=compulab_v8```
+```export MACHINE=compulab_v8```
+```export MACHINE=ucm-imx93```
+```export MACHINE=mcm-imx93```
 
 * Clone the source code:
 ```

@@ -1,0 +1,15 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include <dt-bindings/usb/pd.h>
+#include "../freescale/imx93.dtsi"
+#include "mcm-imx93.dtsi"
+
+/ {
+	model = "CompuLab MCM-i.MX93 board, headless";
+	compatible = "compulab,mcm-imx93", "fsl,imx93";
+};
