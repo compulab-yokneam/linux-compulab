@@ -557,14 +557,6 @@
 	status = "okay";
 };
 
-&lpuart5 {
-	/* BT */
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart5>;
-	/*fsl,uart-has-rtscts;*/
-	status = "okay";
-};
-
 &lpuart7 { /* RS485/_/J22 */
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart7>;

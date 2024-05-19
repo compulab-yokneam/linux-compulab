@@ -98,16 +98,6 @@
 		>;
 	};
 
-	pinctrl_uart5: uart5grp {
-		fsl,pins = <
-			MX93_PAD_GPIO_IO01__LPUART5_RX		0x31e
-			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
-			MX93_PAD_GPIO_IO02__LPUART5_CTS_B	0x31e
-			MX93_PAD_GPIO_IO03__LPUART5_RTS_B	0x31e
-			MX93_PAD_GPIO_IO18__GPIO2_IO18		0x31e
-		>;
-	};
-
 	pinctrl_uart7: uart7grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO08__LPUART7_TX		0x31e

@@ -7,6 +7,7 @@
 
 #include "mcm-imx93.dtsi"
 #include "sbc-mcm-imx93-leds.dtsi"
+#include "sbc-mcm-imx93-uart.dtsi"
 
 / {
 	model = "CompuLab MCM-i.MX93 board, build-in-lvds";
