@@ -21,7 +21,7 @@
 		stdout-path = &lpuart1;
 	};
 
-	leds {
+	leds:leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio_led>;

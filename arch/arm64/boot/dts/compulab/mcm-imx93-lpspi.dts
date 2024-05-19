@@ -3,7 +3,7 @@
  * Copyright 2022 NXP
  */
 
-#include "mcm-imx93.dts"
+#include "sbc-mcm-imx93.dts"
 
 &flexcan2 {
 	status = "disabled";
