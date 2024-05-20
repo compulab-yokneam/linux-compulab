@@ -12,11 +12,6 @@
 };
 
 / {
-	aliases {
-		ethernet0 = &eqos;
-		ethernet1 = &fec;
-	};
-
 	chosen {
 		stdout-path = &lpuart1;
 	};
@@ -252,53 +247,6 @@
 &adc1 {
 	vref-supply = <&reg_vref_1v8>;
 	status = "okay";
-};
-
-&eqos {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_eqos>;
-	phy-mode = "rgmii-id";
-	phy-handle = <&ethphy1>;
-	status = "okay";
-
-	mdio {
-		compatible = "snps,dwmac-mdio";
-		#address-cells = <1>;
-		#size-cells = <0>;
-		clock-frequency = <5000000>;
-
-		ethphy1: ethernet-phy-eqos@4 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reset-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
-			reset-assert-us = <10000>;
-			reset-deassert-us = <80000>;
-			reg = <4>;
-			eee-broken-1000t;
-			rtl821x,aldps-disable;
-			rtl821x,clkout-disable;
-		};
-	};
-};
-
-&fec {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_fec>;
-	phy-mode = "rgmii-id";
-	phy-handle = <&ethphy2>;
-	fsl,magic-packet;
-	status = "disabled";
-
-	mdio {
-		#address-cells = <1>;
-		#size-cells = <0>;
-		clock-frequency = <5000000>;
-
-		ethphy2: ethernet-phy-fec@5 {
-			compatible = "ethernet-phy-ieee802.3-c22";
-			reg = <5>;
-			eee-broken-1000t;
-		};
-	};
 };
 
 &flexcan2 {
