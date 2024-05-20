@@ -8,6 +8,7 @@
 #include "mcm-imx93.dtsi"
 #include "sbc-mcm-imx93-leds.dtsi"
 #include "sbc-mcm-imx93-uart.dtsi"
+#include "sbc-mcm-imx93-rtc.dtsi"
 #include "sbc-mcm-imx93-ethernet.dtsi"
 
 / {
