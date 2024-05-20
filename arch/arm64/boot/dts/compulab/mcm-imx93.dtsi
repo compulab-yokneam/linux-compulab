@@ -286,15 +286,6 @@
 		reg = <0x50>;
 		pagesize = <16>;
 	};
-
-	rtc@69 {
-		compatible = "ab1805";
-		reg = <0x69>;
-		pagesize = <16>;
-		sqw = "32768_Hz";
-		xt-frequency = <32773500>;
-		status = "okay";
-	};
 };
 
 &lpi2c2 {
