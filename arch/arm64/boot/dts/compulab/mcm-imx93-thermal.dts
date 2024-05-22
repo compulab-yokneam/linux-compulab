@@ -5,7 +5,7 @@
 
 /dts-v1/;
 
-#include "mcm-imx93.dtsi"
+#include "sbc-mcm-imx93.dts"
 #include "mcm-imx93-thermal.dtsi"
 
 / {

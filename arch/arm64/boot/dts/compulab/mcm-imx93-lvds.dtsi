@@ -64,20 +64,30 @@
 	status = "okay";
 };
 
-&goodix_ts {
-	pinctrl-0 = <&touchscreen0_pins>;
-	interrupt-parent = <&gpio2>;
-	interrupts = <20 IRQ_TYPE_LEVEL_HIGH>;
-	irq-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
-	reset-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
-	status = "okay";
-};
-
 &iomuxc {
+	touchscreen0_pins: ts0grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO20__GPIO2_IO20		0x31e
+		>;
+	};
 	pinctrl_tpm4: tpm4grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO13__TPM4_CH2	0x59e
 		 >;
+	};
+};
+
+&lpi2c3 {
+	goodix_ts: goodix@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchscreen0_pins>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <20 IRQ_TYPE_LEVEL_HIGH>;
+		irq-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
+		status = "okay";
 	};
 };
 
