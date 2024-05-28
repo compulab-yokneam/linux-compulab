@@ -7,6 +7,21 @@
 		enable-active-high;
 		regulator-always-on;
 	};
+
+	sound-wm8962 {
+		compatible = "fsl,imx-audio-wm8962x";
+		model = "wm8962-audio";
+		audio-cpu = <&sai1>;
+		audio-codec = <&codec>;
+		audio-routing =
+			"Headphone Jack", "HPOUTL",
+			"Headphone Jack", "HPOUTR",
+			"Ext Spk", "SPKOUTL",
+			"Ext Spk", "SPKOUTR",
+			"AMIC", "MICBIAS",
+			"IN3R", "AMIC",
+			"IN1R", "AMIC";
+	};
 };
 
 &lpi2c3 {

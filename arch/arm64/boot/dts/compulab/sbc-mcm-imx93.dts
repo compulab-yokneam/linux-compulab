@@ -13,6 +13,7 @@
 #include "sbc-mcm-imx93-ethernet.dtsi"
 #include "sbc-mcm-imx93-can.dtsi"
 #include "sbc-mcm-imx93-audio.dtsi"
+#include "sbc-mcm-imx93-lpspi.dtsi"
 
 / {
 	model = "CompuLab MCM-i.MX93 board, build-in-lvds";
