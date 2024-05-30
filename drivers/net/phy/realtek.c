@@ -342,6 +342,23 @@ static int rtl8211c_config_init(struct phy_device *phydev)
 			    CTL1000_ENABLE_MASTER | CTL1000_AS_MASTER);
 }
 
+static int rtl8211x_config_init(struct phy_device *phydev)
+{
+#define RTL821E_PHYCR				0x10
+#define RTL821E_PHYCR_CLK125			BIT(4)
+	struct device *dev = &phydev->mdio.dev;
+	u16 val;
+
+	if (of_property_read_bool(dev->of_node, "realtek,clkout-disable")) {
+		 __phy_modify(phydev, RTL821E_PHYCR, RTL821E_PHYCR_CLK125, RTL821E_PHYCR_CLK125);
+	}
+
+	val = __phy_read(phydev, RTL821E_PHYCR) & RTL821E_PHYCR_CLK125;
+	dev_dbg(dev, "CLK125 clock is %s\n",  val ? "disabled" : "enabled");
+
+	return 0;
+};
+
 static int rtl8211f_config_init(struct phy_device *phydev)
 {
 	struct rtl821x_priv *priv = phydev->priv;
@@ -464,6 +481,8 @@ static int rtl8211e_config_init(struct phy_device *phydev)
 {
 	int ret = 0, oldpage;
 	u16 val;
+
+	rtl8211x_config_init(phydev);
 
 	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
 	switch (phydev->interface) {
