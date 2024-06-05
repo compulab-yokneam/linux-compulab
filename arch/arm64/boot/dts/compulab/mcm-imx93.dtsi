@@ -84,17 +84,6 @@
 		};
 	};
 
-	cm33 {
-		mbox-names = "tx", "rx", "rxdb";
-		mboxes = <&mu1 0 1
-			  &mu1 1 1
-			  &mu1 3 1>;
-		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
-				<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
-		fsl,startup-delay-ms = <500>;
-		status = "okay";
-	};
-
 	ethosu {
 		compatible = "arm,ethosu";
 		fsl,cm33-proc = <&cm33>;
@@ -202,6 +191,17 @@
 
 &adc1 {
 	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};
+
+&cm33 {
+	mbox-names = "tx", "rx", "rxdb";
+	mboxes = <&mu1 0 1
+		  &mu1 1 1
+		  &mu1 3 1>;
+	memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
+			<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+	fsl,startup-delay-ms = <500>;
 	status = "okay";
 };
 
@@ -480,6 +480,10 @@
 		compatible = "marvell,sd8897-bt";
 		reg = <2>;
 	};
+};
+
+&wdog3 {
+	status = "okay";
 };
 
 &epxp {
