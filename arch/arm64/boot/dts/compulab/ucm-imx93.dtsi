@@ -633,6 +633,10 @@
 	};
 };
 
+&wdog3 {
+	status = "okay";
+};
+
 &epxp {
 	status = "okay";
 };
