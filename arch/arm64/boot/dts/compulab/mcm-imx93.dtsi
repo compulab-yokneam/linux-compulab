@@ -205,11 +205,6 @@
 	status = "okay";
 };
 
-&lpm {
-	soc-supply = <&buck1>;
-	status = "okay";
-};
-
 &gpio1 {
 	regulator-gpioexp {
 		gpio-hog;
