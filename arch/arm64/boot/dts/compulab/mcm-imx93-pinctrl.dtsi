@@ -44,13 +44,6 @@
 		>;
 	};
 
-	pinctrl_uart2: uart2grp {
-		fsl,pins = <
-			MX93_PAD_UART2_RXD__LPUART2_RX		0x31e
-			MX93_PAD_UART2_TXD__LPUART2_TX		0x31e
-		>;
-	};
-
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			MX93_PAD_SD1_CLK__USDHC1_CLK		0x17fe
