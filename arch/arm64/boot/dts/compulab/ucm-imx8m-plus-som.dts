@@ -15,6 +15,7 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus.dtsi"
+#include "compulab-imx8m-plus-ldo4.dtsi"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus (SOM)";

@@ -1,0 +1,109 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&{/} {
+	lvds_backlight: lvds_backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm2 0 300000 0>;
+		brightness-levels = <96 255>;
+		num-interpolated-steps = <12>;
+		default-brightness-level = <10>;
+		status = "okay";
+	};
+
+	lvds_panel: lvds0_panel {
+		compatible = "boe,hv070wsa-100";
+		backlight = <&lvds_backlight>;
+		enable-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+
+		port {
+			panel_lvds_in: endpoint {
+				remote-endpoint = <&lvds_out>;
+			};
+		};
+	};
+};
+
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	goodix_ts@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		interrupt-parent = <&gpio4>;
+		interrupts = <28 IRQ_TYPE_LEVEL_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchscreen1_pins>;
+
+		irq-gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
+		/*reset-gpios = <&pca9555 4 GPIO_ACTIVE_HIGH>;*/
+		reset-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+
+&iomuxc {
+
+	pinctrl_pwm2: pwm2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_RX__PWM2_OUT		0x116
+		 >;
+	};
+
+	touchscreen1_pins: ts1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28	0x19
+		>;
+	};
+};
+
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm2>;
+	status = "okay";
+};
+
+&lvds_backlight {
+	status = "okay";
+};
+
+&lvds_panel {
+	status = "okay";
+};
+
+&ldb {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	lvds-channel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds_out: endpoint {
+				remote-endpoint = <&panel_lvds_in>;
+			};
+		};
+	};
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+&lcdif2 {
+	status = "okay";
+};

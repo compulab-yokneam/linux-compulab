@@ -1,0 +1,16 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus-som.dts"
+#include "ucm-imx8m-plus-mmc.dtsi"
+#include "ucm-imx8m-plus-pcie.dtsi"
+#include "sbev-ucmimx8plus.dtsi"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus (sbev)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

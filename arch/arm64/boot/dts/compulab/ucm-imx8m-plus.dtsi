@@ -159,29 +159,6 @@
 	};
 };
 
-&flexcan1 {
-	status = "disabled";
-};
-
-&flexcan2 {
-	status = "disabled";
-};
-
-&flexspi {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_flexspi0>;
-	status = "okay";
-
-	flash0: mt25qu256aba@0 {
-		reg = <0>;
-		#address-cells = <1>;
-		#size-cells = <1>;
-		compatible = "jedec,spi-nor";
-		spi-max-frequency = <80000000>;
-		spi-tx-bus-width = <4>;
-		spi-rx-bus-width = <4>;
-	};
-};
 
 &i2c1 {
 	clock-frequency = <100000>;
@@ -522,4 +499,3 @@
 		linux,cma-default;
 	};
 };
-

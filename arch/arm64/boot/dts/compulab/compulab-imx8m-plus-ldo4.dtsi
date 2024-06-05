@@ -3,9 +3,5 @@
 */
 
 &ldo4 {
-    /delete-property/ regulator-name;
-    /delete-property/ regulator-min-microvolt;
-    /delete-property/ regulator-max-microvolt;
-    /delete-property/ regulator-boot-on;
-    /delete-property/ regulator-always-on;
+	regulator-max-microvolt = <1800000>;
 };

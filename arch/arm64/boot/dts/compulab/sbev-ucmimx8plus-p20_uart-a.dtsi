@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&iomuxc {
+	pinctrl0_p20_uarta: set0_p20_uarta {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX	0x140	/* P20P2 */
+			MX8MP_IOMUXC_UART1_TXD__UART1_DCE_TX	0x140	/* P20P4 */
+			/* flow control */
+			MX8MP_IOMUXC_UART3_TXD__UART1_DCE_RTS	0x140	/* P20P3 */
+			MX8MP_IOMUXC_UART3_RXD__UART1_DCE_CTS	0x140	/* P20P6 */
+		>;
+	};
+
+	pinctrl1_p20_uarta: set1_p20_uarta {
+		fsl,pins = <
+			/* GPIO */
+			MX8MP_IOMUXC_UART1_RXD__GPIO5_IO22	0x19	/* gpio 150 */
+			MX8MP_IOMUXC_UART1_TXD__GPIO5_IO23	0x19	/* gpio 151 */
+			MX8MP_IOMUXC_UART3_TXD__GPIO5_IO27	0x19	/* gpio 155 */
+			MX8MP_IOMUXC_UART3_RXD__GPIO5_IO26 	0x19	/* gpio 154 */
+		>;
+	};
+};
+
+&uart1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl0_p20_uarta>;
+	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+	status = "okay";
+};
