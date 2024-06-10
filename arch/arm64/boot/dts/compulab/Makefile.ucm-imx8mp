@@ -29,6 +29,7 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-lvds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-leds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p15_spi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p16_i2c.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p17_can.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p18_gpio.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p19_uart-b.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p20_uart-a.dtbo
