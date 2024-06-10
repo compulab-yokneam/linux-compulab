@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&iomuxc {
+	pinctrl_p15_ecspi2: p15_ecspi2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_SCLK__ECSPI2_SCLK				0x82
+			MX8MP_IOMUXC_ECSPI2_MOSI__ECSPI2_MOSI				0x82
+			MX8MP_IOMUXC_ECSPI2_MISO__ECSPI2_MISO				0x82
+		>;
+	};
+
+	pinctrl_p15_ecspi2_cs: p15_ecspi2cs {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13				0x40000
+		>;
+	};
+};
+
+&ecspi2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_p15_ecspi2>, <&pinctrl_p15_ecspi2_cs>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev2_0: spidev2@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <500000>;
+		status = "okay";
+	};
+};
