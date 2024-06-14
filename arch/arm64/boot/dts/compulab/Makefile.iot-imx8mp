@@ -4,3 +4,6 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2adc.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2emmc.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2tpm.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-brkout_pwm_gpio.dtb
+# falocn mode
+dtb-$(CONFIG_ARCH_MXC) += mmc1_iot-gate-imx8plus-falcon.dtb
+dtb-$(CONFIG_ARCH_MXC) += mmc2_iot-gate-imx8plus-falcon.dtb
