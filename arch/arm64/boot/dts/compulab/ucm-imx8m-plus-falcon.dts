@@ -1,6 +1,7 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus-som.dts"
+#include "ucm-imx8m-plus-mmc.dtsi"
 
 / {
     model = "CompuLab UCM-iMX8M-Plus falcon";
