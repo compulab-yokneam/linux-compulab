@@ -1,2 +1,0 @@
-#include "overlay.h"
-#include "sbev-ucmimx8plus-i2c2.dtsi"

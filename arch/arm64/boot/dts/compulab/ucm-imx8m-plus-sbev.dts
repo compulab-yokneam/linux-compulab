@@ -6,9 +6,9 @@
 /dts-v1/;
 
 #include "ucm-imx8m-plus-som.dts"
-#include "ucm-imx8m-plus-mmc.dtsi"
 #include "ucm-imx8m-plus-pcie.dtsi"
 #include "sbev-ucmimx8plus.dtsi"
+#include "sbev-ucmimx8plus-mmc2.dtsi"
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus (sbev)";

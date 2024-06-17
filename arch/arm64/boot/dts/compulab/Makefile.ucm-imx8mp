@@ -20,7 +20,6 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
 
 # sbev-ucmimx8plus
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtbo
-dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-i2c2.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-enet1.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-mmc2.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-wm8962.dtbo
@@ -34,12 +33,15 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p18_gpio.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p19_uart-b.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p20_uart-a.dtbo
 
-sbev-ucmimx8plus-dtbs := ucm-imx8m-plus-som.dtb \
-		sbev-ucmimx8plus.dtbo \
-		sbev-ucmimx8plus-i2c2.dtbo \
+sbev-ucmimx8plus-dtbs := ucm-imx8m-plus-sbev.dtb \
 		sbev-ucmimx8plus-enet1.dtbo \
-		sbev-ucmimx8plus-mmc2.dtbo \
-		sbev-ucmimx8plus-wm8962.dtbo
+		sbev-ucmimx8plus-wm8962.dtbo \
+		sbev-ucmimx8plus-p15_spi.dtbo \
+		sbev-ucmimx8plus-p16_i2c.dtbo \
+		sbev-ucmimx8plus-p17_can.dtbo \
+		sbev-ucmimx8plus-p18_gpio.dtbo \
+		sbev-ucmimx8plus-p19_uart-b.dtbo \
+		sbev-ucmimx8plus-p20_uart-a.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtb
 
