@@ -59,6 +59,8 @@
  * as of now the ts_reset regulator allows working with the device
  */
 		/* reset-gpios = <&pca9555 4 GPIO_ACTIVE_HIGH>; */
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
 		status = "okay";
 	};
 };
