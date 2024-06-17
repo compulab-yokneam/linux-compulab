@@ -25,6 +25,17 @@
 			};
 		};
 	};
+
+	/* touch screen reset helper */
+	ts_reset: regulator-tsreset {
+		compatible = "regulator-fixed";
+		regulator-name = "tosuch-reset";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
 };
 
 &i2c3 {
@@ -43,8 +54,11 @@
 		pinctrl-0 = <&touchscreen1_pins>;
 
 		irq-gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
-		/*reset-gpios = <&pca9555 4 GPIO_ACTIVE_HIGH>;*/
-		reset-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+/* To be investigated; the drived does not take the device
+ * out of reset if reset-gpios is defined inside the device node
+ * as of now the ts_reset regulator allows working with the device
+ */
+		/* reset-gpios = <&pca9555 4 GPIO_ACTIVE_HIGH>; */
 		status = "okay";
 	};
 };
