@@ -33,7 +33,7 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p18_gpio.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p19_uart-b.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p20_uart-a.dtbo
 
-sbev-ucmimx8plus-dtbs := ucm-imx8m-plus-sbev.dtb \
+sbev-ucmimx8plus-headless-dtbs := ucm-imx8m-plus-sbev.dtb \
 		sbev-ucmimx8plus-enet1.dtbo \
 		sbev-ucmimx8plus-wm8962.dtbo \
 		sbev-ucmimx8plus-p15_spi.dtbo \
@@ -43,12 +43,12 @@ sbev-ucmimx8plus-dtbs := ucm-imx8m-plus-sbev.dtb \
 		sbev-ucmimx8plus-p19_uart-b.dtbo \
 		sbev-ucmimx8plus-p20_uart-a.dtbo
 
-dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-headless.dtb
 
-sbev-ucmimx8plus-lvds-dtbs := sbev-ucmimx8plus.dtb \
+sbev-ucmimx8plus-dtbs := sbev-ucmimx8plus-headless.dtb \
 		sbev-ucmimx8plus-lvds.dtbo
 
-dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-lvds.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtb
 
 sbc-ucm-imx8m-plus-dtbs := ucm-imx8m-plus.dtb \
 		ucm-imx8m-plus-can.dtbo
