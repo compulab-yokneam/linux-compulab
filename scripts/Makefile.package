@@ -198,6 +198,12 @@ tar-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar
 tar%-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar.% FORCE
 	@:
 
+cpl-pkgs := cpl-targz-pkg cpl-tarbz2-pkg cpl-tarxz-pkg cpl-tarzst-pkg
+PHONY += $(cpl-pkgs)
+$(cpl-pkgs):
+	$(MAKE) -f $(srctree)/Makefile
+	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildcpl $@
+
 # perf-tar*-src-pkg - generate a source tarball with perf source
 # ---------------------------------------------------------------------------
 
