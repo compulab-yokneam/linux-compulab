@@ -30,6 +30,7 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2emmc.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2tpm.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-brkout_pwm_gpio.dtb
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p.dtb
+dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus.dtb
 dtb-$(CONFIG_ARCH_MXC) += som-imx8m-plus_mipi-csi1.dtb
