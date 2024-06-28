@@ -24,6 +24,7 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-enet1.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-mmc2.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-wm8962.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-hdmi.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-leds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p15_spi.dtbo
@@ -49,6 +50,17 @@ sbev-ucmimx8plus-dtbs := sbev-ucmimx8plus-headless.dtb \
 		sbev-ucmimx8plus-lvds.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtb
+
+sbev-ucmimx8plus-hdmi-dtbs := sbev-ucmimx8plus-headless.dtb \
+		sbev-ucmimx8plus-hdmi.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-hdmi.dtb
+
+sbev-ucmimx8plus-dualhead-dtbs := sbev-ucmimx8plus-headless.dtb \
+		sbev-ucmimx8plus-lvds.dtbo \
+		ucm-imx8m-plus-hdmi.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-dualhead.dtb
 
 sbc-ucm-imx8m-plus-dtbs := ucm-imx8m-plus.dtb \
 		ucm-imx8m-plus-can.dtbo
