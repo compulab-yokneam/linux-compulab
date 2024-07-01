@@ -17,6 +17,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rtc.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-cma.dtbo
 
 # sbev-ucmimx8plus
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtbo
@@ -25,6 +26,7 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-mmc2.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-wm8962.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-lvds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-cma.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-leds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p15_spi.dtbo

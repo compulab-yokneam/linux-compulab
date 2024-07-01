@@ -494,8 +494,8 @@
 	linux,cma {
 		compatible = "shared-dma-pool";
 		reusable;
-		size = <0 0x2c000000>;
-		alloc-ranges = <0 0x40000000 0 0xC0000000>;
+		size = <0 0x1c000000>;
+		alloc-ranges = <0 0x40000000 0 0x80000000>;
 		linux,cma-default;
 	};
 };
