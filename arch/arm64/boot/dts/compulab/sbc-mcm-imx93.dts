@@ -19,3 +19,8 @@
 	model = "CompuLab MCM-i.MX93 board, build-in-lvds";
 	compatible = "compulab,mcm-imx93", "fsl,imx93";
 };
+
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};
