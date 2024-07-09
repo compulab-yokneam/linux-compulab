@@ -46,8 +46,8 @@ make menuconfig
 nice make -j`nproc`
 ```
 
-* Create a bzip2 compressed tarball
- ```
+## Create a bzip2 compressed tarball
+```
 nice make -j`nproc` cpl-tarbz2-pkg 
 ```
 
