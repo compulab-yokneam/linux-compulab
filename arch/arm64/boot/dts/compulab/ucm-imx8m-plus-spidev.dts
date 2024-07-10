@@ -1,0 +1,10 @@
+/dts-v1/;
+/plugin/;
+
+&ecspi2 {
+	status = "okay";
+};
+
+&spidev2_0 {
+	status = "okay";
+};

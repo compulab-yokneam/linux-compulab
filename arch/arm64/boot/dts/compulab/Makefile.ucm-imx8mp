@@ -44,6 +44,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rtc.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-spidev.dtbo
 
 # All heads + sensor
 ucm-imx8m-plus_mipi-csi1-ar1335-af-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar1335-af.dtbo
