@@ -48,14 +48,14 @@ nice make -j`nproc`
 
 ## Create a bzip2 compressed tarball
 ```
-nice make -j`nproc` cpl-tarbz2-pkg 
+nice make -j`nproc` tarbz2-pkg 
 ```
 
 * Pre Install procedure
 
 |Build Type|Procedure/Command|
 |---|---|
-|On target|``ln -sf $(readlink -e linux-compulab-*.tar.bz2 \| tail -1) /tmp/linux-compulab.tar.bz2``|
+|On target|``ln -sf $(readlink -e linux-*.tar.bz2 \| tail -1) /tmp/linux-compulab.tar.bz2``|
 |On another device|Copy linux-compulab-\<version\>-arm64.tar.bz2 to the target devive /tmp/linux-compulab.tar.bz2|
 
 ## Deploy the created image
