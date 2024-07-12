@@ -56,7 +56,7 @@ nice make -j`nproc` tarbz2-pkg
 |Build Type|Procedure/Command|
 |---|---|
 |On target|``ln -sf $(readlink -e linux-*.tar.bz2 \| tail -1) /tmp/linux-compulab.tar.bz2``|
-|On another device|Copy linux-compulab-\<version\>-arm64.tar.bz2 to the target devive /tmp/linux-compulab.tar.bz2|
+|On another device|Copy linux-\<version\>-arm64.tar.bz2 to the target devive /tmp/linux-compulab.tar.bz2|
 
 ## Deploy the created image
 * Issue CompuLab linux install script as root:
