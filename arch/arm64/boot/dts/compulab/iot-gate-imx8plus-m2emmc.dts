@@ -45,7 +45,7 @@
 &iomuxc {
 	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
 		fsl,pins = <
-			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x101
+			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x110
 		>;
 	};
 };
