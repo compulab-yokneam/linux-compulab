@@ -1,0 +1,34 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 CompuLab
+ */
+
+/dts-v1/;
+
+#include "mcm-imx93.dtsi"
+#include "mcm-imx93-lvds.dtsi"
+
+/ {
+	model = "CompuLab MCM-i.MX93 with mipi csi enabled";
+	compatible = "compulab,mcm-imx93", "fsl,imx93";
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+};
+
+&sensor_mipi2 {
+	status = "okay";
+};
+
+&mipi_csi {
+        status = "okay";
+};

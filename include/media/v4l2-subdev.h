@@ -202,6 +202,15 @@ struct v4l2_subdev_core_ops {
 	int (*load_fw)(struct v4l2_subdev *sd);
 	int (*reset)(struct v4l2_subdev *sd, u32 val);
 	int (*s_gpio)(struct v4l2_subdev *sd, u32 val);
+#ifdef CONFIG_VIDEO_ECAM
+	int (*queryctrl)(struct v4l2_subdev *sd, struct v4l2_queryctrl *qc);
+	int (*g_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
+	int (*s_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
+	int (*querymenu)(struct v4l2_subdev *sd, struct v4l2_querymenu *qm);
+	int (*g_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+	int (*s_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+	int (*try_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+#endif
 	long (*command)(struct v4l2_subdev *sd, unsigned int cmd, void *arg);
 	long (*ioctl)(struct v4l2_subdev *sd, unsigned int cmd, void *arg);
 #ifdef CONFIG_COMPAT

@@ -1,0 +1,37 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+#include <dt-bindings/leds/common.h>
+
+&{/} {
+	user-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_user_leds>;
+
+		user-led-1-green {
+			label = "green";
+			color = <LED_COLOR_ID_GREEN>;
+			gpios = <&gpio4 12 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+		user-led-1-yellow {
+			label = "yellow";
+			color = <LED_COLOR_ID_YELLOW>;
+			gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+	};
+
+};
+
+&iomuxc {
+	pinctrl_user_leds: userledsgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20		0x19
+			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12	0x19
+		>;
+	};
+};

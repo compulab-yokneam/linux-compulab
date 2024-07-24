@@ -1,0 +1,19 @@
+&lvds_backlight {
+	status = "okay";
+};
+
+&lvds_panel {
+	status = "okay";
+};
+
+&ldb {
+	status = "okay";
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+&lcdif2 {
+	status = "okay";
+};
