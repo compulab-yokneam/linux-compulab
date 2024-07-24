@@ -1,0 +1,21 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus_mipi-csi2.dtsi"
+
+&{/} {
+	model = "CompuLab MCM-iMX8M-Plus with ar_1335_mcu mipi csi2 enabled";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};
+
+&sensor_mipi2 {
+	compatible = "aptina,ar1335_mcu", "ar1335_mcu";
+	pwn-gpios = <&pca9555 12 GPIO_ACTIVE_HIGH>;
+	rst-gpios = <&pca9555 13 GPIO_ACTIVE_HIGH>;
+};
+
+&mipi2_ep {
+	data-lanes = <1 2>;
+};
+
+&mipi2_sensor_ep {
+	data-lanes = <2>;
+};

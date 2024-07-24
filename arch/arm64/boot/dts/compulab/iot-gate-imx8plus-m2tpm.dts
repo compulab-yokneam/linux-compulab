@@ -1,0 +1,61 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2022 CompuLab Ltd
+ */
+
+#include "iot-gate-imx8plus.dts"
+
+/* IOT-GATE-IMX8PLUS with TPM extension module in M.2 Expansion Connector */
+
+/ {
+	tpm_nreset: tpm-nreset {
+		compatible = "gpio-reset";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_tpm_nrst>;
+		reset-gpios = <&gpio3 20 GPIO_ACTIVE_HIGH>;
+		#reset-cells = <0>;
+		initially-in-reset;
+	};
+};
+
+&ecspi2 {
+	status = "okay";
+
+	/delete-node/ spidev2@0;
+
+	slb9670: slb9670-ecspi2@0 {
+		resets = <&tpm_nreset>;
+		compatible = "infineon,slb9670", "tcg,tpm_tis-spi";
+		reg = <0>;
+		spi-max-frequency = <5000000>;
+		status = "okay";
+	};
+};
+
+&i2c5 {
+	status = "okay";
+
+	eeprom_m2: eeprom-i2c5@54 {
+		compatible = "atmel,24c08";
+		pagesize = <16>;
+		reg = <0x54>;
+		status = "okay";
+	};
+};
+
+&i2c6 {
+	status = "disabled";
+};
+
+&usdhc2 {
+	status = "disabled";
+};
+
+&iomuxc {
+	pinctrl_tpm_nrst: tpmnrstgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20			0x110
+		>;
+	};
+};
+

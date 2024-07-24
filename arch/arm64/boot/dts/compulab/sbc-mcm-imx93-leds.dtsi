@@ -1,0 +1,18 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 Compulab
+ */
+
+#include "dt-bindings/leds/common.h"
+#include "dt-bindings/gpio/gpio.h"
+
+&leds {
+	user-led1-green {
+		gpios = <&pca9555 2 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	};
+	user-led2-yellow {
+		gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		default-state = "off";
+	};
+};
