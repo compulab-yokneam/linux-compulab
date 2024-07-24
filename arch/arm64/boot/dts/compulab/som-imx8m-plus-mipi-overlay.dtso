@@ -1,0 +1,5 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "som-imx8m-plus-mipi.dtsi"

@@ -1,1 +1,6 @@
 obj-$(CONFIG_IMX8_MIPI_CSI2_YAV) += mxc-mipi-csi2_yav.o
+obj-$(CONFIG_MXC_CAMERA_AR0521)   += ar0521.o
+obj-$(CONFIG_MXC_CAMERA_AR1335)   += ar1335.o
+obj-$(CONFIG_MXC_CAMERA_AR0234)   += ar0234.o
+obj-$(CONFIG_MXC_CAMERA_AR1335_AF)   += ar1335_af.o
+obj-$(CONFIG_MXC_CAMERA_AR1335_MCU)   += ar1335_mcu.o

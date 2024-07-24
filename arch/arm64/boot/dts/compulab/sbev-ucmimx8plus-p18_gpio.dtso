@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "sbev-ucmimx8plus-p18_gpio.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (p18_gpio)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

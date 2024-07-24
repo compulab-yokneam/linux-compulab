@@ -1,0 +1,5 @@
+/dts-v1/;
+/plugin/;
+
+#include "overlay.h"
+#include "ucm-imx8m-plus-mmc.dtsi"

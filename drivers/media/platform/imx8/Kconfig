@@ -6,5 +6,17 @@ config IMX8_MIPI_CSI2_YAV
 	default y
 
 endmenu
-endif #VIDEO_MX8_CAPTURE
 
+config VIDEO_ECAM
+        tristate "e-con camera sensor support"
+        depends on I2C && VIDEO_V4L2_SUBDEV_API
+        help
+          This config is used to enable codes which are used to
+          support econ camera and to disable ISI control codes.
+
+          To compile this driver as a module, choose M here: the module
+          will be called based on sensor name.
+
+source "drivers/media/platform/imx8/ecam/Kconfig"
+
+endif #VIDEO_MX8_CAPTURE

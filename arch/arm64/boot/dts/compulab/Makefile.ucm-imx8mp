@@ -1,0 +1,113 @@
+# DTC_FLAGS := -@
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-som.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-headless.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-sbev.dtb
+dtb-$(CONFIG_ARCH_MXC) += mmc1_ucm-imx8m-plus-falcon.dtb
+dtb-$(CONFIG_ARCH_MXC) += mmc2_ucm-imx8m-plus-falcon.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-spidev.dtbo
+# the features' overlays
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rtc.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-pcie.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-cma.dtbo
+
+# sbev-ucmimx8plus
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-enet1.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-enet1-phy-id.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-mmc2.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-wm8962.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-cma.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-leds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p15_spi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p16_i2c.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p17_can.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p18_gpio.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p19_uart-b.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p20_uart-a.dtbo
+
+sbev-ucmimx8plus-headless-dtbs := ucm-imx8m-plus-sbev.dtb \
+		sbev-ucmimx8plus-enet1.dtbo \
+		sbev-ucmimx8plus-wm8962.dtbo \
+		sbev-ucmimx8plus-p15_spi.dtbo \
+		sbev-ucmimx8plus-p16_i2c.dtbo \
+		sbev-ucmimx8plus-p17_can.dtbo \
+		sbev-ucmimx8plus-p18_gpio.dtbo \
+		sbev-ucmimx8plus-p19_uart-b.dtbo \
+		sbev-ucmimx8plus-p20_uart-a.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-headless.dtb
+
+sbev-ucmimx8plus-dtbs := sbev-ucmimx8plus-headless.dtb \
+		sbev-ucmimx8plus-lvds.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtb
+
+sbev-ucmimx8plus-hdmi-dtbs := sbev-ucmimx8plus-headless.dtb \
+		sbev-ucmimx8plus-hdmi.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-hdmi.dtb
+
+sbev-ucmimx8plus-dualhead-dtbs := sbev-ucmimx8plus-headless.dtb \
+		sbev-ucmimx8plus-lvds.dtbo \
+		ucm-imx8m-plus-hdmi.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-dualhead.dtb
+
+sbc-ucm-imx8m-plus-dtbs := ucm-imx8m-plus.dtb \
+		ucm-imx8m-plus-can.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbc-ucm-imx8m-plus.dtb
+
+ucm-imx8m-plus-thermal-dtbs := ucm-imx8m-plus-headless.dtb ucm-imx8m-plus-thermal.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-thermal.dtb
+
+ucm-imx8m-plus-mipi-dtbs := ucm-imx8m-plus-headless.dtb sb-ucmimx8plus.dtbo ucm-imx8m-plus-mipi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtb
+
+ucm-imx8m-plus-hdmi-dtbs := ucm-imx8m-plus-headless.dtb ucm-imx8m-plus-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-hdmi.dtb
+
+ucm-imx8m-plus-lvds-dtbs := ucm-imx8m-plus-headless.dtb sb-ucmimx8plus.dtbo ucm-imx8m-plus-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtb
+
+ucm-imx8m-plus-usbdev-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus-usbdev.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-usbdev.dtb
+
+ucm-imx8m-plus-wm8731-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus-wm8731.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-wm8731.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-rpmsg.dtb
+
+# All heads + sensor
+ucm-imx8m-plus_mipi-csi1-ar1335-af-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-af.dtb
+
+ucm-imx8m-plus_mipi-csi2-ar1335-af-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi2-ar1335-af.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2-ar1335-af.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar1335-mcu-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
+
+ucm-imx8m-plus_mipi-csi1-imx219-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx219.dtb
+
+ucm-imx8m-plus_mipi-csi1-ov5647-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ov5647.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ov5647.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar0521-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar0521.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0521.dtb
+
+ucm-imx8m-plus_mipi-csi1-ar0234-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ar0234.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar0234.dtb

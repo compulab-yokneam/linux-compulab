@@ -1,0 +1,49 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 Compulab
+ */
+
+&lpi2c1 {
+	rtc@69 {
+		compatible = "ab1805";
+		reg = <0x69>;
+		pagesize = <16>;
+		sqw = "32768_hz";
+		xt-frequency = <32772300>;
+		status = "okay";
+	};
+};
+
+&lpi2c3 {
+        pca9555:pca9555@20 {
+                compatible = "nxp,pca9555";
+                gpio-controller;
+                #gpio-cells = <2>;
+                reg = <0x20>;
+        };
+
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
+&iomuxc {
+	pinctrl_lpi2c6: lpi2c6grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO04__LPI2C6_SDA	0x40000b9e
+			MX93_PAD_GPIO_IO05__LPI2C6_SCL	0x40000b9e
+		>;
+	};
+};
+
+&lpi2c6 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c6>;
+	pinctrl-1 = <&pinctrl_lpi2c6>;
+	status = "okay";
+}; 

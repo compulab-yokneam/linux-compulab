@@ -1,0 +1,130 @@
+/*
+ * Copyright 2022 CompuLab
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ */
+
+&{/} {
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+
+		m4_reserved: m4@80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		vdev0vring0: vdev0vring0@55000000 {
+			reg = <0 0x55000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@55008000 {
+			reg = <0 0x55008000 0 0x8000>;
+			no-map;
+		};
+
+		vdevbuffer: vdevbuffer@55400000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55400000 0 0x100000>;
+			no-map;
+		};
+
+		rsc_table: rsc_table@550ff000 {
+			reg = <0 0x550ff000 0 0x1000>;
+			no-map;
+		};
+
+		audio_reserved: audio@81000000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x81000000 0 0x10000000>;
+		};
+
+		micfil_reserved: mic_rpmsg@91000000 {
+			compatible = "shared-dma-pool";
+			no-map;
+			reg = <0 0x91000000 0 0x100000>;
+		};
+	};
+
+	sound-micfil {
+		status = "disabled";
+	};
+
+	rpmsg_micfil: rpmsg_micfil {
+		compatible = "fsl,imx8mp-rpmsg-audio";
+		model = "micfil-audio";
+		fsl,platform = "rpmsg-micfil-channel";
+		fsl,enable-lpa;
+		fsl,rpmsg-in;
+		assigned-clocks = <&clk IMX8MP_CLK_PDM>;
+		assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
+		assigned-clock-rates = <196608000>;
+		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_PDM_IPG>,
+			 <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_PDM_ROOT>,
+			 <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_SDMA3_ROOT>,
+			 <&clk IMX8MP_AUDIO_PLL1_OUT>,
+			 <&clk IMX8MP_AUDIO_PLL2_OUT>;
+		clock-names = "ipg", "mclk", "dma", "pll8k", "pll11k";
+		memory-region = <&micfil_reserved>;
+		power-domains = <&audiomix_pd>;
+		status = "okay";
+	};
+
+	imx8mp-cm7 {
+		compatible = "fsl,imx8mn-cm7";
+		rsc-da = <0x55000000>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
+		status = "okay";
+	};
+};
+
+&flexcan1 {
+	status = "disabled";
+};
+
+&flexcan2 {
+	status = "disabled";
+};
+
+&flexspi {
+	status = "disabled";
+};
+
+&pwm4{
+	status = "disabled";
+};
+
+&sai3 {
+	status = "disabled";
+};
+
+&micfil {
+	status = "disabled";
+};
+
+&sdma3{
+	status = "disabled";
+};
+
+&uart3 {
+    status = "disabled";
+};
+
+&uart4 {
+	status = "disabled";
+};
