@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "sbev-ucmimx8plus-p20_uart-a.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (p20_uart-a)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

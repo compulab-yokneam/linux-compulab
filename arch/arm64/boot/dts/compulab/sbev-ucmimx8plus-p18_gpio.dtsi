@@ -1,0 +1,62 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&iomuxc {
+	pinctrl_gpio1_io0: gpio1_io0 {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO00__GPIO1_IO00	0x19
+		>;
+	};
+
+	pinctrl_gpio1_io1: gpio1_io1 {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01	0x19
+		>;
+	};
+	pinctrl_gpio4_io25: gpio4_io25 {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_TXC__GPIO4_IO25	0x19
+		>;
+	};
+
+	pinctrl_gpio5_io20: gpio5_io20 {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C4_SCL__GPIO5_IO20	0x19
+		>;
+	};
+};
+
+&gpio1 {
+	gpio-line-names = "P18P4" , "P18P2";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio1_io0>, <&pinctrl_gpio1_io1>;
+};
+
+&gpio4 {
+	gpio-line-names = "", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "P18P6", "", "",
+			"", "", "", "";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio4_io25>;
+};
+
+&gpio5 {
+	gpio-line-names = "", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"P18P3", "", "", "",
+			"", "", "", "",
+			"", "", "", "";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio5_io20>;
+};
+

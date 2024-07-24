@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&iomuxc {
+	pinctrl_p17_flexcan2: p17_flexcan2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_TXD0__CAN2_TX			0x154
+			MX8MP_IOMUXC_SAI2_MCLK__CAN2_RX			0x154
+		>;
+	};
+};
+
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_p17_flexcan2>;
+	status = "okay";
+};

@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx93.dtsi"
+#include "ucm-imx93-thermal.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 board, thermal";
+	compatible = "compulab,ucm-imx93", "fsl,imx93";
+};

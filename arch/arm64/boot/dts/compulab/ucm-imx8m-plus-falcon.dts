@@ -1,0 +1,19 @@
+/dts-v1/;
+
+#include "ucm-imx8m-plus-som.dts"
+#include "ucm-imx8m-plus-mmc.dtsi"
+
+/ {
+    model = "CompuLab UCM-iMX8M-Plus falcon";
+    compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+
+    memory@40000000 {
+        device_type = "memory";
+	reg = <0x0 0x40000000 0 0x80000000>;
+    };
+
+};
+
+&resmem {
+	/delete-node/linux,cma;
+};
