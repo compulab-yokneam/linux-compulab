@@ -36,6 +36,8 @@ dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p17_can.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p18_gpio.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p19_uart-b.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-p20_uart-a.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-csi1.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-csi2.dtbo
 
 sbev-ucmimx8plus-headless-dtbs := ucm-imx8m-plus-sbev.dtb \
 		sbev-ucmimx8plus-enet1.dtbo \
