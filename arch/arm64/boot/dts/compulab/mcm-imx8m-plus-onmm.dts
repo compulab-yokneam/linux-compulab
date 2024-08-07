@@ -1,0 +1,6 @@
+#include "mcm-imx8m-plus.dts"
+#include "mcm-imx8m-plus-onmm.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (onmm)";
+};
