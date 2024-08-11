@@ -63,6 +63,12 @@
 			gpios = <&gpio5 1 GPIO_ACTIVE_HIGH>;
 			default-state = "off";
 		};
+		power-led-red {
+			label = "PowerLED_Red";
+			color = <LED_COLOR_ID_RED>;
+			gpios = <&gpio1 0 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
 	};
 };
 
@@ -83,7 +89,7 @@
 };
 
 &gpio1 {
-	gpio-line-names = "", "", "", "PMIC IRQ", "",
+	gpio-line-names = "PowerLED_Red", "", "", "PMIC IRQ", "",
 			"", "", "", "", "",
 			"ECOS PHY Reset", "", "Heartbeat LED", "", "",
 			"USB MUX Sel", "", "", "", "",
