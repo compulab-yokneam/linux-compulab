@@ -1,44 +1,4 @@
-&{/} {
-	csi1_pwr_dwn: regulator-csi1pwrdwn {
-		compatible = "regulator-fixed";
-		regulator-name = "csi1-pwr-dwn";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 6 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
-	csi1_rst: regulator-csi1rst {
-		compatible = "regulator-fixed";
-		regulator-name = "csi1-rst";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 7 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
-	csi2_pwr_dwn: regulator-csi2pwrdwn {
-		compatible = "regulator-fixed";
-		regulator-name = "csi2-pwr-dwn";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 11 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-
-	csi2_rst: regulator-csi2rst {
-		compatible = "regulator-fixed";
-		regulator-name = "csi2-rst";
-		regulator-min-microvolt = <3300000>;
-		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 12 GPIO_ACTIVE_HIGH>;
-		enable-active-high;
-		regulator-always-on;
-	};
-};
+#include "sbev-ucmimx8plus-camera-csi1-power.dtsi"
 
 &i2c5 {
 	#address-cells = <1>;
