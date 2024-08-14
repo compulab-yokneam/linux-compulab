@@ -12,9 +12,93 @@
 	memory-region = <&ele_reserved>;
 };
 
+&A55_0 {
+	i-cache-size = <32768>;
+	i-cache-line-size = <64>;
+	i-cache-sets = <128>;
+	d-cache-size = <32768>;
+	d-cache-line-size = <64>;
+	d-cache-sets = <128>;
+	next-level-cache = <&l2_cache_l0>;
+};
+
 / {
 	model = "CompuLab UCM-i.MX91 board";
 	compatible = "compulab,ucm-imx91", "fsl,imx91";
+
+	aliases {
+		ethernet0 = &eqos;
+		ethernet1 = &fec;
+	};
+
+	l2_cache_l0: l2-cache-l0 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l2_cache_l1: l2-cache-l1 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l2_cache_l2: l2-cache-l2 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l2_cache_l3: l2-cache-l3 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l2_cache_l4: l2-cache-l4 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l2_cache_l5: l2-cache-l5 {
+		compatible = "cache";
+		cache-size = <65536>;
+		cache-line-size = <64>;
+		cache-sets = <256>;
+		cache-level = <2>;
+		cache-unified;
+		next-level-cache = <&l3_cache>;
+	};
+
+	l3_cache: l3-cache {
+		compatible = "cache";
+		cache-size = <524288>;
+		cache-line-size = <64>;
+		cache-sets = <1024>;
+		cache-level = <3>;
+		cache-unified;
+	};
 
 	chosen {
 		stdout-path = &lpuart1;
