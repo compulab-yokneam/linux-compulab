@@ -1332,7 +1332,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 {
 	struct device_node *np = pdev->dev.of_node;
 	struct device *dev = &pdev->dev;
-	struct fsl_sai *sai;
+	struct fsl_sai *sai = NULL;
 	struct regmap *gpr;
 	void __iomem *base;
 	char tmp[8];
@@ -1341,10 +1341,13 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	int j, k = 0;
 	u64 clk_rate[2];
 	u32 dmas[4];
+	bool sysfs_initialized = false;
 
 	sai = devm_kzalloc(dev, sizeof(*sai), GFP_KERNEL);
-	if (!sai)
-		return -ENOMEM;
+	if (!sai) {
+		ret = -ENOMEM;
+		goto general_finish;
+	}
 
 	sai->pdev = pdev;
 	sai->soc_data = of_device_get_match_data(dev);
@@ -1352,8 +1355,10 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	sai->is_lsb_first = of_property_read_bool(np, "lsb-first");
 
 	base = devm_platform_get_and_ioremap_resource(pdev, 0, &sai->res);
-	if (IS_ERR(base))
-		return PTR_ERR(base);
+	if (IS_ERR(base)) {
+		ret = PTR_ERR(base);
+		goto err_mem_free;
+	}
 
 	if (sai->soc_data->reg_offset == 8) {
 		fsl_sai_regmap_config.reg_defaults = fsl_sai_reg_defaults_ofs8;
@@ -1365,7 +1370,8 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	sai->regmap = devm_regmap_init_mmio(dev, base, &fsl_sai_regmap_config);
 	if (IS_ERR(sai->regmap)) {
 		dev_err(dev, "regmap init failed\n");
-		return PTR_ERR(sai->regmap);
+		ret = PTR_ERR(sai->regmap);
+		goto err_mem_free;
 	}
 
 	sai->bus_clk = devm_clk_get(dev, "bus");
@@ -1376,7 +1382,8 @@ static int fsl_sai_probe(struct platform_device *pdev)
 		dev_err(dev, "failed to get bus clock: %ld\n",
 				PTR_ERR(sai->bus_clk));
 		/* -EPROBE_DEFER */
-		return PTR_ERR(sai->bus_clk);
+		ret = PTR_ERR(sai->bus_clk);
+		goto err_mem_free;
 	}
 
 	for (i = 1; i < FSL_SAI_MCLK_MAX; i++) {
@@ -1427,7 +1434,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	ret = fsl_sai_read_dlcfg(sai);
 	if (ret < 0) {
 		dev_err(dev, "failed to read dlcfg %d\n", ret);
-		return ret;
+		goto err_mem_free;	
 	}
 
 	if (of_find_property(np, "fsl,txm-rxs", NULL) != NULL) {
@@ -1436,14 +1443,16 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	}
 
 	irq = platform_get_irq(pdev, 0);
-	if (irq < 0)
-		return irq;
+	if (irq < 0) {
+		ret = irq;
+		goto err_mem_free;
+	}
 
 	ret = devm_request_irq(dev, irq, fsl_sai_isr, IRQF_SHARED,
 			       np->name, sai);
 	if (ret) {
 		dev_err(dev, "failed to claim irq %u\n", irq);
-		return ret;
+		goto err_mem_free;
 	}
 
 	memcpy(&sai->cpu_dai_drv, &fsl_sai_dai_template,
@@ -1460,7 +1469,8 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	    of_property_read_bool(np, "fsl,sai-asynchronous")) {
 		/* error out if both synchronous and asynchronous are present */
 		dev_err(dev, "invalid binding for synchronous mode\n");
-		return -EINVAL;
+		ret = -EINVAL;
+		goto err_mem_free;
 	}
 
 	if (of_property_read_bool(np, "fsl,sai-synchronous-rx")) {
@@ -1483,12 +1493,15 @@ static int fsl_sai_probe(struct platform_device *pdev)
 		gpr = syscon_regmap_lookup_by_compatible("fsl,imx6ul-iomuxc-gpr");
 		if (IS_ERR(gpr)) {
 			dev_err(dev, "cannot find iomuxc registers\n");
-			return PTR_ERR(gpr);
+			ret = PTR_ERR(gpr);
+			goto err_mem_free;
 		}
 
 		index = of_alias_get_id(np, "sai");
-		if (index < 0)
-			return index;
+		if (index < 0) {
+			ret = index;
+			goto err_mem_free;
+		}
 
 		regmap_update_bits(gpr, IOMUXC_GPR1, MCLK_DIR(index),
 				   MCLK_DIR(index));
@@ -1551,6 +1564,8 @@ static int fsl_sai_probe(struct platform_device *pdev)
 			dev_err(&pdev->dev, "fail to create sys group\n");
 			goto err_pm_get_sync;
 		}
+		else
+			sysfs_initialized = true;
 	}
 
 	/*
@@ -1578,7 +1593,7 @@ static int fsl_sai_probe(struct platform_device *pdev)
 	if (ret)
 		goto err_component_register;
 
-	return ret;
+	goto general_finish;
 
 err_component_register:
 	if (sai->verid.feature & FSL_SAI_VERID_TSTMP_EN)
@@ -1590,6 +1605,11 @@ err_pm_get_sync:
 err_pm_disable:
 	pm_runtime_disable(dev);
 
+	if(sysfs_initialized)
+		sysfs_remove_group(&pdev->dev.kobj, fsl_sai_get_dev_attribute_group(sai->monitor_spdif));
+err_mem_free:
+	devm_kfree(&pdev->dev, sai);
+general_finish:
 	return ret;
 }
 
