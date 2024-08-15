@@ -2282,6 +2282,17 @@ static int imx_uart_probe(struct platform_device *pdev)
 
 	sport->inverted_rx = of_property_read_bool(np, "fsl,inverted-rx");
 
+	if (of_property_read_bool(np, "linux,rs485-enabled-at-boot-time"))
+		sport->port.rs485.flags |= SER_RS485_ENABLED;
+
+	if (of_property_read_bool(np, "rs485-rx-during-tx"))
+			sport->port.rs485.flags |= SER_RS485_RX_DURING_TX;
+
+	if (of_property_read_bool(np, "rs485-rts-active-high"))
+		sport->port.rs485.flags |= SER_RS485_RTS_ON_SEND;
+	else
+		sport->port.rs485.flags |= SER_RS485_RTS_AFTER_SEND;
+
 	if (!of_property_read_u32_array(np, "fsl,dma-info", dma_buf_conf, 2)) {
 		sport->rx_period_length = dma_buf_conf[0];
 		sport->rx_periods = dma_buf_conf[1];
