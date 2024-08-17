@@ -1,0 +1,36 @@
+/* SB-MCM8M P20 header
+* P20.28  -- GPIO1_IO8
+*/
+
+#include <dt-bindings/input/linux-event-codes.h>
+
+/ {
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+		autorepeat;
+
+		back {
+			gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_PROG1>;
+			label = "Key Prog1";
+			linux,input-type = <1>;
+			debounce-interval = <100>;
+			wakeup-source;
+		};
+	};
+};
+
+&iomuxc {
+	mcm-imx8m-mini-input {
+		pinctrl_input: input1grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_GPIO1_IO08_GPIO1_IO8	0x159
+			>;
+		};
+	};
+};
+
+&gpio_keys {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_input>;
+};

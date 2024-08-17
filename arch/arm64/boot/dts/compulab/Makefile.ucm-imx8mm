@@ -1,0 +1,17 @@
+# i.MX8M-mini
+dtb-$(CONFIG_SOC_IMX8M) += ucm-imx8m-mini.dtb
+dtb-$(CONFIG_SOC_IMX8M) += ucm-imx8m-mini-thermal.dtb
+dtb-$(CONFIG_SOC_IMX8M) += mcm-imx8m-mini.dtb
+dtb-$(CONFIG_SOC_IMX8M) += mcm-imx8m-mini-m4.dtb
+dtb-$(CONFIG_SOC_IMX8M) += mcm-imx8m-mini-thermal.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sbc-mcm-imx8m-mini.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sbc-mcm-imx8m-mini-rs485.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sbc-mcm-imx8m-mini-spidev.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sbc-mcm-imx8m-mini-input.dtb 
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-can.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-ied.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-ied-m4.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-poed.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-poedv2.dtb
+dtb-$(CONFIG_SOC_IMX8M) += sb-iotgimx8-ied-wakeup.dtb

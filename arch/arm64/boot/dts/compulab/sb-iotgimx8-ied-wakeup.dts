@@ -1,0 +1,59 @@
+/*
+ * Copyright (C) 2021 CompuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+#include <dt-bindings/input/gpio-keys.h>
+#include "sb-iotgimx8-ied.dts"
+
+/ {
+	gpio-keys {
+		compatible = "gpio-keys";
+
+		 in0 {
+			label = "in0";
+			gpios = <&gpio3 0 GPIO_ACTIVE_HIGH>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_0>;
+			wakeup-source;
+			debounce-interval = <1000>;
+			wakeup-event-action = <EV_ACT_ASSERTED>;
+		};
+		in1 {
+			label = "in1";
+			gpios = <&gpio3 1 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_1>;
+			wakeup-source;
+			debounce-interval = <1000>;
+			wakeup-event-action = <EV_ACT_DEASSERTED>;
+		};
+		in2 {
+			label = "in2";
+			gpios = <&gpio3 6 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_2>;
+			wakeup-source;
+			debounce-interval = <1000>;
+			wakeup-event-action = <EV_ACT_DEASSERTED>;
+		};
+		in3 {
+			label = "in3";
+			gpios = <&gpio3 7 GPIO_ACTIVE_LOW>;
+			linux,input-type = <EV_KEY>;
+			linux,code = <KEY_3>;
+			wakeup-source;
+			debounce-interval = <1000>;
+			wakeup-event-action = <EV_ACT_DEASSERTED>;
+		};
+	};
+};
