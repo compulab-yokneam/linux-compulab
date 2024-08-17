@@ -667,6 +667,15 @@ config MAX11100
 	  To compile this driver as a module, choose M here: the module will be
 	  called max11100.
 
+config MAX11108
+	tristate "Maxim max11108 ADC driver"
+	depends on SPI_MASTER
+	help
+	  Say yes here to build support for Maxim max11108 SPI ADC
+
+	  To compile this driver as a module, choose M here: the module will be
+	  called max11108.
+
 config MAX1118
 	tristate "Maxim max1117/max1118/max1119 ADCs driver"
 	depends on SPI
