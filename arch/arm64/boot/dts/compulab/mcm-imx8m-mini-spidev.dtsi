@@ -1,0 +1,48 @@
+/* SB-MCM8M P20 header
+* P20.1  -- ECSPI3_SS0
+* P20.3  -- ECSPI3_MISO
+* P20.9  -- ECSPI3_MOSI
+* P20.11 -- ECSPI3_SCLK
+*/
+
+&iomuxc {
+	mcm-imx8m-mini-spidev {
+		pinctrl_ecspi3: ecspi3grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_UART2_RXD_ECSPI3_MISO	0x140
+				MX8MM_IOMUXC_UART1_TXD_ECSPI3_MOSI	0x140
+				MX8MM_IOMUXC_UART1_RXD_ECSPI3_SCLK	0x140
+			>;
+		};
+
+		pinctrl_ecspi3_cs: ecspi3cs {
+			fsl,pins = <
+				MX8MM_IOMUXC_UART2_TXD_GPIO5_IO25	0x40000
+			>;
+		};
+	};
+};
+
+&ecspi3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <1>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi3 &pinctrl_ecspi3_cs>;
+	cs-gpios = <&gpio5 25 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	spidev1: spi@0 {
+		reg = <0>;
+		compatible = "rohm,dh2228fv";
+		spi-max-frequency = <500000>;
+	};
+};
+
+&uart1 {
+	status = "disabled";
+};
+
+&uart2 {
+	status = "disabled";
+};

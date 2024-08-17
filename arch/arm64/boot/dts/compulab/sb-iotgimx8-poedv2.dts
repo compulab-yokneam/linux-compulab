@@ -1,0 +1,64 @@
+/*
+ * Copyright (C) 2021 CompuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+#include "sb-iotgimx8.dts"
+
+/ {
+	model = "CompuLab SB-IOTGIMX8 board + IE-POED-v2 extension";
+	compatible = "sb-iotgimx8-poedv2", "sb-iotgimx8", "cpl,ucm-imx8m-mini", "fsl,imx8mm";
+
+	regulator-usbmux-mod {
+		compatible = "regulator-fixed";
+		regulator-name = "usbmux_mod";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio5 1 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
+		enable-active-high;
+	};
+};
+
+&i2c4 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c4>;
+	status = "okay";
+
+	eeprom@51 {
+		compatible = "atmel,24c02";
+		reg = <0x51>;
+		pagesize = <16>;
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog_sb_iotgimx8_poedv2>;
+
+	sb-iotgimx8-poedv2 {
+		pinctrl_hog_sb_iotgimx8_poedv2: hoggrp_sb-iotgimx8-poedv2 {
+			fsl,pins = <
+				/* USB_MUX */
+				MX8MM_IOMUXC_SAI3_TXD_GPIO5_IO1		0x00000140
+			>;
+		};
+
+		pinctrl_i2c4: i2c4grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_I2C4_SCL_I2C4_SCL		0x400001c3
+				MX8MM_IOMUXC_I2C4_SDA_I2C4_SDA		0x400001c3
+			>;
+		};
+	};
+};
