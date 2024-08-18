@@ -11,6 +11,7 @@
 #include <linux/iio/trigger.h>
 #include <linux/iio/trigger_consumer.h>
 #include <linux/iio/triggered_buffer.h>
+#include <linux/of.h>
 
 /*
  * LSB is the ADC single digital step
@@ -226,7 +227,7 @@ disable_regulator:
 	return ret;
 }
 
-static int max11108_remove(struct spi_device *spi)
+static void max11108_remove(struct spi_device *spi)
 {
 	struct iio_dev *indio_dev = spi_get_drvdata(spi);
 	struct max11108_state *state = iio_priv(indio_dev);
@@ -234,7 +235,7 @@ static int max11108_remove(struct spi_device *spi)
 	iio_device_unregister(indio_dev);
 	regulator_disable(state->vref_reg);
 
-	return 0;
+	return;
 }
 
 static const struct of_device_id max11108_ids[] = {
