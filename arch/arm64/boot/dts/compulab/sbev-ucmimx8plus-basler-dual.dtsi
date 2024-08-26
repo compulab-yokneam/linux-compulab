@@ -1,2 +1,2 @@
-#include "sbev-ucmimx8plus-camera-csi1-power.dtsi"
-#include "sbev-ucmimx8plus-camera-csi2-power.dtsi"
+#include "sbev-ucmimx8plus-csi1.dtsi"
+#include "sbev-ucmimx8plus-csi2.dtsi"
