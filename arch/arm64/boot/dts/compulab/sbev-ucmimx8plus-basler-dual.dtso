@@ -1,0 +1,8 @@
+#include "overlay.h"
+#include "sbev-ucmimx8plus-basler-dual.dtsi"
+
+&{/} {
+	model = "CompuLab UCM-iMX8M-Plus with csi1 and csi2 enabled on EB-EVCAMBLR";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+

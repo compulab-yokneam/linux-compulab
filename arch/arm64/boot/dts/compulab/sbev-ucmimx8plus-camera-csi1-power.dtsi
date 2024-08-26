@@ -1,0 +1,22 @@
+&{/} {
+	csi1_pwr_dwn: regulator-csi1pwrdwn {
+		compatible = "regulator-fixed";
+		regulator-name = "csi1-pwr-dwn";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+
+	csi1_rst: regulator-csi1rst {
+		compatible = "regulator-fixed";
+		regulator-name = "csi1-rst";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555 7 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
