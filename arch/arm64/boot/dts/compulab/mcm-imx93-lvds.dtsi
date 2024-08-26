@@ -78,6 +78,8 @@
 };
 
 &lpi2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
 	goodix_ts: goodix@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
