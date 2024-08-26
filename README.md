@@ -13,7 +13,7 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 ```
 
 * Set a CompuLab machine:
-* 
+
 | Machine | Command Line |
 |---|---|
 |ucm-imx8m-plus|```export MACHINE=compulab_v8```
