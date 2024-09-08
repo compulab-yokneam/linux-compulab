@@ -238,6 +238,13 @@
 			};
 		};
 	};
+
+	imx9_reset: reset-controller {
+		#address-cells = <2>;
+	        #size-cells = <2>;
+		compatible = "clab,imx9-reset";
+		reg = <0 0x43810054 0 8>;
+	};
 };
 
 &sai1 {
@@ -650,6 +657,7 @@
 &tempsense0 {
 	status = "okay";
 };
+
 
 &iomuxc {
 	pinctrl_gpio_led: gpioledgrp {
