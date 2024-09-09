@@ -32,6 +32,15 @@
 		};
 	};
 
+	reg_usdhc2_vsel: regulator-usdhc2-vsel {
+		compatible = "regulator-gpio";
+		regulator-name = "sd-vsel";
+		regulator-min-microvolt = <1800000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&gpio1 4 GPIO_ACTIVE_HIGH>;
+		states = <1800000 0x1 3300000 0x0>;
+	};
+
 	/***** Reset *****/
 	tpm_nreset: tpm-nreset {
 		compatible = "gpio-reset";
@@ -62,6 +71,11 @@
 		initially-in-reset;
 	};
 	/***** Reset - End *****/
+
+	usdhc2_pwrseq: usdhc2_pwrseq {
+		compatible = "mmc-pwrseq-simple";
+		reset-gpios = <&pca9555_sb 0 GPIO_ACTIVE_LOW>;
+	};
 
 	user-leds {
 		compatible = "gpio-leds";
@@ -320,6 +334,30 @@
 
 &usb_dwc3_1 {
 	status = "okay";
+};
+
+&usdhc2 {
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	non-removable;
+	wakeup-source;
+	no-1-8-v;
+	mmc-pwrseq = <&usdhc2_pwrseq>;
+	vqmmc-supply = <&reg_usdhc2_vsel>;
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	mwifiex: wifi@1 {
+		compatible = "marvell,sd8997";
+		reg = <1>;
+};
+
+	btmrvl: btmrvl@2 {
+		compatible = "marvell,sd8897-bt";
+		reg = <2>;
+	};
 };
 
 /***** B2B CONNECTOR - Begin *****/
@@ -582,6 +620,12 @@
 	pinctrl_usb2_vbus_en: usb2vbusengrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI1_MCLK__GPIO4_IO20			0x154
+		>;
+	};
+
+	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x100
 		>;
 	};
 
