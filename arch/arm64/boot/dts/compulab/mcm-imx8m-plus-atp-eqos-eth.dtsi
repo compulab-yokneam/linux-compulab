@@ -1,0 +1,17 @@
+&eqos {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_eqos>, <&pinctrl_eqos_atp>;
+};
+
+&ethphy0 {
+	reset-gpios = <&gpio4 9 GPIO_ACTIVE_LOW>;
+};
+
+&iomuxc {
+	pinctrl_eqos_atp: eqosgrp_atp {
+		fsl,pins = <
+			/* gpio */
+			MX8MP_IOMUXC_SAI1_RXD7__GPIO4_IO09	0x19
+		>;
+	};
+};

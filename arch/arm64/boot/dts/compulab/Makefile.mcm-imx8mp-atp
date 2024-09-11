@@ -1,0 +1,33 @@
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-som.dtb
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-eqos-eth.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-pcie.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mmc1.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-mmc2.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-pca9555.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-i2c6.dtbo
+
+mcm-imx8m-plus-atp-headless-dtbs := mcm-imx8m-plus-som.dtb \
+		mcm-imx8m-plus-pcie.dtbo \
+		mcm-imx8m-plus-mmc1.dtbo \
+		mcm-imx8m-plus-mmc2.dtbo \
+		mcm-imx8m-plus-atp-i2c6.dtbo \
+		mcm-imx8m-plus-atp-eqos-eth.dtbo \
+		mcm-imx8m-plus-atp-pca9555.dtbo \
+		mcm-imx8m-plus-headless-header.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-headless.dtb
+
+mcm-imx8m-plus-atp-full-dtbs := mcm-imx8m-plus-atp-headless.dtb \
+		mcm-imx8m-plus-atp-mipi.dtbo \
+		mcm-imx8m-plus-atp-hdmi.dtbo \
+		mcm-imx8m-plus-full-header.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-full.dtb
+
+mcm-imx8m-plus-atp-mipi-dtbs := mcm-imx8m-plus-atp-headless.dtb \
+	mcm-imx8m-plus-atp-mipi.dtbo mcm-imx8m-plus-mipi-header.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-mipi.dtb
+
+mcm-imx8m-plus-atp-hdmi-dtbs := mcm-imx8m-plus-atp-headless.dtb \
+	mcm-imx8m-plus-atp-hdmi.dtbo mcm-imx8m-plus-atp-hdmi-header.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-atp-hdmi.dtb

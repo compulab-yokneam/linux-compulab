@@ -1,0 +1,20 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab
+ */
+
+/dts-v1/;
+
+#include "mcm-imx8m-plus-som.dts"
+#include "mcm-imx8m-plus-mmc1.dtsi"
+#include "mcm-imx8m-plus-mmc2.dtsi"
+#include "mcm-imx8m-plus-pcie.dtsi"
+#include "mcm-imx8m-plus-atp-i2c6.dtsi"
+#include "mcm-imx8m-plus-atp-eqos-eth.dtsi"
+#include "mcm-imx8m-plus-atp-mipi.dtsi"
+#include "mcm-imx8m-plus-atp-hdmi.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus";
+	compatible = "compulab,mcm-imx8m-plus-atp", "fsl,imx8mp";
+};

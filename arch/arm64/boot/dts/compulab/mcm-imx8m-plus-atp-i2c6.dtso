@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-atp-i2c6.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (i2c6 at uart4)";
+	compatible = "compulab,mcm-imx8m-plus-atp", "fsl,imx8mp";
+};

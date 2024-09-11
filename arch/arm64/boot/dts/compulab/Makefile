@@ -4,5 +4,6 @@ include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.ucm-imx8mp
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.iot-imx8mp
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.som-imx8mp
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.mcm-imx8mp
+include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.mcm-imx8mp-atp
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.ucm-imx93
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.mcm-imx93
