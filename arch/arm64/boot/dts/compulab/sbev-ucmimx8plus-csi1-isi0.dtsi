@@ -1,3 +1,3 @@
 #include "sbev-ucmimx8plus-camera-csi1-power.dtsi"
 #include "sbev-ucmimx8plus-csi1-link.dtsi"
-#include "sbev-ucmimx8plus-isp0.dtsi"
+#include "sbev-ucmimx8plus-isi0.dtsi"
