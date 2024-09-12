@@ -475,7 +475,7 @@
 	fsl,chain_buf;
 
 	cap_device {
-		status = "okay";
+		status = "disabled";
 	};
 
 };
@@ -485,8 +485,20 @@
 	fsl,chain_buf;
 
 	cap_device {
-		status = "okay";
+		status = "disabled";
 	};
+};
+
+&isp_0 {
+	status = "disabled";
+};
+
+&isp_1 {
+	status = "disabled";
+};
+
+&dewarp {
+	status = "disabled";
 };
 
 &resmem {

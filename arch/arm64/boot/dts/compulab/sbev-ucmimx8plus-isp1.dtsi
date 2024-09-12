@@ -1,0 +1,11 @@
+&basler_1 {
+    compatible = "basler,basler-camera-vvcam", "basler-camera-vvcam";
+};
+
+&isp_1 {
+	status = "okay";
+};
+
+&dewarp {
+	status = "okay";
+};

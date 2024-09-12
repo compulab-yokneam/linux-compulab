@@ -1,0 +1,45 @@
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	basler_0: basler0_camera@36 {
+		reg = <0x36>;
+		csi_id = <0x00>;
+		status = "okay";
+
+		port {
+			basler_ep_0: endpoint {
+				data-lanes = <1 2 3 4>;
+				clock-lanes = <0>;
+				link-frequencies = /bits/ 64 <600000000>;
+				max-lane-frequency = /bits/ 64 <600000000>;
+				max-pixel-frequency = /bits/ 64 <266000000>;
+				max-data-rate = /bits/ 64 <0>;
+
+				remote-endpoint = <&mipi_csi0_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	clock-frequency = <266000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
+	assigned-clock-rates = <266000000>;
+
+	port {
+		mipi_csi0_ep: endpoint {
+			remote-endpoint = <&basler_ep_0>;
+			data-lanes = <4>;
+			csis-hs-settle = <16>;
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
