@@ -487,6 +487,10 @@
 	cap_device {
 		status = "disabled";
 	};
+
+	m2m_device{
+		status = "okay";
+	};
 };
 
 &isp_0 {
