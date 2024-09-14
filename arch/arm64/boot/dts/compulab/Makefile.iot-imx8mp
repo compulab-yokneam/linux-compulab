@@ -7,3 +7,4 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-m2tpm.dtb
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-brkout_pwm_gpio.dtb
 # IOTDIN-IMX8P
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p.dtb
+dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-rpmsg.dtb
