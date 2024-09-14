@@ -10,5 +10,6 @@ dtb-$(CONFIG_ARCH_MXC) += mmc1_iot-gate-imx8plus-falcon.dtb
 dtb-$(CONFIG_ARCH_MXC) += mmc2_iot-gate-imx8plus-falcon.dtb
 # IOTDIN-IMX8P
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p.dtb
+dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-rpmsg.dtb
 # Overlays
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
