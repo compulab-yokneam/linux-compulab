@@ -1,0 +1,8 @@
+&iomuxc {
+	pinctrl_i2c6: i2c6grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART4_RXD__I2C6_SCL	0x00000106
+            MX8MP_IOMUXC_UART4_TXD__I2C6_SDA	0x00000106
+		>;
+	};
+};

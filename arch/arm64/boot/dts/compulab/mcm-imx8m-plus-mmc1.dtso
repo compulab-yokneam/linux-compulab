@@ -1,0 +1,8 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-mmc1.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (eMMC on SD1)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};
+

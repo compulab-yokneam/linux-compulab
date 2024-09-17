@@ -1,0 +1,2 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-atp-mipi.dtsi"
