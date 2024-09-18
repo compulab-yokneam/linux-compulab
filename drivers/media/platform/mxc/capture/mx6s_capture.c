@@ -50,7 +50,7 @@
 #define MX6S_CAM_VERSION "0.0.1"
 #define MX6S_CAM_DRIVER_DESCRIPTION "i.MX6S_CSI"
 
-#define MAX_VIDEO_MEM 64
+#define MAX_VIDEO_MEM 128
 
 /* reset values */
 #define CSICR1_RESET_VAL	0x40000800
@@ -132,6 +132,7 @@
 #define BIT_MIPI_DATA_FORMAT_RAW8		(0x2a << 25)
 #define BIT_MIPI_DATA_FORMAT_RAW10		(0x2b << 25)
 #define BIT_MIPI_DATA_FORMAT_YUV422_8B	(0x1e << 25)
+#define BIT_MIPI_DATA_FORMAT_YUV420_8B (0x18 << 25)
 #define BIT_MIPI_DATA_FORMAT_MASK	(0x3F << 25)
 #define BIT_MIPI_DATA_FORMAT_OFFSET	25
 #define BIT_DATA_FROM_MIPI		(0x1 << 22)
@@ -171,6 +172,34 @@
 
 #define NUM_FORMATS ARRAY_SIZE(formats)
 #define MX6SX_MAX_SENSORS    1
+
+struct mipi_csis_event {
+	u32 mask;
+	const char * const name;
+	unsigned int counter;
+};
+
+static const struct mipi_csis_event mipi_csis_events[] = {
+	{ BIT_ADDR_CH_ERR_INT, "Base address switching occur before DMA complete" },
+	{ BIT_FIELD0_INT, "DMA field 0 is complete" },
+	{ BIT_FIELD1_INT, "DMA field 1 is complete" },
+	{ BIT_SFF_OR_INT, "STATFIFO has overflowed" },
+	{ BIT_RFF_OR_INT, "RXFIFO has overflowed" },
+	{ BIT_DMA_TSF_DONE_SFF, "DMA Transfer Done from StatFIFO" },
+	{ BIT_STATFF_INT, "STATFIFO Full Interrupt Status" },
+	{ BIT_DMA_TSF_DONE_FB2, "DMA Transfer Done in Frame Buffer2" },
+	{ BIT_DMA_TSF_DONE_FB1, "DMA Transfer Done in Frame Buffer1" },
+	{ BIT_RXFF_INT, "RXFIFO Full Interrupt Status" },
+	{ BIT_EOF_INT, "EOF is detected" },
+	{ BIT_SOF_INT, "SOF is detected" },
+	{ BIT_F2_INT, "Field 2 of video is about to start" },
+	{ BIT_F1_INT, "Field 1 of video is about to start" },
+	{ BIT_COF_INT, "Change of video field is detected" },
+	{ BIT_HRESP_ERR_INT, "Hresponse error is detected" },
+	{ BIT_ECC_INT, "Error is detected in CCIR coding" },
+	{ BIT_DRDY, "At least 1 datum (word) is ready in RXFIFO" },
+};
+#define MIPI_CSIS_NUM_EVENTS ARRAY_SIZE(mipi_csis_events)
 
 struct csi_signal_cfg_t {
 	unsigned data_width:3;
@@ -247,25 +276,56 @@ static struct mx6s_fmt formats[] = {
 		.fourcc		= V4L2_PIX_FMT_UYVY,
 		.pixelformat	= V4L2_PIX_FMT_UYVY,
 		.mbus_code	= MEDIA_BUS_FMT_UYVY8_2X8,
-		.bpp		= 2,
+		.bpp		= 16,
 	}, {
 		.name		= "YUYV-16",
 		.fourcc		= V4L2_PIX_FMT_YUYV,
 		.pixelformat	= V4L2_PIX_FMT_YUYV,
 		.mbus_code	= MEDIA_BUS_FMT_YUYV8_2X8,
-		.bpp		= 2,
+		.bpp		= 16,
 	}, {
 		.name		= "YUV32 (X-Y-U-V)",
 		.fourcc		= V4L2_PIX_FMT_YUV32,
 		.pixelformat	= V4L2_PIX_FMT_YUV32,
 		.mbus_code	= MEDIA_BUS_FMT_AYUV8_1X32,
-		.bpp		= 4,
+		.bpp		= 32,
 	}, {
 		.name		= "RAWRGB8 (SBGGR8)",
 		.fourcc		= V4L2_PIX_FMT_SBGGR8,
 		.pixelformat	= V4L2_PIX_FMT_SBGGR8,
 		.mbus_code	= MEDIA_BUS_FMT_SBGGR8_1X8,
-		.bpp		= 1,
+		.bpp		= 8,
+	}, {
+		.name		= "RAWRGB8 (SRGGB8)",
+		.fourcc		= V4L2_PIX_FMT_SRGGB8,
+		.pixelformat	= V4L2_PIX_FMT_SRGGB8,
+		.mbus_code	= MEDIA_BUS_FMT_SRGGB8_1X8,
+		.bpp		= 8,
+	}, {
+		.name		= "Grey 10bit",
+		.fourcc		= V4L2_PIX_FMT_Y10,
+		.pixelformat = V4L2_PIX_FMT_Y10,
+		.mbus_code	= MEDIA_BUS_FMT_Y10_1X10,
+		.bpp		= 16,
+	}, {
+		.name		= "RAW10 (SBGGR10)",
+		.fourcc		= V4L2_PIX_FMT_SBGGR10,
+		.pixelformat = V4L2_PIX_FMT_SBGGR10,
+		.mbus_code	= MEDIA_BUS_FMT_Y10_1X10,
+		.bpp		= 16,
+	}, {
+		/*
+		 * The bridge actually saves YUV420 images
+		 * in an unsupported interleaved format
+		 * (even lines = YY, odd lines = UYVY).
+		 * We just use V4L2_PIX_FMT_NV12 here
+		 * due to the lack of a matching V4L2 pixfmt.
+		 */
+		.name		= "YUV 420",
+		.fourcc		= V4L2_PIX_FMT_NV12,
+		.pixelformat	= V4L2_PIX_FMT_NV12,
+		.mbus_code	= MEDIA_BUS_FMT_UYVY8_1_5X8,
+		.bpp		= 12,
 	}
 };
 
@@ -342,6 +402,9 @@ struct mx6s_csi_dev {
 	bool csi_two_8bit_sensor_mode;
 	const struct mx6s_csi_soc *soc;
 	struct mx6s_csi_mux csi_mux;
+
+	struct mipi_csis_event events[MIPI_CSIS_NUM_EVENTS];
+	unsigned long BaslerIrq;
 };
 
 static const struct of_device_id mx6s_csi_dt_ids[];
@@ -580,8 +643,11 @@ static void csi_dmareq_rff_enable(struct mx6s_csi_dev *csi_dev)
 	cr3 |= BIT_HRESP_ERR_EN;
 	cr3 &= ~BIT_RXFF_LEVEL;
 	cr3 |= 0x2 << 4;
-	if (csi_dev->csi_two_8bit_sensor_mode)
+	if (csi_dev->csi_two_8bit_sensor_mode) {
 		cr3 |= BIT_TWO_8BIT_SENSOR;
+	} else {
+		cr3 &= ~BIT_TWO_8BIT_SENSOR;
+	}
 
 	__raw_writel(cr3, csi_dev->regbase + CSI_CSICR3);
 	__raw_writel(cr2, csi_dev->regbase + CSI_CSICR2);
@@ -636,6 +702,35 @@ static void csi_error_recovery(struct mx6s_csi_dev *csi_dev)
 	/* Ensable csi  */
 	cr18 |= BIT_CSI_ENABLE;
 	csi_write(csi_dev, cr18, CSI_CSICR18);
+}
+
+static void mx6s_clear_counters(struct mx6s_csi_dev *state)
+{
+	unsigned long flags;
+	int i;
+
+	spin_lock_irqsave(&state->slock, flags);
+	for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++)
+		state->events[i].counter = 0;
+	state->BaslerIrq = 0;
+	spin_unlock_irqrestore(&state->slock, flags);
+}
+
+static void mx6s_log_counters(struct mx6s_csi_dev *state, bool non_errors)
+{
+	int i = MIPI_CSIS_NUM_EVENTS;
+	unsigned long flags;
+
+	spin_lock_irqsave(&state->slock, flags);
+
+	dev_dbg(state->dev, "--> Total %ld IRQ events\n", state->BaslerIrq);
+
+	for (i--; i >= 0; i--) {
+		dev_dbg(state->dev, "%s events: %d\n", state->events[i].name,
+				state->events[i].counter);
+	}
+
+	spin_unlock_irqrestore(&state->slock, flags);
 }
 
 /*
@@ -837,7 +932,9 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 
 	switch (csi_dev->fmt->pixelformat) {
 	case V4L2_PIX_FMT_YUV32:
+	case V4L2_PIX_FMT_SRGGB8:
 	case V4L2_PIX_FMT_SBGGR8:
+	case V4L2_PIX_FMT_NV12:
 		width = pix->width;
 		break;
 	case V4L2_PIX_FMT_UYVY:
@@ -848,6 +945,10 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 			/* For parallel 8-bit sensor input */
 			width = pix->width * 2;
 		break;
+	case V4L2_PIX_FMT_Y10:
+	case V4L2_PIX_FMT_SBGGR10:
+		width = pix->width;
+		break;
 	default:
 		pr_debug("   case not supported\n");
 		return -EINVAL;
@@ -857,6 +958,14 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 	if (csi_dev->csi_mipi_mode == true) {
 		cr1 = csi_read(csi_dev, CSI_CSICR1);
 		cr1 &= ~BIT_GCLK_MODE;
+
+		if ((V4L2_PIX_FMT_SBGGR10 == csi_dev->fmt->pixelformat) ||
+			(V4L2_PIX_FMT_Y10 == csi_dev->fmt->pixelformat)) {
+			cr1 |= BIT_PIXEL_BIT;
+		} else {
+			cr1 &= ~BIT_PIXEL_BIT;
+		}
+
 		csi_write(csi_dev, cr1, CSI_CSICR1);
 
 		cr18 = csi_read(csi_dev, CSI_CSICR18);
@@ -866,10 +975,24 @@ static int mx6s_configure_csi(struct mx6s_csi_dev *csi_dev)
 		switch (csi_dev->fmt->pixelformat) {
 		case V4L2_PIX_FMT_UYVY:
 		case V4L2_PIX_FMT_YUYV:
+			csi_dev->csi_two_8bit_sensor_mode = true;
 			cr18 |= BIT_MIPI_DATA_FORMAT_YUV422_8B;
+			cr18 |= BIT_MIPI_DOUBLE_CMPNT;
 			break;
+		case V4L2_PIX_FMT_NV12:
+			csi_dev->csi_two_8bit_sensor_mode = true;
+			cr18 |= BIT_MIPI_DATA_FORMAT_YUV420_8B;
+			cr18 |= BIT_MIPI_DOUBLE_CMPNT;
+			break;
+		case V4L2_PIX_FMT_SRGGB8:
 		case V4L2_PIX_FMT_SBGGR8:
+			csi_dev->csi_two_8bit_sensor_mode = false;
 			cr18 |= BIT_MIPI_DATA_FORMAT_RAW8;
+			break;
+		case V4L2_PIX_FMT_SBGGR10:
+		case V4L2_PIX_FMT_Y10:
+			csi_dev->csi_two_8bit_sensor_mode = true;
+			cr18 |= BIT_MIPI_DATA_FORMAT_RAW10;
 			break;
 		default:
 			pr_debug("   fmt not supported\n");
@@ -1089,8 +1212,11 @@ static irqreturn_t mx6s_csi_irq_handler(int irq, void *data)
 	struct mx6s_csi_dev *csi_dev =  data;
 	unsigned long status;
 	u32 cr3, cr18;
+	unsigned int i = 0;
 
 	spin_lock(&csi_dev->slock);
+
+	csi_dev->BaslerIrq++;
 
 	status = csi_read(csi_dev, CSI_CSISR);
 	csi_write(csi_dev, status, CSI_CSISR);
@@ -1162,6 +1288,13 @@ static irqreturn_t mx6s_csi_irq_handler(int irq, void *data)
 				mx6s_csi_frame_done(csi_dev, 1, false);
 		} else
 			pr_warn("skip frame 1\n");
+	}
+
+	/* Update the event/error counters */
+	for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++) {
+		if (!(status & csi_dev->events[i].mask))
+			continue;
+		csi_dev->events[i].counter++;
 	}
 
 	spin_unlock(&csi_dev->slock);
@@ -1432,8 +1565,14 @@ static int mx6s_vidioc_try_fmt_vid_cap(struct file *file, void *priv,
 	if (pix->field != V4L2_FIELD_INTERLACED)
 		pix->field = V4L2_FIELD_NONE;
 
-	pix->sizeimage = fmt->bpp * pix->height * pix->width;
-	pix->bytesperline = fmt->bpp * pix->width;
+	if (fmt->pixelformat == V4L2_PIX_FMT_NV12) {
+		pix->bytesperline = pix->width;
+		pix->sizeimage = DIV_ROUND_UP(
+			fmt->bpp * pix->height * pix->width, 8);
+	} else {
+		pix->bytesperline = DIV_ROUND_UP(fmt->bpp * pix->width, 8);
+		pix->sizeimage = pix->bytesperline * pix->height;
+	}
 
 	pix->colorspace = V4L2_COLORSPACE_SRGB;
 	pix->ycbcr_enc = V4L2_MAP_YCBCR_ENC_DEFAULT(pix->colorspace);
@@ -1541,6 +1680,8 @@ static int mx6s_vidioc_streamoff(struct file *file, void *priv,
 
 	WARN_ON(priv != file->private_data);
 
+	mx6s_clear_counters(csi_dev);
+
 	if (i != V4L2_BUF_TYPE_VIDEO_CAPTURE)
 		return -EINVAL;
 
@@ -1551,6 +1692,8 @@ static int mx6s_vidioc_streamoff(struct file *file, void *priv,
 	ret = vb2_streamoff(&csi_dev->vb2_vidq, i);
 	if (!ret)
 		v4l2_subdev_call(sd, video, s_stream, 0);
+
+	mx6s_log_counters(csi_dev, 1);
 
 	return ret;
 }
@@ -1677,6 +1820,102 @@ static int mx6s_vidioc_enum_frameintervals(struct file *file, void *priv,
 	return 0;
 }
 
+static int mx6s_vidioc_queryctrl(struct file *file, void *priv,
+				 struct v4l2_queryctrl *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_queryctrl(sd->ctrl_handler, a);
+}
+
+static int mx6s_vidioc_query_ext_ctrl(struct file *file, void *priv,
+				      struct v4l2_query_ext_ctrl *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_query_ext_ctrl(sd->ctrl_handler, a);
+}
+
+static int mx6s_vidioc_g_ctrl(struct file *file, void *priv,
+			      struct v4l2_control *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_g_ctrl(sd->ctrl_handler, a);
+}
+
+static int mx6s_vidioc_s_ctrl(struct file *file, void *priv,
+			      struct v4l2_control *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_s_ctrl(NULL, sd->ctrl_handler, a);
+}
+
+static int mx6s_vidioc_g_ext_ctrls(struct file *file, void *priv,
+				   struct v4l2_ext_controls *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_g_ext_ctrls(sd->ctrl_handler, csi_dev->vdev, NULL, a);
+}
+
+static int mx6s_vidioc_s_ext_ctrls(struct file *file, void *priv,
+				   struct v4l2_ext_controls *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_s_ext_ctrls(NULL, sd->ctrl_handler, csi_dev->vdev, NULL, a);
+}
+
+static int mx6s_vidioc_try_ext_ctrls(struct file *file, void *priv,
+				     struct v4l2_ext_controls *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_try_ext_ctrls(sd->ctrl_handler, csi_dev->vdev, NULL, a);
+}
+
+static int mx6s_vidioc_querymenu(struct file *file, void *priv,
+				 struct v4l2_querymenu *a)
+{
+	struct mx6s_csi_dev *csi_dev = video_drvdata(file);
+	struct v4l2_subdev *sd = csi_dev->sd;
+
+	if (!sd || !sd->ctrl_handler)
+		return -ENOTTY;
+
+	return v4l2_querymenu(sd->ctrl_handler, a);
+}
+
 static const struct v4l2_ioctl_ops mx6s_csi_ioctl_ops = {
 	.vidioc_querycap          = mx6s_vidioc_querycap,
 	.vidioc_enum_fmt_vid_cap  = mx6s_vidioc_enum_fmt_vid_cap,
@@ -1703,6 +1942,14 @@ static const struct v4l2_ioctl_ops mx6s_csi_ioctl_ops = {
 	.vidioc_s_parm        = mx6s_vidioc_s_parm,
 	.vidioc_enum_framesizes = mx6s_vidioc_enum_framesizes,
 	.vidioc_enum_frameintervals = mx6s_vidioc_enum_frameintervals,
+	.vidioc_queryctrl      = mx6s_vidioc_queryctrl,
+	.vidioc_query_ext_ctrl = mx6s_vidioc_query_ext_ctrl,
+	.vidioc_g_ctrl         = mx6s_vidioc_g_ctrl,
+	.vidioc_s_ctrl         = mx6s_vidioc_s_ctrl,
+	.vidioc_g_ext_ctrls    = mx6s_vidioc_g_ext_ctrls,
+	.vidioc_s_ext_ctrls    = mx6s_vidioc_s_ext_ctrls,
+	.vidioc_try_ext_ctrls  = mx6s_vidioc_try_ext_ctrls,
+	.vidioc_querymenu      = mx6s_vidioc_querymenu,
 };
 
 static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
@@ -1722,6 +1969,21 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 		  subdev->name);
 
 	return 0;
+}
+
+static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
+				   struct v4l2_subdev *subdev,
+		       		   struct v4l2_async_connection *asc)
+{
+	struct mx6s_csi_dev *csi_dev = notifier_to_mx6s_dev(notifier);
+
+	BUG_ON(subdev == NULL);
+
+	if (subdev == csi_dev->sd)
+		csi_dev->sd = NULL;
+
+	v4l2_info(&csi_dev->v4l2_dev, "Unregistered sensor subdevice: %s\n",
+		  subdev->name);
 }
 
 static int mx6s_csi_mode_sel(struct mx6s_csi_dev *csi_dev)
@@ -1770,20 +2032,8 @@ static int mx6s_csi_mode_sel(struct mx6s_csi_dev *csi_dev)
 
 static const struct v4l2_async_notifier_operations mx6s_capture_async_ops = {
 	.bound = subdev_notifier_bound,
+	.unbind = subdev_notifier_unbind,
 };
-
-static int mx6s_csi_two_8bit_sensor_mode_sel(struct mx6s_csi_dev *csi_dev)
-{
-	struct device_node *np = csi_dev->dev->of_node;
-
-	if (of_get_property(np, "fsl,two-8bit-sensor-mode", NULL))
-		csi_dev->csi_two_8bit_sensor_mode = true;
-	else {
-		csi_dev->csi_two_8bit_sensor_mode = false;
-	}
-
-	return 0;
-}
 
 static int mx6sx_register_subdevs(struct mx6s_csi_dev *csi_dev)
 {
@@ -1826,7 +2076,7 @@ static int mx6sx_register_subdevs(struct mx6s_csi_dev *csi_dev)
 	ret = v4l2_async_nf_register(&csi_dev->subdev_notifier);
 	if (ret)
 		dev_err(csi_dev->dev,
-					"Error register async notifier regoster\n");
+					"Error registering async notifier\n");
 
 	return ret;
 }
@@ -1888,12 +2138,14 @@ static int mx6s_csi_probe(struct platform_device *pdev)
 	csi_dev->dev = dev;
 
 	mx6s_csi_mode_sel(csi_dev);
-	mx6s_csi_two_8bit_sensor_mode_sel(csi_dev);
 
 	of_id = of_match_node(mx6s_csi_dt_ids, csi_dev->dev->of_node);
 	if (!of_id)
 		return -EINVAL;
 	csi_dev->soc = of_id->data;
+
+	/* Initialize event counters */
+	memcpy(csi_dev->events, mipi_csis_events, sizeof(csi_dev->events));
 
 	snprintf(csi_dev->v4l2_dev.name,
 		 sizeof(csi_dev->v4l2_dev.name), "CSI");
@@ -2005,7 +2257,7 @@ static const struct mx6s_csi_soc mx6sl_soc = {
 };
 static const struct mx6s_csi_soc mx8mq_soc = {
 	.rx_fifo_rst = true,
-	.baseaddr_switch = 0x80030,
+	.baseaddr_switch = 0x00030,		// MASK_OPTION = 00 | BASEADDR_SWITCH_SEL | BASEADDR_SWITCH_EN
 };
 
 static const struct of_device_id mx6s_csi_dt_ids[] = {
