@@ -25,6 +25,7 @@
 #include <media/v4l2-fwnode.h>
 #include <media/v4l2-subdev.h>
 #include <media/v4l2-device.h>
+#include <media/v4l2-ctrls.h>
 
 #include "mxc-mipi-csi2.h"
 static int debug;
@@ -42,8 +43,6 @@ MODULE_PARM_DESC(debug, "Debug level (0-2)");
 #define	GPR_CSI2_1_CONT_CLK_MODE 	BIT(8)
 #define	GPR_CSI2_1_S_PRG_RXHS_SETTLE(x)	(((x) & 0x3F) << 2)
 #define	GPR_CSI2_1_RX_RCAL		(3)
-
-static u8 rxhs_settle[2] = { 0x14, 0x9 };
 
 static struct mxc_mipi_csi2_dev *sd_to_mxc_mipi_csi2_dev(struct v4l2_subdev
 							 *sdev)
@@ -383,13 +382,6 @@ static int mipi_csi2_set_fmt(struct v4l2_subdev *sd,
 	if (fmt->pad)
 		return -EINVAL;
 
-	if (fmt->format.width * fmt->format.height > 720 * 480) {
-		csi2dev->hs_settle = rxhs_settle[1];
-	} else {
-		csi2dev->hs_settle = rxhs_settle[0];
-	}
-	csi2dev->send_level = 64;
-
 	return v4l2_subdev_call(sensor_sd, pad, set_fmt, NULL, fmt);
 }
 
@@ -444,10 +436,19 @@ static int mipi_csi2_parse_dt(struct mxc_mipi_csi2_dev *csi2dev)
 	struct device_node *node = dev->of_node;
 	struct v4l2_fwnode_endpoint endpoint;
 	u32 i;
+	int ret;
 
 	csi2dev->id = of_alias_get_id(node, "csi");
 
 	csi2dev->vchannel = of_property_read_bool(node, "virtual-channel");
+
+	ret = of_property_read_u32(node, "rxhs-settle", &csi2dev->hs_settle);
+	if(ret < 0)
+		csi2dev->hs_settle = 0x09;
+
+	ret = of_property_read_u32(node, "send-level", &csi2dev->send_level);
+	if(ret < 0)
+		csi2dev->send_level = 64;
 
 	node = of_graph_get_next_endpoint(node, NULL);
 	if (!node) {
@@ -480,12 +481,22 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 {
 	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
 
-	if (subdev == NULL)
+	if (subdev == NULL || csi2dev->sensor_sd != NULL)
 		return -EINVAL;
+
+	/* Initialize our control handler */
+	v4l2_ctrl_handler_init(&csi2dev->ctrl_handler, 10);
+	if (csi2dev->ctrl_handler.error)
+		return csi2dev->ctrl_handler.error;
+	csi2dev->sd.ctrl_handler = &csi2dev->ctrl_handler;
 
 	/* Find platform data for this sensor subdev */
 	if (csi2dev->fwnode == of_fwnode_handle(subdev->dev->of_node))
 		csi2dev->sensor_sd = subdev;
+
+	/* Merge subdev handler into our handler */
+	v4l2_ctrl_add_handler(csi2dev->sd.ctrl_handler, subdev->ctrl_handler,
+		  NULL, true);
 
 	v4l2_info(&csi2dev->v4l2_dev, "Registered sensor subdevice: %s\n",
 		  subdev->name);
@@ -493,8 +504,31 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 	return 0;
 }
 
+static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
+				   struct v4l2_subdev *subdev,
+		       		   struct v4l2_async_connection *asc)
+{
+	struct mxc_mipi_csi2_dev *csi2dev = notifier_to_mipi_dev(notifier);
+
+	BUG_ON(subdev == NULL);
+
+	if (subdev == csi2dev->sensor_sd)
+	{
+		if (csi2dev->sd.ctrl_handler) {
+			csi2dev->sd.ctrl_handler = NULL;
+			v4l2_ctrl_handler_free(&csi2dev->ctrl_handler);
+		}
+
+		csi2dev->sensor_sd = NULL;
+	}
+
+	v4l2_info(&csi2dev->v4l2_dev, "Unregistered sensor subdevice: %s\n",
+		  subdev->name);
+}
+
 static const struct v4l2_async_notifier_operations subdev_notifier_ops = {
 	.bound = subdev_notifier_bound,
+	.unbind = subdev_notifier_unbind,
 };
 
 static int mipi_csis_subdev_host(struct mxc_mipi_csi2_dev *csi2dev)
@@ -597,7 +631,7 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	ret = v4l2_device_register(dev, &csi2dev->v4l2_dev);
 	if (ret) {
 		dev_err(&pdev->dev, "Unable to register v4l2 device.\n");
-		return -EINVAL;
+		return -EINVAL;;
 	}
 	ret = v4l2_async_register_subdev(&csi2dev->sd);
 	if (ret < 0) {
@@ -619,6 +653,12 @@ static int mipi_csi2_probe(struct platform_device *pdev)
 	ret = mipi_csi2_clk_enable(csi2dev);
 	if (ret < 0)
 		goto e_clkdis;
+
+	dev_info(dev, "rxhs-settle: %d, name: %s\n",
+		 csi2dev->hs_settle, csi2dev->sd.name);
+
+	dev_info(dev, "send-level: %d, name: %s\n",
+		 csi2dev->send_level, csi2dev->sd.name);
 
 	dev_info(&pdev->dev, "lanes: %d, name: %s\n",
 		 csi2dev->num_lanes, csi2dev->sd.name);
@@ -645,6 +685,10 @@ static int mipi_csi2_remove(struct platform_device *pdev)
 	v4l2_async_nf_cleanup(&csi2dev->subdev_notifier);
 	mipi_csi2_clk_disable(csi2dev);
 	pm_runtime_disable(&pdev->dev);
+	if (sd->ctrl_handler) {
+		sd->ctrl_handler = NULL;
+		v4l2_ctrl_handler_free(&csi2dev->ctrl_handler);
+	}
 
 	return 0;
 }

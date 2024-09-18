@@ -38,6 +38,7 @@
 #include <linux/videodev2.h>
 #include <media/v4l2-subdev.h>
 #include <media/v4l2-device.h>
+#include <media/v4l2-ctrls.h>
 
 static int debug;
 module_param(debug, int, 0644);
@@ -154,6 +155,7 @@ MODULE_PARM_DESC(debug, "Debug level (0-2)");
 #define MIPI_CSIS_ISPCFG_DOUBLE_CMPNT        (1 << 12)
 #define MIPI_CSIS_ISPCFG_ALIGN_32BIT         (1 << 11)
 #define MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT   (0x1e << 2)
+#define MIPI_CSIS_ISPCFG_FMT_YUV420_8BIT   (0x18 << 2)
 #define MIPI_CSIS_ISPCFG_FMT_RAW8		(0x2a << 2)
 #define MIPI_CSIS_ISPCFG_FMT_RAW10		(0x2b << 2)
 #define MIPI_CSIS_ISPCFG_FMT_RAW12		(0x2c << 2)
@@ -287,10 +289,15 @@ struct csi_state {
 	struct mipi_csis_event events[MIPI_CSIS_NUM_EVENTS];
 
 	struct fwnode_handle *fwnode;
+
+	unsigned long BaslerIrq;
+
 	struct v4l2_async_notifier  subdev_notifier;
 
 	struct csis_hw_reset hw_reset;
 	struct regulator     *mipi_phy_regulator;
+
+	struct v4l2_ctrl_handler ctrl_handler;
 };
 
 /**
@@ -318,13 +325,21 @@ static const struct csis_pix_format mipi_csis_formats[] = {
 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
 		.data_alignment = 16,
 	}, {
-                .code = MEDIA_BUS_FMT_UYVY8_2X8,
-                .fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
-                .data_alignment = 16,
+		.code = MEDIA_BUS_FMT_UYVY8_2X8,
+		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YCBCR422_8BIT,
+		.data_alignment = 16,
 	}, {
 		.code = MEDIA_BUS_FMT_SBGGR8_1X8,
 		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW8,
 		.data_alignment = 8,
+	}, {
+		.code = MEDIA_BUS_FMT_Y10_1X10,
+		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_RAW10,
+		.data_alignment = 10,
+	}, {
+		.code	= MEDIA_BUS_FMT_UYVY8_1_5X8,
+		.fmt_reg = MIPI_CSIS_ISPCFG_FMT_YUV420_8BIT,
+		.data_alignment = 16
 	}
 };
 
@@ -476,6 +491,11 @@ static void __mipi_csis_set_format(struct csi_state *state)
 	/* Color format */
 	val = mipi_csis_read(state, MIPI_CSIS_ISPCONFIG_CH0);
 	val = (val & ~MIPI_CSIS_ISPCFG_FMT_MASK) | state->csis_fmt->fmt_reg;
+
+	/* Enable dual pixel mode for YUV422 and YUV420 */
+	if (mf->code == MEDIA_BUS_FMT_UYVY8_2X8 || mf->code == MEDIA_BUS_FMT_UYVY8_1_5X8)
+		val |= MIPI_CSIS_ISPCFG_DOUBLE_CMPNT;
+
 	mipi_csis_write(state, MIPI_CSIS_ISPCONFIG_CH0, val);
 
 	/* Pixel resolution */
@@ -645,6 +665,9 @@ static void mipi_csis_clear_counters(struct csi_state *state)
 	spin_lock_irqsave(&state->slock, flags);
 	for (i = 0; i < MIPI_CSIS_NUM_EVENTS; i++)
 		state->events[i].counter = 0;
+
+	state->BaslerIrq = 0;
+
 	spin_unlock_irqrestore(&state->slock, flags);
 }
 
@@ -654,6 +677,8 @@ static void mipi_csis_log_counters(struct csi_state *state, bool non_errors)
 	unsigned long flags;
 
 	spin_lock_irqsave(&state->slock, flags);
+
+	v4l2_info(&state->mipi_sd, "--> Total %ld IRQ events\n", state->BaslerIrq);
 
 	for (i--; i >= 0; i--) {
 		if (state->events[i].counter > 0 || debug)
@@ -962,6 +987,8 @@ static irqreturn_t mipi_csis_irq_handler(int irq, void *dev_id)
 
 	spin_lock_irqsave(&state->slock, flags);
 
+	state->BaslerIrq++;
+
 	if ((status & MIPI_CSIS_INTSRC_NON_IMAGE_DATA) && pktbuf->data) {
 		u32 offset;
 
@@ -1002,15 +1029,49 @@ static int subdev_notifier_bound(struct v4l2_async_notifier *notifier,
 
 	if (subdev == NULL)
 		return -EINVAL;
+	BUG_ON(subdev == NULL || state->sensor_sd != NULL);
 
 	/* Find platform data for this sensor subdev */
 	if (state->fwnode == dev_fwnode(subdev->dev))
 		state->sensor_sd = subdev;
 
+	/* Initialize our control handler */
+	v4l2_ctrl_handler_init(&state->ctrl_handler, 10);
+	if (state->ctrl_handler.error)
+		return state->ctrl_handler.error;
+	state->mipi_sd.ctrl_handler = &state->ctrl_handler;
+
+	/* Merge subdev handler into our handler */
+	v4l2_ctrl_add_handler(state->mipi_sd.ctrl_handler, subdev->ctrl_handler,
+		  NULL, true);
+
+
 	v4l2_info(&state->v4l2_dev, "Registered sensor subdevice: %s\n",
 		  subdev->name);
 
 	return 0;
+}
+
+static void subdev_notifier_unbind(struct v4l2_async_notifier *notifier,
+				   struct v4l2_subdev *subdev,
+		       		   struct v4l2_async_connection *asc)
+{
+	struct csi_state *state = notifier_to_mipi_dev(notifier);
+
+	BUG_ON(subdev == NULL);
+
+	if (subdev == state->sensor_sd)
+	{
+		if (state->mipi_sd.ctrl_handler) {
+			state->mipi_sd.ctrl_handler = NULL;
+			v4l2_ctrl_handler_free(&state->ctrl_handler);
+		}
+
+		state->sensor_sd = NULL;
+	}
+
+	v4l2_info(&state->v4l2_dev, "Unregistered sensor subdevice: %s\n",
+		  subdev->name);
 }
 
 static int mipi_csis_parse_dt(struct platform_device *pdev,
@@ -1053,6 +1114,7 @@ static const struct of_device_id mipi_csis_of_match[];
 
 static const struct v4l2_async_notifier_operations mxc_mipi_csi_subdev_ops = {
 	.bound = subdev_notifier_bound,
+	.unbind = subdev_notifier_unbind,
 };
 
 /* register parent dev */
@@ -1346,6 +1408,10 @@ static int mipi_csis_remove(struct platform_device *pdev)
 	v4l2_async_nf_unregister(&state->subdev_notifier);
 	v4l2_async_nf_cleanup(&state->subdev_notifier);
 	v4l2_device_unregister(&state->v4l2_dev);
+	if (state->mipi_sd.ctrl_handler) {
+		state->mipi_sd.ctrl_handler = NULL;
+		v4l2_ctrl_handler_free(&state->ctrl_handler);
+	}
 
 	pm_runtime_disable(&pdev->dev);
 	mipi_csis_pm_suspend(&pdev->dev, true);
