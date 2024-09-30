@@ -16,9 +16,9 @@
 
 #include "ucm-imx8m-mini.dtsi"
 #include "sb-ucm-imx8-rev2.dtsi"
-#include "wifi-lwb5.dtsi"
+#include "wifi-iw612.dtsi"
 
 / {
-	model = "CompuLab UCM i.MX8MM board";
+	model = "CompuLab UCM i.MX8MM board rev 1.4";
 	compatible = "cpl,ucm-imx8m-mini", "fsl,imx8mm";
 };
