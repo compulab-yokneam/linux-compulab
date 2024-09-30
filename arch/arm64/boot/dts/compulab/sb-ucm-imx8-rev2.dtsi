@@ -70,7 +70,7 @@
 		off-on-delay-us = <12000>;
 	};
 
-	backlight {
+	dsi_backlight: backlight {
 		compatible = "pwm-backlight";
 		pwms = <&pwm2 0 3000000 0>;
 
@@ -150,7 +150,7 @@
 		reg = <0x1a>;
 		status = "okay";
 	};
-
+#if 1 
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
@@ -178,7 +178,7 @@
 			};
 		};
 	};
-
+#endif
 	goodix_ts@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
@@ -244,7 +244,7 @@
 	assigned-clock-rates = <12288000>;
 	status = "okay";
 };
-
+#if 1
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -274,13 +274,14 @@
 		};
 	};
 };
-
+#endif
 &mipi_dsi {
 	status = "okay";
 	panel: panel@0 {
 		compatible = "startek,kd050hdfia020";
 		reg = <0>;
-		reset-gpio = <&pca9555 6 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&pca9555 6 GPIO_ACTIVE_LOW>;
+		backlight = <&dsi_backlight>;
 		dsi-lanes = <4>;
 		status = "okay";
 

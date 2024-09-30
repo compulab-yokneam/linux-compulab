@@ -89,7 +89,10 @@
 
 	usdhc1_pwrseq: usdhc1_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+		reset-gpios =	<&gpio2 10 GPIO_ACTIVE_HIGH>, // WIFI res
+				<&gpio2 6 GPIO_ACTIVE_HIGH>, // BT res
+				<&gpio1 14 GPIO_ACTIVE_LOW>; // PD
+		post-power-on-delay-ms = <20>;
 	};
 
 	modem_reset: modem-reset {
@@ -323,16 +326,6 @@
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	uart-has-rtscts;
 	status = "okay";
-
-	bluetooth {
-		compatible = "brcm,bcm4330-bt";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_bt>;
-		max-speed = <3000000>;
-		device-wakeup-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
-		host-wakeup-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
-		shutdown-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
-	};
 };
 
 &usdhc1 {
@@ -348,15 +341,11 @@
 	pm-ignore-notify;
 	cap-power-off-card;
 	status = "okay";
+	no-1-8-v;
 	mmc-pwrseq = <&usdhc1_pwrseq>;
-
-	brcmf: wifi@1 {
-		compatible = "brcm,bcm4329-fmac";
-		reg = <1>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <9 IRQ_TYPE_LEVEL_HIGH>;
-		interrupt-names = "host-wake";
-	};
+	keep-power-in-suspend;
+	wakeup-source;
+	fsl,sdio-async-interrupt-enable;
 };
 
 
@@ -454,7 +443,9 @@
 
 		pinctrl_usdhc1_gpio: usdhc1grpgpio {
 			fsl,pins = <
-				MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x41
+				MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x06
+				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x06
+				MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14	0x06
 			>;
 		};
 

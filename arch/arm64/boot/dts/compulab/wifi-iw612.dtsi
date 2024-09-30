@@ -1,0 +1,18 @@
+&uart4 { /* bluetooth */
+	bluetooth_iw612: bluetooth {
+		compatible = "nxp,88w8987-bt";
+		//fw-init-baudrate = <3000000>; //Optional. Default is considered 115200 if this parameter not defined.
+		max-speed = <3000000>;
+		status = "okay";
+	};
+};
+
+&usdhc1 {
+	wifi_iw612: wifi_wake_host {
+		compatible = "nxp,wifi-wake-host";
+		interrupt-parent = <&gpio2>;
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-names = "host-wake";
+		status = "okay";
+	};
+};
