@@ -150,7 +150,7 @@
 		reg = <0x1a>;
 		status = "okay";
 	};
-#if 1 
+
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
@@ -167,18 +167,21 @@
 		To be looked into & fixed
 		As of now the device is alwas out of reset & under the power
 		*/
-		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_LOW>;
-		rst-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		powerdown-gpios = <&pca9555 8 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
 
 		mclk = <24000000>;
 		mclk_source = <0>;
+		mipi_csi;
 		port {
 			ov5640_mipi1_ep: endpoint {
 				remote-endpoint = <&mipi1_sensor_ep>;
+				data-lanes = <1 2>;
+				clocks-lanes = <0>;
 			};
 		};
 	};
-#endif
+
 	goodix_ts@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
@@ -244,7 +247,7 @@
 	assigned-clock-rates = <12288000>;
 	status = "okay";
 };
-#if 1
+
 &mipi_csi_1 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -274,7 +277,7 @@
 		};
 	};
 };
-#endif
+
 &mipi_dsi {
 	status = "okay";
 	panel: panel@0 {
@@ -419,7 +422,6 @@
 		*/
 		pinctrl_csi1: csi1grp {
 			fsl,pins = <
-				MX8MM_IOMUXC_GPIO1_IO15_CCMSRCGPCMIX_CLKO2	0x59
 				MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 			>;
 		};
