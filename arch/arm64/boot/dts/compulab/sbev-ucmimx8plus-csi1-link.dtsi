@@ -31,7 +31,8 @@
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
 	assigned-clock-rates = <266000000>;
 
-	port {
+	port@0 {
+		reg = <0>;
 		mipi_csi0_ep: endpoint {
 			remote-endpoint = <&basler_ep_0>;
 			data-lanes = <4>;
