@@ -25,7 +25,7 @@ mkdir -p compulab-kernel/build && cd compulab-kernel
 
 * Clone the source code:
 ```
-git clone -b linux-compulab_v6.6.3 https://github.com/compulab-yokneam/linux-compulab.git
+git clone -b linux-compulab_v6.6.23-rt https://github.com/compulab-yokneam/linux-compulab.git
 cd linux-compulab
 ```
 
@@ -33,7 +33,7 @@ cd linux-compulab
 
 * Apply the default CompuLab config:
 ```
-make ${MACHINE}_defconfig compulab.config
+make ${MACHINE}_defconfig compulab.config compulab_rt.config
 ```
 
 * Ussue menuconfig on order to change the default CompuLab configuration:
