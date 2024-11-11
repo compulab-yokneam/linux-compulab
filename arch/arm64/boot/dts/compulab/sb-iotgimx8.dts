@@ -15,6 +15,7 @@
 /dts-v1/;
 
 #include "ucm-imx8m-mini.dtsi"
+#include <dt-bindings/phy/phy-imx8-pcie.h>
 
 / {
 	model = "CompuLab SB-IOTGIMX8 board";
@@ -210,6 +211,14 @@
 	no-mmc-hs400;
 	non-removable;
 	vmmc-supply = <&reg_usdhc2_rst>;
+	status = "okay";
+};
+
+&pcie_phy {
+	clocks = <&pcie0_refclk>;
+	clock-names = "ref";
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_INPUT>;
+	fsl,clkreq-unsupported;
 	status = "okay";
 };
 
