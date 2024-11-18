@@ -1,0 +1,9 @@
+DTC_FLAGS := -@
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-headless.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-lvds.dtbo
+
+ucm-imx95-evk-dtbs := ucm-imx95-headless.dtb \
+		ucm-imx95-lvds.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk.dtb
