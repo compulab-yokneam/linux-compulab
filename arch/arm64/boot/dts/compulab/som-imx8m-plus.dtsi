@@ -294,12 +294,12 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		ethphy1: ethernet-phy@1 {
+		ethphy1: ethernet-phy@4 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reset-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
-			reg = <0>;
+			reg = <4>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
 		};
@@ -373,12 +373,12 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		ethphy0: ethernet-phy@0 {
+		ethphy0: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
 			reset-assert-us = <10000>;
 			reset-deassert-us = <80000>;
-			reg = <0>;
+			reg = <5>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
 		};
