@@ -276,12 +276,16 @@
 
 		mclk = <24000000>;
 		mclk_source = <0>;
+		mipi_csi;
 		port {
 			ov5640_mipi1_ep: endpoint {
 				remote-endpoint = <&mipi1_sensor_ep>;
+				data-lanes = <1 2>;
+				clocks-lanes = <0>;
 			};
 		};
 	};
+
 	goodix_ts@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
