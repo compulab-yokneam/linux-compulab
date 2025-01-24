@@ -83,13 +83,16 @@
 	imx8mp-cm7 {
 		compatible = "fsl,imx8mn-cm7";
 		rsc-da = <0x55000000>;
-		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>,
+			 <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_AUDPLL_ROOT>;
+		clock-names = "core", "audio";
 		mbox-names = "tx", "rx", "rxdb";
 		mboxes = <&mu 0 1
 			  &mu 1 1
 			  &mu 3 1>;
 		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
 		status = "okay";
+		fsl,startup-delay-ms = <500>;
 	};
 };
 
