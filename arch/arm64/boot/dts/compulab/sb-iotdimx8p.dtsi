@@ -172,6 +172,15 @@
 		gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
 	};
 	/***** 1-wire - End *****/
+
+	/***** MCP2518FD oscillator *****/
+        mcp251xfd_osc: mcp251xfd-osc {
+                compatible = "fixed-clock";
+                #clock-cells = <0>;
+                clock-frequency = <40000000>;
+                clock-output-names = "mcp251xfd-osc";
+		status = "okay";
+        };
 };
 
 &cpu_alert0 {
@@ -362,10 +371,33 @@
 
 /***** B2B CONNECTOR - Begin *****/
 &ecspi2 {
-	status = "disabled";
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi2>, <&pinctrl_ecspi2_cs>;
+	num-cs = <2>;
+	cs-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>, <&gpio3 27 GPIO_ACTIVE_LOW>;
+	status = "okay";
 
-	spidev2_0: spidev2@0 {
-		status = "disabled";
+	/delete-node/ spidev2@0;
+
+	mcp251xfd_0@0 {
+		compatible = "microchip,mcp251xfd";
+		reg = <0>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mcp251xfd_0>;
+		clocks = <&mcp251xfd_osc>;
+		interrupts-extended = <&gpio2 20 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <15000000>;
+		status = "okay";
+	};
+	mcp251xfd_1@1 {
+		compatible = "microchip,mcp251xfd";
+		reg = <1>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mcp251xfd_1>;
+		clocks = <&mcp251xfd_osc>;
+		interrupts-extended = <&gpio2 19 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <15000000>;
+		status = "okay";
 	};
 };
 
@@ -451,10 +483,6 @@
 
 	adc_0: adc-0@48 {
 		compatible = "ti,ads1015";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_adc_0>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <20 IRQ_TYPE_LEVEL_LOW>;
 		reg = <0x48>;
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -490,10 +518,6 @@
 
 	adc_1: adc-1@49 {
 		compatible = "ti,ads1015";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_adc_1>;
-		interrupt-parent = <&gpio2>;
-		interrupts = <19 IRQ_TYPE_LEVEL_LOW>;
 		reg = <0x49>;
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -544,6 +568,13 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_di2o2>;
 
+	pinctrl_ecspi2_cs: ecspi2cs {
+		fsl,pins = <
+			MX8MP_IOMUXC_ECSPI2_SS0__GPIO5_IO13			0x40000 /* CS0 */
+			MX8MP_IOMUXC_HDMI_DDC_SDA__GPIO3_IO27			0x40000 /* CS1 */
+		>;
+	};
+
 	pinctrl_fec_phy_reset: fecphyrstgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24			0x10
@@ -561,18 +592,7 @@
 
 	pinctrl_gpiokeys: gpiokeysgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12			0x140 /* P5-18 */
-		>;
-	};
-
-	pinctrl_adc_0: adc_0grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20				0x140
-		>;
-	};
-	pinctrl_adc_1: adc_1grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SD2_RESET_B__GPIO2_IO19			0x140
+			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12			0x140 /* SYS_CONFIG pushbutton */
 		>;
 	};
 
@@ -597,10 +617,20 @@
 		>;
 	};
 
+	pinctrl_mcp251xfd_0: mcp251xfd_0grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20				0x146 /* MCP2518FD 0 nINT */
+		>;
+	};
+	pinctrl_mcp251xfd_1: mcp251xfd_1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_RESET_B__GPIO2_IO19			0x146 /* MCP2518FD 1 nINT */
+		>;
+	};
+
 	pinctrl_pcie: pciegrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_I2C4_SCL__PCIE_CLKREQ_B			0x60 /* open drain, pull up */
-			MX8MP_IOMUXC_HDMI_DDC_SDA__GPIO3_IO27			0x1c4 /* PCIE_WAKEn */
 			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02			0x40 /* PCIE_PERSTn */
 		>;
 	};
