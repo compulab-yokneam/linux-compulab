@@ -9,3 +9,4 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-rpmsg.dtb
 # IOTDIN-IMX8P
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p.dtb
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-rpmsg.dtb
+dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-legacy.dtb
