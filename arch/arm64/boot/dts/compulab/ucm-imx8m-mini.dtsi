@@ -89,18 +89,7 @@
 
 	usdhc1_pwrseq: usdhc1_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios =	<&gpio2 10 GPIO_ACTIVE_HIGH>, // WIFI res
-				<&gpio2 6 GPIO_ACTIVE_HIGH>, // BT res
-				<&gpio1 14 GPIO_ACTIVE_LOW>; // PD
 		post-power-on-delay-ms = <20>;
-	};
-
-	modem_reset: modem-reset {
-		compatible = "gpio-reset";
-		reset-gpios = <&gpio2 6 GPIO_ACTIVE_LOW>;
-		reset-delay-us = <2000>;
-		reset-post-delay-ms = <40>;
-		#reset-cells = <0>;
 	};
 };
 
@@ -328,27 +317,6 @@
 	status = "okay";
 };
 
-&usdhc1 {
-	#address-cells = <1>;
-	#size-cells = <0>;
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc1_100mhz>, <&pinctrl_usdhc1_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc1_200mhz>, <&pinctrl_usdhc1_gpio>;
-	bus-width = <4>;
-	non-removable;
-	wifi-host;
-	pm-ignore-notify;
-	cap-power-off-card;
-	status = "okay";
-	no-1-8-v;
-	mmc-pwrseq = <&usdhc1_pwrseq>;
-	keep-power-in-suspend;
-	wakeup-source;
-	fsl,sdio-async-interrupt-enable;
-};
-
-
 &usdhc3 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc3>;
@@ -438,14 +406,6 @@
 				MX8MM_IOMUXC_ECSPI2_MOSI_UART4_DCE_TX    0x140
 				MX8MM_IOMUXC_ECSPI2_SS0_UART4_DCE_RTS_B  0x140
 				MX8MM_IOMUXC_ECSPI2_SCLK_UART4_DCE_RX    0x140
-			>;
-		};
-
-		pinctrl_usdhc1_gpio: usdhc1grpgpio {
-			fsl,pins = <
-				MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x06
-				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x06
-				MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14	0x06
 			>;
 		};
 
