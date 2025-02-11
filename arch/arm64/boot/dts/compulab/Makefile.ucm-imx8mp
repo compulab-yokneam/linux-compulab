@@ -19,6 +19,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mmc.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-cma.dtbo
 dtb-$(CONFIG_ARCH_MXC) += compulab-imx8m-plus-rpmsg.dtbo
+dtb-$(CONFIG_ARCH_MXC) += compulab-imx8m-plus-thermal.dtbo
 
 # sbev-ucmimx8plus
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtbo
