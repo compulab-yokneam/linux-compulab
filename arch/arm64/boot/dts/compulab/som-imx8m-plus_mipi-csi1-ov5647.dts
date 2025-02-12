@@ -1,7 +1,7 @@
 #include "overlay.h"
 
 &{/} {
-	model = "CompuLab SOM-iMX8M-Plus with ISP imx219 mipi csi1 enabled";
+	model = "CompuLab SOM-iMX8M-Plus with ISP ov5647 mipi csi1 enabled";
 	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
 };
 
@@ -10,9 +10,11 @@
 	#size-cells = <0>;
 	status = "okay";
 
-	imx219_mipi1: imx219_mipi1@10 {
-		compatible = "sony,imx219";
-		reg = <0x10>;
+	ov5647_mipi: ov5647_mipi@36 {
+		compatible = "ovti,ov5647";
+		reg = <0x36>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		clock-names = "xclk";
 		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
@@ -23,15 +25,14 @@
 		mclk = <24000000>;
 		mclk_source = <0>;
 		mipi_csi;
-		camera_mipi_lanes = <2>;
 		status = "okay";
 
 		port {
-			imx219_mipi1_ep: endpoint {
+			mipi1_ep: endpoint {
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
 				clock-noncontinuous;
-				link-frequencies = /bits/ 64 <456000000>;
+				link-frequencies = /bits/ 64 <500000000>;
 				remote-endpoint = <&mipi1_sensor_ep>;
 			};
 		};
@@ -42,11 +43,8 @@
 	status = "okay";
 	port@0 {
 		mipi1_sensor_ep: endpoint {
-			remote-endpoint = <&imx219_mipi1_ep>;
+			remote-endpoint = <&mipi1_ep>;
 			data-lanes = <2>;
-			csis-hs-settle = <23>;
-			csis-clk-settle = <2>;
-			csis-wclk;
 		};
 	};
 };
