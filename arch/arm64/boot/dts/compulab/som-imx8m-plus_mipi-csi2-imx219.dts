@@ -1,16 +1,11 @@
 #include "overlay.h"
 
-&{/} {
-	model = "CompuLab SOM-iMX8M-Plus with ISP ov5647 mipi csi2 enabled";
-	compatible = "compulab,som-imx8m-plus", "fsl,imx8mp";
-};
-
 &i2c4 {
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
 
-	imx219_mipi2: imx219_mipi2@10 {
+	sensor_mipi2: sensor_mipi2 {
 		compatible = "sony,imx219";
 		reg = <0x10>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
@@ -26,11 +21,11 @@
 		status = "okay";
 
 		port {
-			imx219_mipi2_ep: endpoint {
+			mipi2_ep: endpoint {
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
 				clock-noncontinuous;
-				link-frequencies = /bits/ 64 <456000000>;
+				link-frequencies = /bits/ 64 <500000000>;
 				remote-endpoint = <&mipi2_sensor_ep>;
 			};
 		};
@@ -44,7 +39,7 @@
 	port@1 {
 		reg = <1>;
 		mipi2_sensor_ep: endpoint {
-			remote-endpoint = <&imx219_mipi2_ep>;
+			remote-endpoint = <&mipi2_ep>;
 			data-lanes = <2>;
 		};
 	};
