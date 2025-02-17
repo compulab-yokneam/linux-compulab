@@ -2219,9 +2219,7 @@ struct net_device {
 #if IS_ENABLED(CONFIG_AX25)
 	void			*ax25_ptr;
 #endif
-#if IS_ENABLED(CONFIG_CFG80211)
 	struct wireless_dev	*ieee80211_ptr;
-#endif
 #if IS_ENABLED(CONFIG_IEEE802154) || IS_ENABLED(CONFIG_6LOWPAN)
 	struct wpan_dev		*ieee802154_ptr;
 #endif
