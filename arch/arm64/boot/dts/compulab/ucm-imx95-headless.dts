@@ -7,6 +7,7 @@
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
 #include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/leds/common.h>
 #include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/usb/pd.h>
 #include "../freescale/imx95.dtsi"
@@ -38,6 +39,20 @@
 			bootargs = "earlycon=xen console=hvc0 loglevel=8 root=/dev/mmcblk0p2 rw rootwait";
 			compatible = "xen,linux-zimage", "xen,multiboot-module";
 			reg = <0x00000000 0x9e000000 0x00000000 0x2000000>;
+		};
+	};
+
+	gpio-leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pwrled>;
+
+		heartbeat-led {
+			label = "Heartbeat";
+			color = <LED_COLOR_ID_AMBER>;
+			function = LED_FUNCTION_HEARTBEAT;
+			gpios = <&gpio2 24 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
 		};
 	};
 
@@ -726,6 +741,12 @@
 };
 
 &scmi_iomuxc {
+	pinctrl_pwrled: pwrledgrp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO24__GPIO2_IO_BIT24		0xc51e
+		>;
+	};
+
 	pinctrl_tpm3: tpm3grp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO12__TPM3_CH2			0x51e
