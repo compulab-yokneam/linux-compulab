@@ -609,16 +609,9 @@ dtb-$(CONFIG_SOC_IMX6SLL) += \
 	imx6sll-evk-reva.dtb \
 	imx6sll-evk-btwifi.dtb
 dtb-$(CONFIG_SOC_IMX7D) += \
-	imx7d-cl-som-imx7.dtb \
 	imx7d-colibri-eval-v3.dtb \
 	imx7d-nitrogen7.dtb \
 	imx7d-pico.dtb \
-	imx7d-sbc-imx7.dtb \
-	imx7d-sbc-imx7-lvds.dtb \
-	imx7d-sbc-imx7-m4.dtb \
-	imx7d-sbc-iot-imx7.dtb \
-	imx7d-sbc-iot-imx7-can.dtb \
-	imx7d-sbc-iot-imx7-rs485-hdx.dtb \
 	imx7d-sdb.dtb \
 	imx7d-sdb-epdc.dtb \
 	imx7d-sdb-gpmi-weim.dtb \
@@ -1240,6 +1233,16 @@ dtb-$(CONFIG_ARCH_ZX) += zx296702-ad1.dtb
 dtb-$(CONFIG_ARCH_ASPEED) += aspeed-bmc-opp-palmetto.dtb \
 	aspeed-bmc-opp-romulus.dtb \
 	aspeed-ast2500-evb.dtb
+
+dtb-$(CONFIG_SOC_IMX7D) += \
+	compulab/imx7d-cl-som-imx7.dtb \
+	compulab/imx7d-sbc-imx7.dtb \
+	compulab/imx7d-sbc-imx7-lvds.dtb \
+	compulab/imx7d-sbc-imx7-m4.dtb \
+	compulab/imx7d-sbc-iot-imx7.dtb \
+	compulab/imx7d-sbc-iot-imx7-can.dtb \
+	compulab/imx7d-sbc-iot-imx7-rs485-hdx.dtb
+
 endif
 
 dtstree		:= $(srctree)/$(src)
