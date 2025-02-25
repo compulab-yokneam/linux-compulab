@@ -12,7 +12,7 @@
 
 /dts-v1/;
 
-#include "imx7d.dtsi"
+#include "../imx7d.dtsi"
 
 / {
 	model = "CompuLab CL-SOM-iMX7";
