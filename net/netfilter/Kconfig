@@ -514,6 +514,11 @@ config NFT_FLOW_OFFLOAD
 	  This option adds the "flow_offload" expression that you can use to
 	  choose what flows are placed into the hardware.
 
+config NFT_COUNTER
+	tristate "Dummy config per Snapdaq request"
+	help
+	This option is added per Snapdaq request for backward compatibility
+
 config NFT_CONNLIMIT
 	tristate "Netfilter nf_tables connlimit module"
 	depends on NF_CONNTRACK
