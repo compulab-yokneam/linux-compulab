@@ -46,4 +46,21 @@ make menuconfig
 nice make -j`nproc`
 ```
 
+## Compile the Kernel with ``PREEMPT_RT``
+
+* Apply the RT patches:
+```
+git cherry-pick a5eb9c93dbe6 aee6962621ce
+```
+
+* Apply the RT CompuLab config:
+```
+make ${MACHINE}_defconfig compulab.config compulab_rt.config
+```
+
+* Build the kernel
+```
+nice make -j`nproc`
+```
+
 * [Deploy the CompuLab Linux Kernel to CompuLab devices](https://github.com/compulab-yokneam/Documentation/blob/master/etc/linux_kernel_deployment.md#create-deb-package)
