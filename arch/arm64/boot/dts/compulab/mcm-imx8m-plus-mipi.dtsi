@@ -29,7 +29,7 @@
 	#size-cells = <0>;
 	status = "okay";
 
-	goodix_ts@5d {
+	mipi_ts: goodix_ts@5d {
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
 

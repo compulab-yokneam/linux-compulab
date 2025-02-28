@@ -11,8 +11,8 @@
 #include "mcm-imx8m-plus-can.dtsi"
 #include "mcm-imx8m-plus-pcie.dtsi"
 #include "mcm-imx8m-plus-mipi.dtsi"
-#include "mcm-imx8m-plus-lvds.dtsi"
 #include "mcm-imx8m-plus-hdmi.dtsi"
+#include "mcm-imx8m-plus-atp.dtsi"
 
 / {
 	model = "CompuLab MCM-iMX8M-Plus";
