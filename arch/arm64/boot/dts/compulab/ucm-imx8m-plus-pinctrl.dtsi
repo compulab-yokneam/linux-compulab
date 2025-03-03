@@ -4,6 +4,15 @@
  */
 
 &iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog>;
+
+	pinctrl_hog: hoggrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2		0x50
+		>;
+	};
+
 	pinctrl_fec: fecgrp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SD1_CLK__ENET1_MDC					0x2
@@ -267,10 +276,5 @@
 		>;
 	};
 
-	pinctrl_csi_mclk: csi_mclk_grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_GPIO1_IO15__CCM_CLKO2	0x50
-		>;
-	};
 };
 
