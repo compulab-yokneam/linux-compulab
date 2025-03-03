@@ -13,8 +13,6 @@
 	ov5647_mipi1: ov5647_mipi1@36 {
 		compatible = "ovti,ov5647";
 		reg = <0x36>;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_csi_mclk>;
 		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
 		clock-names = "xclk";
 		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
