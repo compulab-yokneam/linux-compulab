@@ -9,6 +9,7 @@ dtb-$(CONFIG_ARCH_MXC) += mmc2_ucm-imx8m-plus-falcon.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ldo4.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-spidev.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-ws2812b.dtbo
 # the features' overlays
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-mipi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-lvds.dtbo
