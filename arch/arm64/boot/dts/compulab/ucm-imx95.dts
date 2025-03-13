@@ -3,5 +3,5 @@
  * Copyright 2024 CompuLab
  */
 
-#include "ucm-imx95-headless.dts"
+#include "ucm-imx95-som.dts"
 #include "ucm-imx95-lvds.dtsi"
