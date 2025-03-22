@@ -117,6 +117,9 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ar1335-mcu.dtb
 ucm-imx8m-plus_mipi-csi1-imx219-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-imx219.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-imx219.dtb
 
+ucm-imx8m-plus_mipi-csi2-imx219-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi2-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi2-imx219.dtb
+
 ucm-imx8m-plus_mipi-csi1-ov5647-dtbs := ucm-imx8m-plus.dtb ucm-imx8m-plus_mipi-csi1-ov5647.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus_mipi-csi1-ov5647.dtb
 
