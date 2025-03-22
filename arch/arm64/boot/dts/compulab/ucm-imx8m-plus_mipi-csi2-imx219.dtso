@@ -14,8 +14,8 @@
 		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
 		assigned-clock-rates = <24000000>;
 		csi_id = <1>;
-		pwn-gpios = <&pca9555 12 GPIO_ACTIVE_HIGH>;
-		rst-gpios = <&pca9555 13 GPIO_ACTIVE_LOW>;
+		pwn-gpios = <&pca9555 11 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 12 GPIO_ACTIVE_HIGH>;
 		mclk = <24000000>;
 		mclk_source = <0>;
 		mipi_csi;
@@ -27,7 +27,7 @@
 				clock-lanes = <0>;
 				data-lanes = <1 2>;
 				clock-noncontinuous;
-				link-frequencies = /bits/ 64 <500000000>;
+				link-frequencies = /bits/ 64 <266000000>;
 				remote-endpoint = <&mipi2_sensor_ep>;
 			};
 		};
@@ -36,6 +36,9 @@
 
 &mipi_csi_1 {
 	status = "okay";
+	clock-frequency = <266000000>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
+	assigned-clock-rates = <266000000>;
 	#address-cells = <1>;
 	#size-cells = <0>;
 	port@1 {
