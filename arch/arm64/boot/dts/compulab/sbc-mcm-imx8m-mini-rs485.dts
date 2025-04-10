@@ -1,0 +1,15 @@
+/dts-v1/;
+
+#include "mcm-imx8m-mini.dtsi"
+#include "mcm-imx8m-mini-rs485.dtsi"
+#include "sb-mcm-imx8-rev1.dtsi"
+
+/ {
+	model = "CompuLab MCM i.MX8MM on SB-MCM8M Rev 1.0";
+	compatible = "cpl,sbc-mcm-imx8m-mini", "cpl,mcm-imx8m-mini", "fsl,imx8mm";
+};
+
+&uart4_sel {
+	/delete-property/ enable-active-low;
+	enable-active-high;
+};
