@@ -13,6 +13,11 @@ Required properties:
 - clock-names: Must include the following additional entries:
 	- "pcie_phy"
 
+Optional properties for imx7d-pcie:
+ - phy-ref-clk: pcie phy reference clock source: may take on following values:
+	0 - external oscillator (default value)
+	1 - internal pll
+
 Example:
 
 	pcie@0x01000000 {

@@ -28,3 +28,49 @@ and valid to enable charging:
  - "abracon,tc-diode": should be "standard" (0.6V) or "schottky" (0.3V)
  - "abracon,tc-resistor": should be <0>, <3>, <6> or <11>. 0 disables the output
                           resistor, the other values are in ohm.
+
+The Abracon ab08x5 and ab18x5 RTC families have a programmable square wave output
+generator with a wide range of frequency selections (32.768 kHz to 1 year).
+Please refer to the datasheet for more info.
+The square wave output be configured via the following properties:
+
+ - "abracon,sqw-enable": boolean to enable square wave output. If this property is
+    not set, the square wave output will be disabled.
+ - "abracon,sqw-freq-sel": square wave output frequency select SQFS as described below.
+   If this property is not set, the square wave output will be set to a default value.
+
+    SQFS Value | Square Wave Output
+   ============+=====================
+        0      |    1 century
+        1      |    32.768 kHz
+        2      |    8.192 kHz
+        3      |    4.096 kHz
+        4      |    2.048 kHz
+        5      |    1.024 kHz
+        6      |    512 Hz – default
+        7      |    256 Hz
+        8      |    128 Hz
+        9      |    64 Hz
+       10      |    32 Hz
+       11      |    16 Hz
+       12      |    8 Hz
+       13      |    4 Hz
+       14      |    2 Hz
+       15      |    1 Hz
+       16      |    1/2 Hz
+       17      |    1/4 Hz
+       18      |    1/8 Hz
+       19      |    1/16 Hz
+       20      |    1/32 Hz
+       21      |    1/60 Hz
+       22      |    16.384 kHz
+       23      |    100 Hz
+       24      |    1 hour
+       25      |    1 day
+       26      |    TIRQ
+       27      |    NOT TIRQ
+       28      |    1 year
+       29      |    1 Hz to Counters
+       30      |    1/32 Hz from Acal
+       31      |    1/8 Hz from Acal
+   ==================================

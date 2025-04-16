@@ -44,6 +44,8 @@
 #include <linux/platform_data/serial-imx.h>
 #include <linux/platform_data/dma-imx.h>
 
+#include "serial_mctrl_gpio.h"
+
 /* Register definitions */
 #define URXD0 0x0  /* Receiver Register */
 #define URTX0 0x40 /* Transmitter Register */
@@ -218,6 +220,7 @@ struct imx_port {
 	struct timer_list	timer;
 	unsigned int		old_status;
 	unsigned int		have_rtscts:1;
+	unsigned int		have_rtsgpio:1;
 	unsigned int		dte_mode:1;
 	unsigned int		irda_inv_rx:1;
 	unsigned int		irda_inv_tx:1;
@@ -225,6 +228,8 @@ struct imx_port {
 	struct clk		*clk_ipg;
 	struct clk		*clk_per;
 	const struct imx_uart_data *devdata;
+
+	struct mctrl_gpios *gpios;
 
 	/* DMA fields */
 	unsigned int		dma_is_inited:1;
@@ -330,49 +335,26 @@ static void imx_port_ucrs_restore(struct uart_port *port,
 }
 #endif
 
-/*
- * Handle any change of modem status signal since we were last called.
- */
-static void imx_mctrl_check(struct imx_port *sport)
+static void imx_port_rts_active(struct imx_port *sport, unsigned long *ucr2)
 {
-	unsigned int status, changed;
+	*ucr2 &= ~(UCR2_CTSC | UCR2_CTS);
 
-	status = sport->port.ops->get_mctrl(&sport->port);
-	changed = status ^ sport->old_status;
-
-	if (changed == 0)
-		return;
-
-	sport->old_status = status;
-
-	if (changed & TIOCM_RI)
-		sport->port.icount.rng++;
-	if (changed & TIOCM_DSR)
-		sport->port.icount.dsr++;
-	if (changed & TIOCM_CAR)
-		uart_handle_dcd_change(&sport->port, status & TIOCM_CAR);
-	if (changed & TIOCM_CTS)
-		uart_handle_cts_change(&sport->port, status & TIOCM_CTS);
-
-	wake_up_interruptible(&sport->port.state->port.delta_msr_wait);
+	/*pr_info("%s: call mctrl_gpio_set()\n", __func__);*/
+	mctrl_gpio_set(sport->gpios, sport->port.mctrl | TIOCM_RTS);
 }
 
-/*
- * This is our per-port timeout handler, for checking the
- * modem status signals.
- */
-static void imx_timeout(unsigned long data)
+static void imx_port_rts_inactive(struct imx_port *sport, unsigned long *ucr2)
 {
-	struct imx_port *sport = (struct imx_port *)data;
-	unsigned long flags;
+	*ucr2 &= ~UCR2_CTSC;
+	*ucr2 |= UCR2_CTS;
 
-	if (sport->port.state) {
-		spin_lock_irqsave(&sport->port.lock, flags);
-		imx_mctrl_check(sport);
-		spin_unlock_irqrestore(&sport->port.lock, flags);
+	/*pr_info("%s: call mctrl_gpio_set()\n", __func__);*/
+	mctrl_gpio_set(sport->gpios, sport->port.mctrl & ~TIOCM_RTS);
+}
 
-		mod_timer(&sport->timer, jiffies + MCTRL_TIMEOUT);
-	}
+static void imx_port_rts_auto(struct imx_port *sport, unsigned long *ucr2)
+{
+	*ucr2 |= UCR2_CTSC;
 }
 
 /*
@@ -398,9 +380,10 @@ static void imx_stop_tx(struct uart_port *port)
 	    readl(port->membase + USR2) & USR2_TXDC) {
 		temp = readl(port->membase + UCR2);
 		if (port->rs485.flags & SER_RS485_RTS_AFTER_SEND)
-			temp &= ~UCR2_CTS;
+			imx_port_rts_active(sport, &temp);
 		else
-			temp |= UCR2_CTS;
+			imx_port_rts_inactive(sport, &temp);
+		temp |= UCR2_RXEN;
 		writel(temp, port->membase + UCR2);
 
 		temp = readl(port->membase + UCR4);
@@ -444,6 +427,8 @@ static void imx_enable_ms(struct uart_port *port)
 	struct imx_port *sport = (struct imx_port *)port;
 
 	mod_timer(&sport->timer, jiffies);
+
+	mctrl_gpio_enable_ms(sport->gpios);
 }
 
 static inline void imx_transmit_buffer(struct imx_port *sport)
@@ -599,11 +584,14 @@ static void imx_start_tx(struct uart_port *port)
 		/* enable transmitter and shifter empty irq */
 		temp = readl(port->membase + UCR2);
 		if (port->rs485.flags & SER_RS485_RTS_ON_SEND)
-			temp &= ~UCR2_CTS;
+			imx_port_rts_active(sport, &temp);
 		else
-			temp |= UCR2_CTS;
+			imx_port_rts_inactive(sport, &temp);
+		if (!(port->rs485.flags & SER_RS485_RX_DURING_TX))
+			temp &= ~UCR2_RXEN;
 		writel(temp, port->membase + UCR2);
 
+		/* enable transmitter and shifter empty irq */
 		temp = readl(port->membase + UCR4);
 		temp |= UCR4_TCEN;
 		writel(temp, port->membase + UCR4);
@@ -784,9 +772,8 @@ static unsigned int imx_tx_empty(struct uart_port *port)
 /*
  * We have a modem side uart, so the meanings of RTS and CTS are inverted.
  */
-static unsigned int imx_get_mctrl(struct uart_port *port)
+static unsigned int imx_get_hwmctrl(struct imx_port *sport)
 {
-	struct imx_port *sport = (struct imx_port *)port;
 	unsigned int tmp = TIOCM_DSR | TIOCM_CAR;
 
 	if (readl(sport->port.membase + USR1) & USR1_RTSS)
@@ -799,6 +786,16 @@ static unsigned int imx_get_mctrl(struct uart_port *port)
 		tmp |= TIOCM_LOOP;
 
 	return tmp;
+}
+
+static unsigned int imx_get_mctrl(struct uart_port *port)
+{
+	struct imx_port *sport = (struct imx_port *)port;
+	unsigned int ret = imx_get_hwmctrl(sport);
+
+	mctrl_gpio_get(sport->gpios, &ret);
+
+	return ret;
 }
 
 static void imx_set_mctrl(struct uart_port *port, unsigned int mctrl)
@@ -818,6 +815,8 @@ static void imx_set_mctrl(struct uart_port *port, unsigned int mctrl)
 	if (mctrl & TIOCM_LOOP)
 		temp |= UTS_LOOP;
 	writel(temp, sport->port.membase + uts_reg(sport));
+
+	mctrl_gpio_set(sport->gpios, mctrl);
 }
 
 /*
@@ -838,6 +837,51 @@ static void imx_break_ctl(struct uart_port *port, int break_state)
 	writel(temp, sport->port.membase + UCR1);
 
 	spin_unlock_irqrestore(&sport->port.lock, flags);
+}
+
+/*
+ * Handle any change of modem status signal since we were last called.
+ */
+static void imx_mctrl_check(struct imx_port *sport)
+{
+	unsigned int status, changed;
+
+	status = imx_get_hwmctrl(sport);
+	changed = status ^ sport->old_status;
+
+	if (changed == 0)
+		return;
+
+	sport->old_status = status;
+
+	if (changed & TIOCM_RI)
+		sport->port.icount.rng++;
+	if (changed & TIOCM_DSR)
+		sport->port.icount.dsr++;
+	if (changed & TIOCM_CAR)
+		uart_handle_dcd_change(&sport->port, status & TIOCM_CAR);
+	if (changed & TIOCM_CTS)
+		uart_handle_cts_change(&sport->port, status & TIOCM_CTS);
+
+	wake_up_interruptible(&sport->port.state->port.delta_msr_wait);
+}
+
+/*
+ * This is our per-port timeout handler, for checking the
+ * modem status signals.
+ */
+static void imx_timeout(unsigned long data)
+{
+	struct imx_port *sport = (struct imx_port *)data;
+	unsigned long flags;
+
+	if (sport->port.state) {
+		spin_lock_irqsave(&sport->port.lock, flags);
+		imx_mctrl_check(sport);
+		spin_unlock_irqrestore(&sport->port.lock, flags);
+
+		mod_timer(&sport->timer, jiffies + MCTRL_TIMEOUT);
+	}
 }
 
 #define TXTL 2 /* reset default */
@@ -1224,6 +1268,8 @@ static void imx_shutdown(struct uart_port *port)
 		imx_uart_dma_exit(sport);
 	}
 
+	mctrl_gpio_disable_ms(sport->gpios);
+
 	spin_lock_irqsave(&sport->port.lock, flags);
 	temp = readl(sport->port.membase + UCR2);
 	temp &= ~(UCR2_TXEN);
@@ -1301,9 +1347,10 @@ imx_set_termios(struct uart_port *port, struct ktermios *termios,
 {
 	struct imx_port *sport = (struct imx_port *)port;
 	unsigned long flags;
-	unsigned int ucr2, old_ucr1, old_txrxen, baud, quot;
+	unsigned long ucr2, old_ucr1, old_txrxen;
+	unsigned int baud, quot;
 	unsigned int old_csize = old ? old->c_cflag & CSIZE : CS8;
-	unsigned int div, ufcr;
+	unsigned long div, ufcr;
 	unsigned long num, denom;
 	uint64_t tdiv64;
 
@@ -1332,19 +1379,25 @@ imx_set_termios(struct uart_port *port, struct ktermios *termios,
 				 * it under manual control and keep transmitter
 				 * disabled.
 				 */
-				if (!(port->rs485.flags &
-				      SER_RS485_RTS_AFTER_SEND))
-					ucr2 |= UCR2_CTS;
+				if (port->rs485.flags &
+				    SER_RS485_RTS_AFTER_SEND)
+					imx_port_rts_active(sport, &ucr2);
+				else
+					imx_port_rts_inactive(sport, &ucr2);
 			} else {
-				ucr2 |= UCR2_CTSC;
+				imx_port_rts_auto(sport, &ucr2);
 			}
 		} else {
 			termios->c_cflag &= ~CRTSCTS;
 		}
-	} else if (port->rs485.flags & SER_RS485_ENABLED)
+	} else if (port->rs485.flags & SER_RS485_ENABLED) {
 		/* disable transmitter */
-		if (!(port->rs485.flags & SER_RS485_RTS_AFTER_SEND))
-			ucr2 |= UCR2_CTS;
+		if (port->rs485.flags & SER_RS485_RTS_AFTER_SEND)
+			imx_port_rts_active(sport, &ucr2);
+		else
+			imx_port_rts_inactive(sport, &ucr2);
+	}
+
 
 	if (termios->c_cflag & CSTOPB)
 		ucr2 |= UCR2_STPB;
@@ -1580,26 +1633,31 @@ static int imx_rs485_config(struct uart_port *port,
 			    struct serial_rs485 *rs485conf)
 {
 	struct imx_port *sport = (struct imx_port *)port;
+	unsigned long temp;
 
 	/* unimplemented */
 	rs485conf->delay_rts_before_send = 0;
 	rs485conf->delay_rts_after_send = 0;
-	rs485conf->flags |= SER_RS485_RX_DURING_TX;
 
 	/* RTS is required to control the transmitter */
-	if (!sport->have_rtscts)
+	if (!sport->have_rtscts && !sport->have_rtsgpio)
 		rs485conf->flags &= ~SER_RS485_ENABLED;
 
 	if (rs485conf->flags & SER_RS485_ENABLED) {
-		unsigned long temp;
-
 		/* disable transmitter */
 		temp = readl(sport->port.membase + UCR2);
-		temp &= ~UCR2_CTSC;
 		if (rs485conf->flags & SER_RS485_RTS_AFTER_SEND)
-			temp &= ~UCR2_CTS;
+			imx_port_rts_active(sport, &temp);
 		else
-			temp |= UCR2_CTS;
+			imx_port_rts_inactive(sport, &temp);
+		writel(temp, sport->port.membase + UCR2);
+	}
+
+	/* Make sure Rx is enabled in case Tx is active with Rx disabled */
+	if (!(rs485conf->flags & SER_RS485_ENABLED) ||
+	    rs485conf->flags & SER_RS485_RX_DURING_TX) {
+		temp = readl(sport->port.membase + UCR2);
+		temp |= UCR2_RXEN;
 		writel(temp, sport->port.membase + UCR2);
 	}
 
@@ -1939,6 +1997,20 @@ static int serial_imx_probe_dt(struct imx_port *sport,
 	if (of_get_property(np, "fsl,dte-mode", NULL))
 		sport->dte_mode = 1;
 
+	if (of_get_property(np, "rts-gpios", NULL))
+		sport->have_rtsgpio = 1;
+
+	if (of_property_read_bool(np, "linux,rs485-enabled-at-boot-time"))
+		sport->port.rs485.flags |= SER_RS485_ENABLED;
+
+	if (of_property_read_bool(np, "rs485-rx-during-tx"))
+		sport->port.rs485.flags |= SER_RS485_RX_DURING_TX;
+
+	if (of_property_read_bool(np, "rs485-rts-active-high"))
+		sport->port.rs485.flags |= SER_RS485_RTS_ON_SEND;
+	else
+		sport->port.rs485.flags |= SER_RS485_RTS_AFTER_SEND;
+
 	sport->devdata = of_id->data;
 
 	return 0;
@@ -2002,12 +2074,17 @@ static int serial_imx_probe(struct platform_device *pdev)
 	sport->port.fifosize = 32;
 	sport->port.ops = &imx_pops;
 	sport->port.rs485_config = imx_rs485_config;
-	sport->port.rs485.flags =
-		SER_RS485_RTS_ON_SEND | SER_RS485_RX_DURING_TX;
+	if (!sport->port.rs485.flags)
+		sport->port.rs485.flags =
+			SER_RS485_RTS_ON_SEND | SER_RS485_RX_DURING_TX;
 	sport->port.flags = UPF_BOOT_AUTOCONF;
 	init_timer(&sport->timer);
 	sport->timer.function = imx_timeout;
 	sport->timer.data     = (unsigned long)sport;
+
+	sport->gpios = mctrl_gpio_init(&sport->port, 0);
+	if (IS_ERR(sport->gpios))
+		return PTR_ERR(sport->gpios);
 
 	sport->clk_ipg = devm_clk_get(&pdev->dev, "ipg");
 	if (IS_ERR(sport->clk_ipg)) {

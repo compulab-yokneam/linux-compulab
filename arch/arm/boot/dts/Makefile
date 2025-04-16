@@ -387,6 +387,15 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-12x12-lpddr3-arm2-mqs.dtb \
 	imx7d-12x12-lpddr3-arm2-pcie.dtb \
 	imx7d-19x19-lpddr2-arm2.dtb \
+	imx7d-cl-som-imx7.dtb \
+	imx7d-cl-som-imx7-m4.dtb \
+	imx7d-sbc-imx7.dtb \
+	imx7d-sbc-imx7-csi.dtb \
+	imx7d-sbc-imx7-lvds.dtb \
+	imx7d-sbc-imx7-m4.dtb \
+	imx7d-sbc-iot-imx7.dtb \
+	imx7d-sbc-iot-imx7-can.dtb \
+	imx7d-sbc-iot-imx7-rs485-hdx.dtb \
 	imx7d-sdb.dtb \
 	imx7d-sdb-epdc.dtb \
 	imx7d-sdb-gpmi-weim.dtb \
@@ -400,7 +409,9 @@ dtb-$(CONFIG_SOC_IMX7D) += \
 	imx7d-sdb-reva-m4.dtb \
 	imx7d-sdb-reva-qspi.dtb \
 	imx7d-sdb-reva-touch.dtb \
-	imx7d-sdb-reva-wm8960.dtb
+	imx7d-sdb-reva-wm8960.dtb \
+	imx7d-ucm-imx7.dtb \
+	imx7d-sbc-ucm-imx7.dtb
 dtb-$(CONFIG_SOC_LS1021A) += \
 	ls1021a-qds.dtb \
 	ls1021a-twr.dtb

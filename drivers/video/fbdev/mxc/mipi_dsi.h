@@ -48,12 +48,22 @@ struct mipi_dsi_lcd_callback {
 	void (*get_mipi_lcd_videomode)(struct fb_videomode **, int *,
 			struct mipi_lcd_config **);
 	int  (*mipi_lcd_setup)(struct mipi_dsi_info *);
+	int  (*mipi_lcd_start)(struct mipi_dsi_info *);
+	int  (*mipi_lcd_stop)(struct mipi_dsi_info *);
 
+};
+
+struct mipi_dsi_host_timing {
+	u32 mipi_dsi_pllctrl_pms;
+	u32 mipi_dsi_phytiming;
+	u32 mipi_dsi_phytiming1;
+	u32 mipi_dsi_phytiming2;
 };
 
 struct mipi_dsi_match_lcd {
 	char *lcd_panel;
 	struct mipi_dsi_lcd_callback lcd_callback;
+	struct mipi_dsi_host_timing host_timing;
 };
 
 struct mipi_dsi_bus_mux {
@@ -85,6 +95,8 @@ struct mipi_dsi_info {
 	struct backlight_device		*bl;
 	/* callback for lcd panel operation */
 	struct mipi_dsi_lcd_callback	*lcd_callback;
+	/* mipi front end timings */
+	struct mipi_dsi_host_timing	*host_timing;
 
 	int (*mipi_dsi_pkt_read)(struct mipi_dsi_info *mipi,
 			u8 data_type, u32 *buf, int len);
@@ -110,7 +122,16 @@ void mipid_hx8363_get_lcd_videomode(struct fb_videomode **mode, int *size,
 int mipid_hx8363_lcd_setup(struct mipi_dsi_info *);
 #endif
 
-#ifndef CONFIG_FB_MXC_TRULY_WVGA_SYNC_PANEL
+#ifdef CONFIG_FB_MXC_SN65DSI8X
+void sn65dsi83_get_lcd_videomode(struct fb_videomode **mode, int *size,
+				 struct mipi_lcd_config **data);
+int sn65dsi83_lcd_setup(struct mipi_dsi_info *);
+int sn65dsi83_lcd_start(struct mipi_dsi_info *mipi_dsi);
+int sn65dsi83_lcd_stop(struct mipi_dsi_info *mipi_dsi);
+#endif
+
+#if !defined(CONFIG_FB_MXC_TRULY_WVGA_SYNC_PANEL) && \
+	!defined(CONFIG_FB_MXC_SN65DSI8X)
 #error "Please configure MIPI LCD panel, we cannot find one!"
 #endif
 

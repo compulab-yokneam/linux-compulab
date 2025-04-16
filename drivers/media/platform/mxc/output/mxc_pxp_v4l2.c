@@ -1288,6 +1288,7 @@ static int pxp_probe(struct platform_device *pdev)
 	memcpy(pxp->vdev, &pxp_template, sizeof(pxp_template));
 	pxp->vdev->v4l2_dev = v4l2_dev;
 	video_set_drvdata(pxp->vdev, pxp);
+	pxp->s0_fmt = &pxp_s0_formats[0];
 
 	err = video_register_device(pxp->vdev, VFL_TYPE_GRABBER, video_nr);
 	if (err) {

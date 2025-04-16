@@ -76,13 +76,17 @@ static int asoc_simple_card_hw_params(struct snd_pcm_substream *substream,
 	struct snd_soc_pcm_runtime *rtd = substream->private_data;
 	struct snd_soc_dai *codec_dai = rtd->codec_dai;
 	struct simple_card_data *priv = snd_soc_card_get_drvdata(rtd->card);
+	struct simple_dai_props *dai_props =
+		&priv->dai_props[rtd - rtd->card->rtd];
+	unsigned int sysclk_id = dai_props->codec_dai.sysclk_id;
+	unsigned int sysclk_dir = dai_props->codec_dai.sysclk_dir;
 	unsigned int mclk;
 	int ret = 0;
 
 	if (priv->mclk_fs) {
 		mclk = params_rate(params) * priv->mclk_fs;
-		ret = snd_soc_dai_set_sysclk(codec_dai, 0, mclk,
-					     SND_SOC_CLOCK_IN);
+		ret = snd_soc_dai_set_sysclk(codec_dai, sysclk_id, mclk,
+					     sysclk_dir);
 	}
 
 	return ret;
@@ -126,7 +130,8 @@ static int __asoc_simple_card_dai_init(struct snd_soc_dai *dai,
 	int ret;
 
 	if (set->sysclk) {
-		ret = snd_soc_dai_set_sysclk(dai, 0, set->sysclk, 0);
+		ret = snd_soc_dai_set_sysclk(dai, set->sysclk_id, set->sysclk,
+					     set->sysclk_dir);
 		if (ret && ret != -ENOTSUPP) {
 			dev_err(dai->dev, "simple-card: set_sysclk error\n");
 			goto err;
@@ -134,7 +139,9 @@ static int __asoc_simple_card_dai_init(struct snd_soc_dai *dai,
 	}
 
 	if (set->slots) {
-		ret = snd_soc_dai_set_tdm_slot(dai, 0, 0,
+		ret = snd_soc_dai_set_tdm_slot(dai,
+					       set->tx_slot_mask,
+					       set->rx_slot_mask,
 						set->slots,
 						set->slot_width);
 		if (ret && ret != -ENOTSUPP) {
@@ -203,6 +210,7 @@ asoc_simple_card_sub_parse_of(struct device_node *np,
 {
 	struct of_phandle_args args;
 	struct clk *clk;
+	const char *str;
 	u32 val;
 	int ret;
 
@@ -226,10 +234,31 @@ asoc_simple_card_sub_parse_of(struct device_node *np,
 		return ret;
 
 	/* Parse TDM slot */
-	ret = snd_soc_of_parse_tdm_slot(np, &dai->slots, &dai->slot_width);
+	ret = snd_soc_of_parse_tdm_slot(np, &dai->tx_slot_mask,
+					&dai->rx_slot_mask,
+					&dai->slots, &dai->slot_width);
 	if (ret)
 		return ret;
 
+	ret = of_property_read_string(np, "system-clock-direction", &str);
+	if (ret == 0) {
+		if (!strcmp(str, "out"))
+			dai->sysclk_dir = SND_SOC_CLOCK_OUT;
+		else if (!strcmp(str, "in"))
+			dai->sysclk_dir = SND_SOC_CLOCK_IN;
+		else
+			return -EINVAL;
+	}
+
+	ret = of_property_read_string(np, "system-clock-type", &str);
+	if (ret == 0) {
+		if (!strcmp(str, "xtal"))
+			dai->sysclk_id = 1;
+		else if (!strcmp(str, "mclk"))
+			dai->sysclk_id = 2;
+		else
+			return -EINVAL;
+	}
 	/*
 	 * Parse dai->sysclk come from "clocks = <&xxx>"
 	 * (if system has common clock)

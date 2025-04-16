@@ -1,0 +1,13 @@
+/*
+ * Support for CompuLab CL-SOM-iMX7 System-on-Module Cortex-M4
+ *
+ * Copyright (C) 2017 CompuLab Ltd. - http://www.compulab.co.il/
+ * Author: Nikita Kiryanov <nikita@compulab.co.il>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "imx7d-cl-som-imx7.dts"
+#include "imx7d-cl-som-imx7-m4.dtsi"

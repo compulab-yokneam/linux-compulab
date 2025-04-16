@@ -31,6 +31,12 @@
 #define ABX8XX_CTRL_WRITE	BIT(0)
 #define ABX8XX_CTRL_12_24	BIT(6)
 
+#define ABX8XX_REG_SQW		0x13
+#define ABX8XX_SQWE		BIT(7)
+#define ABX8XX_SQFS		(BIT(4) | BIT(3) | BIT(2) | \
+				BIT(1) | BIT(0))
+#define ABX8XX_SQFS_DEFAULT	(BIT(2) | BIT(1))
+
 #define ABX8XX_REG_CFG_KEY	0x1f
 #define ABX8XX_CFG_KEY_MISC	0x9d
 
@@ -49,17 +55,18 @@ enum abx80x_chip {AB0801, AB0803, AB0804, AB0805,
 struct abx80x_cap {
 	u16 pn;
 	bool has_tc;
+	bool has_sqw;
 };
 
 static struct abx80x_cap abx80x_caps[] = {
 	[AB0801] = {.pn = 0x0801},
 	[AB0803] = {.pn = 0x0803},
 	[AB0804] = {.pn = 0x0804, .has_tc = true},
-	[AB0805] = {.pn = 0x0805, .has_tc = true},
+	[AB0805] = {.pn = 0x0805, .has_tc = true, .has_sqw = true},
 	[AB1801] = {.pn = 0x1801},
 	[AB1803] = {.pn = 0x1803},
 	[AB1804] = {.pn = 0x1804, .has_tc = true},
-	[AB1805] = {.pn = 0x1805, .has_tc = true},
+	[AB1805] = {.pn = 0x1805, .has_tc = true, .has_sqw = true},
 	[ABX80X] = {.pn = 0}
 };
 
@@ -185,6 +192,54 @@ static int abx80x_dt_trickle_cfg(struct device_node *np)
 	return (trickle_cfg | i);
 }
 
+static char *sqw_freq_out[] =
+{
+	"1 century","32.768 kHz", "8.192 kHz",   "4.096 kHz",
+	"2.048 kHz", "1.024 kHz",  "512 Hz",     "256 Hz",
+	"128 Hz",    "64 Hz",      "32 Hz",      "16 Hz",
+	"8 Hz",      "4 Hz",       "2 Hz",       "1 Hz",
+	"1/2 Hz",    "1/4 Hz",     "1/8 Hz",     "1/16 Hz",
+	"1/32 Hz",   "1/60 Hz",    "16.384 kHz", "100 Hz",
+	"1 hour",    "1 day",      "TIRQ",       "NOT TIRQ",
+	"1 year",                  "1 Hz to Counters",
+	"1/32 Hz from Acal",       "1/8 Hz from Acal",
+};
+
+static int abx80x_dt_sqw_cfg(struct i2c_client *client)
+{
+	struct device_node *np = client->dev.of_node;
+	u8 ret, sqw_freq_sel, sqw;
+
+	sqw = i2c_smbus_read_byte_data(client, ABX8XX_REG_SQW);
+	if (sqw < 0) {
+		dev_err(&client->dev, "Unable to read SQW register\n");
+		return sqw;
+	}
+
+	ret = of_property_read_u8(np, "abracon,sqw-freq-sel", &sqw_freq_sel);
+	if (ret == 0)
+		sqw_freq_sel &= ABX8XX_SQFS;
+	else
+		sqw_freq_sel = ABX8XX_SQFS_DEFAULT;
+
+	dev_info(&client->dev, "Set the square wave output to \'%s\'\n",
+		 sqw_freq_out[sqw_freq_sel]);
+
+	sqw &= ~(ABX8XX_SQFS);
+	sqw |= sqw_freq_sel;
+
+	if (of_property_read_bool(np, "abracon,sqw-enable")) {
+		dev_info(&client->dev, "Enable the square wave output\n");
+		sqw |= ABX8XX_SQWE;
+	}
+	else {
+		dev_info(&client->dev, "Disable the square wave output\n");
+		sqw &= ~(ABX8XX_SQWE);
+	}
+
+	return i2c_smbus_write_byte_data(client, ABX8XX_REG_SQW, sqw);
+}
+
 static int abx80x_probe(struct i2c_client *client,
 			const struct i2c_device_id *id)
 {
@@ -259,6 +314,9 @@ static int abx80x_probe(struct i2c_client *client,
 			 trickle_cfg);
 		abx80x_enable_trickle_charger(client, trickle_cfg);
 	}
+
+	if (np && abx80x_caps[part].has_sqw)
+		abx80x_dt_sqw_cfg(client);
 
 	rtc = devm_rtc_device_register(&client->dev, abx80x_driver.driver.name,
 				       &abx80x_rtc_ops, THIS_MODULE);

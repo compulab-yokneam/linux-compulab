@@ -38,6 +38,7 @@
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
+#include <linux/of_gpio.h>
 
 #define MAX_ST_DEVICES	3	/* Imagine 1 on each UART for now */
 static struct platform_device *st_kim_devices[MAX_ST_DEVICES];
@@ -482,9 +483,15 @@ long st_kim_start(void *kim_data)
 			pdata->chip_enable(kim_gdata);
 
 		/* Configure BT nShutdown to HIGH state */
-		gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
+		if (gpio_cansleep(kim_gdata->nshutdown))
+			gpio_set_value_cansleep(kim_gdata->nshutdown, GPIO_LOW);
+		else
+			gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
 		mdelay(5);	/* FIXME: a proper toggle */
-		gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
+		if (gpio_cansleep(kim_gdata->nshutdown))
+			gpio_set_value_cansleep(kim_gdata->nshutdown, GPIO_HIGH);
+		else
+			gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
 		mdelay(100);
 		/* re-initialize the completion */
 		reinit_completion(&kim_gdata->ldisc_installed);
@@ -566,11 +573,20 @@ long st_kim_stop(void *kim_data)
 	}
 
 	/* By default configure BT nShutdown to LOW state */
-	gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
+	if (gpio_cansleep(kim_gdata->nshutdown))
+		gpio_set_value_cansleep(kim_gdata->nshutdown, GPIO_LOW);
+	else
+		gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
 	mdelay(1);
-	gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
+	if (gpio_cansleep(kim_gdata->nshutdown))
+		gpio_set_value_cansleep(kim_gdata->nshutdown, GPIO_HIGH);
+	else
+		gpio_set_value(kim_gdata->nshutdown, GPIO_HIGH);
 	mdelay(1);
-	gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
+	if (gpio_cansleep(kim_gdata->nshutdown))
+		gpio_set_value_cansleep(kim_gdata->nshutdown, GPIO_LOW);
+	else
+		gpio_set_value(kim_gdata->nshutdown, GPIO_LOW);
 
 	/* platform specific disable */
 	if (pdata->chip_disable)
@@ -621,8 +637,8 @@ static ssize_t store_baud_rate(struct device *dev,
 {
 	struct kim_data_s *kim_data = dev_get_drvdata(dev);
 	pr_debug("storing baud rate >%s<", buf);
-	sscanf(buf, "%ld", &kim_data->baud_rate);
-	pr_debug("stored baud rate >%ld<", kim_data->baud_rate);
+	sscanf(buf, "%ud", &kim_data->baud_rate);
+	pr_debug("stored baud rate >%ud<", kim_data->baud_rate);
 	return count;
 }
 #endif	/* if DEBUG */
@@ -759,8 +775,7 @@ static struct ti_st_plat_data *get_platform_data(struct device *dev)
 	dt_property = of_get_property(np, "dev_name", &len);
 	if (dt_property)
 		memcpy(&dt_pdata->dev_name, dt_property, len);
-	of_property_read_u32(np, "nshutdown_gpio",
-			     &dt_pdata->nshutdown_gpio);
+	dt_pdata->nshutdown_gpio = of_get_named_gpio(np, "nshutdown_gpio", 0);
 	of_property_read_u32(np, "flow_cntrl", &dt_pdata->flow_cntrl);
 	of_property_read_u32(np, "baud_rate", &dt_pdata->baud_rate);
 

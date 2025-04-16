@@ -1,0 +1,107 @@
+/*
+ * Copyright (C) 2017 CompuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License version 2 as
+ * published by the Free Software Foundation.
+ */
+
+#include "imx7d-sbc-imx7.dts"
+
+/ {
+	pxp_v4l2_out {
+		compatible = "fsl,imx7d-pxp-v4l2", "fsl,imx6sx-pxp-v4l2", "fsl,imx6sl-pxp-v4l2";
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	sbc-imx7-csi {
+		pinctrl_i2c1: i2c1grp {
+			fsl,pins = <
+				MX7D_PAD_I2C1_SCL__I2C1_SCL 		0x4000002f /* P4-2 P1-63 */
+				MX7D_PAD_I2C1_SDA__I2C1_SDA 		0x4000002f /* P4-4 P1-65 */
+			>;
+		};
+
+		pinctrl_mipi_csi: mipicsigrp-1 {
+			fsl,pins = <
+				/* MIPI CSI PinMux */
+				MX7D_PAD_I2C4_SDA__CSI_MCLK		0x19
+				MX7D_PAD_I2C2_SDA__GPIO4_IO11		0x59 /* WPM */
+				MX7D_PAD_EPDC_PWR_COM__GPIO2_IO30	0x59 /* RST */
+			>;
+		};
+	};
+};
+
+/* Avoid a conflict with I2C1 bus */
+&flexcan1 {
+	status = "disable";
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "okay";
+
+	ov564x_mipi: ov564x_mipi@3c {
+		compatible = "ovti,ov5640_mipi";
+		reg = <0x3c>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipi_csi>;
+
+		clocks = <&clks IMX7D_CSI_MCLK_ROOT_CLK>;
+		clock-names = "csi_mclk";
+
+		pwn-gpios = <&gpio4 11 1>;
+		rst-gpios = <&gpio2 30 0>;
+
+		csi_id = <0>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		port {
+			ov564x_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_sensor_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi {
+	clock-frequency = <240000000>;
+	status = "okay";
+	port {
+		mipi_sensor_ep: endpoint1 {
+			remote-endpoint = <&ov564x_mipi_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <13>;
+			csis-clk-settle = <2>;
+			/* csis-wclk; */
+		};
+
+		csi_mipi_ep: endpoint2 {
+			remote-endpoint = <&csi_ep>;
+		};
+	};
+};
+
+&csi1 {
+	csi-mux-mipi = <&gpr 0x14 4>;
+	status = "okay";
+
+	port {
+		csi_ep: endpoint {
+			remote-endpoint = <&csi_mipi_ep>;
+		};
+	};
+};
+
+&sdma {
+	status = "okay";
+};
+
+&epxp {
+	status = "okay";
+};
