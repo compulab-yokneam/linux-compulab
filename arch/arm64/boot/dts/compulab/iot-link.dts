@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+// Copyright 2025 Compulab
+
+/dts-v1/;
+
+#include "mcm-imx93.dtsi"
+#include "iot-link.dtsi"
+
+/ {
+	model = "CompuLab IOT-LINK board";
+	compatible = "fsl,imx93";
+};
