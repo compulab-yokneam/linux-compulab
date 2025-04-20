@@ -10,6 +10,7 @@
 			MX93_PAD_GPIO_IO15__LPUART3_RX	0x31e
 		>;
 	};
+
 	pinctrl_uart5: uart5grp {
 		fsl,pins = <
 			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
@@ -19,6 +20,7 @@
 		>;
 	};
 };
+
 &lpuart3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_uart3>;
