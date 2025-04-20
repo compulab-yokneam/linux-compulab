@@ -1,3 +1,5 @@
+#include "overlay.h"
+
 &irqsteer_hdmi {
 	status = "okay";
 };

@@ -1,3 +1,5 @@
+#include "overlay.h"
+
 &pwm1 {
 	status = "okay";
 };
