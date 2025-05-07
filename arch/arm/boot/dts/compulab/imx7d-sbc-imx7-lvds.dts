@@ -45,6 +45,11 @@
 		reg = <0x2c>;
 		enable-gpios = <&pca9555 2 GPIO_ACTIVE_HIGH>;
 		status = "okay";
+		port {
+			bridge_out: endpoint{
+				remote-endpoint = <&lvds_in>;
+			};
+		};
 		lvds_panel {
 			lvds-bpp = <24>;
 			lvds-format = <1>;
@@ -68,6 +73,11 @@
 
 				de-active = <0>;
 				pixelclk-active = <0>;
+			};
+			port {
+				lvds_in: endpoint{
+					remote-endpoint = <&bridge_out>;
+				};
 			};
 		};
 	};
