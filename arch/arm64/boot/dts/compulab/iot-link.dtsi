@@ -101,6 +101,12 @@
 	status = "okay";
 };
 
+&usdhc3_pwrseq {
+	pinctrl-names = "default";
+	pinctrl-0 = <&wifi_pdn>;
+	reset-gpios = <&gpio2 20 GPIO_ACTIVE_LOW>; // iw611 pdn
+};
+
 &gpio2 {
     gpio_hog_example: hog_gpio19 {
         gpio-hog;
@@ -117,6 +123,12 @@
     pinctrl_hog: hoggrp {
         fsl,pins = <
             MX93_PAD_GPIO_IO19__GPIO2_IO19  0x31e
+        >;
+    };
+
+	wifi_pdn: wifi_pdn {
+        fsl,pins = <
+			MX93_PAD_GPIO_IO20__GPIO2_IO20  0x31e
         >;
     };
 
