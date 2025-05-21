@@ -34,6 +34,18 @@
 			gpios = <&gpio1 12 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "heartbeat";
 		};
+
+		yellow-led {
+			label = "yellow-led";
+			gpios = <&gpio3 19 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
+
+		green-led {
+			label = "green-led";
+			gpios = <&gpio3 25 GPIO_ACTIVE_HIGH>;
+			default-state = "off";
+		};
 	};
 
 	soc@0 {
@@ -377,6 +389,8 @@
 		pinctrl_gpio_led: gpioledgrp {
 			fsl,pins = <
 				MX8MM_IOMUXC_GPIO1_IO12_GPIO1_IO12	0x19
+				MX8MM_IOMUXC_SAI5_MCLK_GPIO3_IO25	0x19
+				MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19	0x19
 			>;
 		};
 
