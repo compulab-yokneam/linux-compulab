@@ -108,7 +108,10 @@
 };
 
 &gpio2 {
-    gpio_hog_example: hog_gpio19 {
+	gpio-line-names = "", "", "", "", "dio2_out", "dio3_out", "", "",
+		"", "", "", "", "dio4_out", "", "", "",
+		"dio2_in", "dio3_in", "", "", "", "dio4_in";
+    tpm_rst {
         gpio-hog;
         gpios = <19 GPIO_ACTIVE_HIGH>;
         output-high;
