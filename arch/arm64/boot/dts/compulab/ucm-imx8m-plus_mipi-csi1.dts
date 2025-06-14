@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2021 CompuLab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx8m-plus.dts"
+#include "ucm-imx8m-plus_mipi-csi1.dtsi"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus with ar_1335_af mipi csi1 enabled";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

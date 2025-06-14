@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus-mipi.dtsi"
+
+&{/} {
+	model = "CompuLab UCM-iMX8M-Plus (mipi)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

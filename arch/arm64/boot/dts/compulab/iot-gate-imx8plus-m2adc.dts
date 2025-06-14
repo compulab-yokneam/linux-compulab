@@ -1,0 +1,45 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 CompuLab Ltd
+ */
+
+#include "iot-gate-imx8plus-m2tpm.dts"
+
+/* IOT-GATE-IMX8PLUS with ADS1015 A2DC + SLB9670 TPM extension module in M.2 Expansion Connector */
+
+&i2c5 {
+	ads1015: adc@48 {
+		compatible = "ti,ads1015";
+		reg = <0x48>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		/* Voltage over AIN0 and GND */
+		channel@4 {
+			reg = <4>;
+			ti,datarate = <4>;
+			ti,gain = <2>;
+		};
+
+		/* Voltage over AIN1 and GND */
+		channel@5 {
+			reg = <5>;
+			ti,datarate = <4>;
+			ti,gain = <2>;
+		};
+
+		/*Voltage over AIN2 and GND */
+		channel@6 {
+			reg = <6>;
+			ti,datarate = <4>;
+			ti,gain = <2>;
+		};
+
+		/* Voltage over AIN3 and GND */
+		channel@7 {
+			reg = <7>;
+			ti,datarate = <4>;
+			ti,gain = <2>;
+		};
+	};
+};

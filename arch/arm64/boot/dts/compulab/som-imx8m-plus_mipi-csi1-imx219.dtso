@@ -1,0 +1,69 @@
+#include "overlay.h"
+
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	sensor_mipi1: sensor_mipi1 {
+		compatible = "sony,imx219";
+		reg = <0x10>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		csi_id = <0>;
+		rst-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		camera_mipi_lanes = <2>;
+		status = "okay";
+
+		port {
+			mipi1_ep: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				clock-noncontinuous;
+				link-frequencies = /bits/ 64 <500000000>;
+				remote-endpoint = <&mipi1_sensor_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	status = "okay";
+	port@0 {
+		mipi1_sensor_ep: endpoint {
+			remote-endpoint = <&mipi1_ep>;
+			data-lanes = <2>;
+			csis-hs-settle = <23>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "disabled";
+
+};
+
+&isi_1 {
+	status = "disabled";
+
+};
+
+&isp_0 {
+	status = "okay";
+};
+
+&dewarp {
+	status = "okay";
+};

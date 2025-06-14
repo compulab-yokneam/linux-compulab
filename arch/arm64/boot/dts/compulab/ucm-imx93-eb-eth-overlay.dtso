@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2022 NXP
+ */
+
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "ucm-imx93-eb-eth.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 board, eb-eth-overlay";
+};

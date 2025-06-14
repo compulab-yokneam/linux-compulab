@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-can.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (can)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

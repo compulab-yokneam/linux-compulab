@@ -1,0 +1,13 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2025 NXP
+ */
+
+/dts-v1/;
+
+#include "ucm-imx91.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX91 board";
+	compatible = "compulab,ucm-imx91", "fsl,imx91";
+};

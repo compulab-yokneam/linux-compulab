@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus-hdmi.dtsi"
+
+&{/} {
+	model = "CompuLab UCM-iMX8M-Plus (hdmi)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

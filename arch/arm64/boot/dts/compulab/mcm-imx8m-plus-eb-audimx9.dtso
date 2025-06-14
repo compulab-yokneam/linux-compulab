@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "mcm-imx8m-plus-eb-audimx9.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (eb-audimx9)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

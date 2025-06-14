@@ -1,0 +1,18 @@
+#include "overlay.h"
+#include "som-imx8m-plus_mipi-csi2.dtsi"
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_1 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};

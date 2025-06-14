@@ -1,0 +1,103 @@
+&{/} {
+	dsi_backlight: dsi_backlight {
+		compatible = "pwm-backlight";
+		pwms = <&pwm1 0 3000000 0>;
+		brightness-levels = <0 255>;
+		num-interpolated-steps = <255>;
+		default-brightness-level = <255>;
+		status = "okay";
+	};
+};
+
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	goodix_ts@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		interrupt-parent = <&gpio3>;
+		interrupts = <22 IRQ_TYPE_LEVEL_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&touchscreen_pins>;
+
+		irq-gpios = <&gpio3 22 GPIO_ACTIVE_HIGH>;
+		reset-gpios = <&pca9555 5 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	pinctrl_pwm1: pwm1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__PWM1_OUT	0x116
+		>;
+	};
+
+	touchscreen_pins: tsgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXD1__GPIO3_IO22	0x00
+		>;
+	};
+};
+
+&pwm1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pwm1>;
+	status = "okay";
+};
+
+&mipi_dsi {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	mipi_panel: panel@0 {
+		compatible = "startek,kd050hdfia020";
+		reg = <0>;
+		reset-gpios = <&pca9555 4 GPIO_ACTIVE_LOW>;
+		dsi-lanes = <4>;
+		backlight = <&dsi_backlight>;
+		status = "okay";
+	};
+};
+
+&lcdif1 {
+	status = "okay";
+};
+
+#define MIPI_DSI_BACKLIGHT_GPIO
+#ifdef MIPI_DSI_BACKLIGHT_GPIO
+&dsi_backlight {
+	status = "disabled";
+};
+
+&pwm1 {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	/delete-property/ backlight;
+};
+
+&iomuxc {
+	pinctrl_mipibl: pwm1mpipbl {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05  0x41
+		>;
+	};
+};
+
+&gpio5 {
+	regulator-mipi-gpio-blcklight {
+		gpio-hog;
+		gpios = <5 GPIO_ACTIVE_HIGH>;
+		line-name = "mipi-gpio-backlight";
+		output-high;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_mipibl>;
+	};
+};
+#endif

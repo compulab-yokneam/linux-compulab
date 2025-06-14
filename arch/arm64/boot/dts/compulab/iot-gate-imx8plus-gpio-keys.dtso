@@ -1,0 +1,26 @@
+/dts-v1/;
+/plugin/;
+
+/*
+ !!! WARNING !!!
+ If a GPIO pin turned into a gpio-keys, it is not longer available as a regular gpio pin.
+ Neither gpiolib nor sysfs work with this pin.
+ 
+ HowTo:
+ grab event)
+ evtest --grab /dev/input/by-path/platform-gpio-keys-event
+ wtach for interrupts count)
+ watch -n 0.5 "cat /proc/interrupts  | awk '/DIO_IN/'"	
+
+*/
+
+&{/} {
+	gpio-keys {
+		compatible = "gpio-keys";
+		switch-1 {
+			label = "DIO_IN";
+			linux,code = <0x100>;
+			gpios = <&gpio4 29 0>;
+		};
+	};
+};

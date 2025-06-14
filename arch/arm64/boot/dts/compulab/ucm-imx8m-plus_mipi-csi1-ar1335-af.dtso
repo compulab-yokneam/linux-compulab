@@ -1,0 +1,11 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus_mipi-csi1.dtsi"
+
+&{/} {
+	model = "CompuLab UCM-iMX8M-Plus with ar_1335_af mipi csi1 enabled";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};
+
+&sensor_mipi1 {
+	compatible = "econ,ar1335_af", "ar1335_af";
+};

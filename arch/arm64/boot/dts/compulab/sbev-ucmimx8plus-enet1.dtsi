@@ -1,0 +1,60 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&fec {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_fec>;
+	phy-mode = "rgmii-rxid";
+	phy-handle = <&ethphy1>;
+	fsl,magic-packet;
+	status = "okay";
+
+	mdio {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		ethphy1: ethernet-phy@4 {
+			compatible = "ethernet-phy-ieee802.3-c22";
+			reg = <4>;
+			reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
+			eee-broken-1000t;
+			realtek,aldps-enable;
+			realtek,clkout-disable;
+			interrupt-parent = <&gpio4>;
+			interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_fec: fecgrp {
+		fsl,pins = <
+			/* mdio */
+			MX8MP_IOMUXC_SD1_CLK__ENET1_MDC			0x2
+			MX8MP_IOMUXC_SD1_CMD__ENET1_MDIO		0x2
+			/* */
+			MX8MP_IOMUXC_SD1_DATA1__ENET1_RGMII_TD0		0x16
+			MX8MP_IOMUXC_SD1_DATA0__ENET1_RGMII_TD1		0x16
+			MX8MP_IOMUXC_SAI1_TXD2__ENET1_RGMII_TD2		0x16
+			MX8MP_IOMUXC_SAI1_TXD3__ENET1_RGMII_TD3		0x16
+			/* */
+			MX8MP_IOMUXC_SAI1_TXD4__ENET1_RGMII_TX_CTL	0x16
+			MX8MP_IOMUXC_SAI1_TXD5__ENET1_RGMII_TXC		0x16
+
+			MX8MP_IOMUXC_SD1_DATA2__ENET1_RGMII_RD0		0x90
+			MX8MP_IOMUXC_SD1_DATA3__ENET1_RGMII_RD1		0x90
+			MX8MP_IOMUXC_SAI1_RXD6__ENET1_RGMII_RD2		0x90
+			/* PHYADDR */
+			MX8MP_IOMUXC_SAI1_RXD7__ENET1_RGMII_RD3		0x90
+			MX8MP_IOMUXC_SAI1_TXC__ENET1_RGMII_RXC		0x90
+			MX8MP_IOMUXC_SAI1_TXFS__ENET1_RGMII_RX_CTL	0x90
+			/* gpio */
+			MX8MP_IOMUXC_SAI2_RXFS__GPIO4_IO21		0x10 /* INT */
+			MX8MP_IOMUXC_SAI2_TXFS__GPIO4_IO24		0x10 /* RST */
+		>;
+	};
+};

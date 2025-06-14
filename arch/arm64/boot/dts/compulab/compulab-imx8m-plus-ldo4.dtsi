@@ -1,0 +1,7 @@
+/* This is a way of disabling regulator
+ delete-node does not work in overlays
+*/
+
+&ldo4 {
+	regulator-max-microvolt = <1800000>;
+};

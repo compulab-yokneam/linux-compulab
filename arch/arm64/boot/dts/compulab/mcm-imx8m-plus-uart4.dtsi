@@ -1,0 +1,16 @@
+&uart4 { /* P17 RS232 (UART4) */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4>;
+	assigned-clocks = <&clk IMX8MP_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_uart4: uart4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART4_RXD__UART4_DCE_RX	0x49
+			MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x49
+		>;
+	};
+};

@@ -1,0 +1,75 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+// Copyright 2023 CompuLab
+
+&lpi2c8 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c8>;
+	pinctrl-1 = <&pinctrl_lpi2c8>;
+	status = "okay";
+
+	sensor_mipi2: mipi2@42 {
+		compatible = "aptina,ar1335_mcu";
+		reg = <0x42>;
+		clocks = <&clk IMX93_CLK_MIPI_PHY_CFG>;
+		clock-names = "xclk";
+		/*
+		pwdn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		pwn-gpios = <&pca9555 8 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 9 GPIO_ACTIVE_LOW>;
+		*/
+		mclk = <24000000>;
+		mclk_source = <0>;
+		mipi_csi;
+		camera_mipi_lanes = <2>;
+		status = "okay";
+
+		port {
+			ar1335_mipi_ep: endpoint {
+				remote-endpoint = <&mipi_csi_ep>;
+				data-lanes = <1 2>;
+				clock-lanes = <0>;
+			};
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_lpi2c8: pinctrl_lpi2c8{
+		fsl,pins = <
+			MX93_PAD_GPIO_IO10__LPI2C8_SDA			0x40000b9e
+			MX93_PAD_GPIO_IO11__LPI2C8_SCL			0x40000b9e
+		>;
+	};
+};
+
+&mipi_csi {
+        #address-cells = <1>;
+        #size-cells = <0>;
+        status = "okay";
+
+        port@0 {
+                reg = <0>;
+                mipi_csi_ep: endpoint {
+                        remote-endpoint = <&ar1335_mipi_ep>;
+                        data-lanes = <2>;
+                        cfg-clk-range = <28>;
+                        hs-clk-range = <0x2b>;
+                        bus-type = <4>;
+                };
+        };
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+};

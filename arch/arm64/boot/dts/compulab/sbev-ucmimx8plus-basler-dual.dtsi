@@ -1,0 +1,2 @@
+#include "sbev-ucmimx8plus-csi1.dtsi"
+#include "sbev-ucmimx8plus-csi2.dtsi"
