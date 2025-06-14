@@ -1,0 +1,8 @@
+/* Use this file in order to override the default xt-freq value */
+
+/dts-v1/;
+/plugin/;
+
+&ab1805_rtc {
+    xt-frequency = <32770750>;
+};
