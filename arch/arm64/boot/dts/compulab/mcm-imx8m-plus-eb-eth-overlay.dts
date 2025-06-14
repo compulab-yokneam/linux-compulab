@@ -1,0 +1,5 @@
+/dts-v1/;
+/plugin/;
+
+#include <dt-bindings/gpio/gpio.h>
+#include "mcm-imx8m-plus-eb-eth.dtsi"

@@ -1,0 +1,26 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include "mcm-imx93.dtsi"
+#include "mcm-imx93-lvds.dtsi"
+#include "sbc-mcm-imx93-leds.dtsi"
+#include "sbc-mcm-imx93-uart.dtsi"
+#include "sbc-mcm-imx93-i2c.dtsi"
+#include "sbc-mcm-imx93-ethernet.dtsi"
+#include "sbc-mcm-imx93-can.dtsi"
+#include "sbc-mcm-imx93-audio.dtsi"
+#include "sbc-mcm-imx93-lpspi.dtsi"
+
+/ {
+	model = "CompuLab MCM-i.MX93 board, build-in-lvds";
+	compatible = "compulab,mcm-imx93", "fsl,imx93";
+};
+
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};

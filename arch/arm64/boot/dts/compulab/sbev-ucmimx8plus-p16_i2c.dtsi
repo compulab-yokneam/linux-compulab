@@ -1,0 +1,27 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab LTD.
+ */
+
+&iomuxc {
+	pinctrl_i2c5_p17: i2c5_p17grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_MCLK__I2C5_SDA				0x400001c3
+			MX8MP_IOMUXC_SAI5_RXD0__I2C5_SCL				0x400001c3
+		>;
+	};
+};
+
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c5_p17>;
+	status = "okay";
+	w1_ds2482: ds2482@18 {
+		compatible = "ds2482";
+		reg = <0x18>;
+		status = "okay";
+	};
+};

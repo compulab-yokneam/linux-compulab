@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus-pcie.dtsi"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus (pice)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

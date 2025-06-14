@@ -1,0 +1,14 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 CompuLab Ltd
+ */
+
+#include "ucm-imx8m-plus.dtsi"
+#include "ucm-imx8m-plus-can.dtsi"
+#include "ucm-imx8m-plus-pcie.dtsi"
+#include "sb-iotdimx8p.dtsi"
+
+/ {
+	model = "CompuLab IOTDIN-IMX8P";
+	compatible = "compulab,iotdin-imx8p", "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+};

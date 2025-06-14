@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "compulab-imx8m-plus-spidev.dtsi"
+
+/ {
+	model = "CompuLab MCM-iMX8M-Plus (spidev)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

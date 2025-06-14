@@ -1,0 +1,13 @@
+&basler_1 {
+    compatible = "basler,basler-camera", "basler-camera";
+};
+
+&isi_1 {
+	status = "okay";
+	dma-coherent;
+	bsl,dma-invalidate;
+	fsl,chain_buf;
+	cap_device {
+		status = "okay";
+	};
+};
