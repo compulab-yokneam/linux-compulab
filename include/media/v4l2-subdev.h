@@ -219,6 +219,14 @@ struct v4l2_subdev_core_ops {
 			       struct v4l2_event_subscription *sub);
 	int (*unsubscribe_event)(struct v4l2_subdev *sd, struct v4l2_fh *fh,
 				 struct v4l2_event_subscription *sub);
+
+	int (*queryctrl)(struct v4l2_subdev *sd, struct v4l2_queryctrl *qc);
+	int (*g_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
+	int (*s_ctrl)(struct v4l2_subdev *sd, struct v4l2_control *ctrl);
+	int (*querymenu)(struct v4l2_subdev *sd, struct v4l2_querymenu *qm);
+	int (*g_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+	int (*s_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
+	int (*try_ext_ctrls)(struct v4l2_subdev *sd, struct v4l2_ext_controls *ctrls);
 };
 
 /**
