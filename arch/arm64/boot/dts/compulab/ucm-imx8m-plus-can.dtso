@@ -1,0 +1,10 @@
+#include "overlay.h"
+#include "ucm-imx8m-plus-can.dtsi"
+
+&flexcan1 {
+	status ="okay";
+};
+
+&flexcan2 {
+	status ="okay";
+};

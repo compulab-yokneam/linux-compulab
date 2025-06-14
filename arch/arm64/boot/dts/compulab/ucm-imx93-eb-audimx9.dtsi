@@ -1,0 +1,7 @@
+&sai1 {
+	status = "okay";
+};
+
+&codec {
+	status = "okay";
+};

@@ -1,0 +1,53 @@
+&uart4 { /* bluetooth */
+	bluetooth_iw612: bluetooth {
+		compatible = "nxp,88w8987-bt";
+		//fw-init-baudrate = <3000000>; //Optional. Default is considered 115200 if this parameter not defined.
+		max-speed = <3000000>;
+		status = "okay";
+	};
+};
+
+&usdhc1_pwrseq {
+	reset-gpios =	<&gpio2 10 GPIO_ACTIVE_LOW>, // WIFI res
+			<&gpio2 6 GPIO_ACTIVE_HIGH>, // BT res
+			<&gpio1 14 GPIO_ACTIVE_LOW>; // PD
+};
+
+&usdhc1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>, <&pinctrl_usdhc1_gpio>;
+	bus-width = <4>;
+	non-removable;
+	wifi-host;
+	pm-ignore-notify;
+	cap-power-off-card;
+	status = "okay";
+	no-1-8-v;
+	mmc-pwrseq = <&usdhc1_pwrseq>;
+	keep-power-in-suspend;
+	wakeup-source;
+	fsl,sdio-async-interrupt-enable;
+	wifi_iw612: wifi_wake_host {
+		compatible = "nxp,wifi-wake-host";
+		interrupt-parent = <&gpio2>;
+		interrupts = <9 IRQ_TYPE_LEVEL_LOW>;
+		interrupt-names = "host-wake";
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	ifi-iw612 {
+		pinctrl_usdhc1_gpio: usdhc1grpgpio {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x06
+				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6	0x06
+				MX8MM_IOMUXC_GPIO1_IO14_GPIO1_IO14	0x06
+			>;
+		};
+	};
+};
