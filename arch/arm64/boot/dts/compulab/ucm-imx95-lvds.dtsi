@@ -1,8 +1,25 @@
 &{/} {
 	lvds_panel: panel  {
-		compatible = "boe,hv070wsa-100";
+		compatible = "panel-lvds";
 		backlight = <&lvds_backlight>;
 		enable-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		data-mapping = "vesa-24";
+		width-mm = <154>;
+		height-mm = <90>;
+		status = "okay";
+
+		panel-timing {
+			clock-frequency = <42105000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hback-porch = <30>;
+			hfront-porch = <30>;
+			vback-porch = <10>;
+			vfront-porch = <10>;
+			hsync-len = <30>;
+			vsync-len = <10>;
+			de-active = <1>;
+		};
 
 		port {
 			panel_in: endpoint {
@@ -17,10 +34,6 @@
 		brightness-levels = <255 203 158 119 88 63 45 0>;
 		default-brightness-level = <6>;
 	};
-};
-
-&lvds_panel {
-	status = "okay";
 };
 
 &lvds_backlight {
