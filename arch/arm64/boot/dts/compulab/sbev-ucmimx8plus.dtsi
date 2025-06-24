@@ -13,6 +13,13 @@
 		enable-active-high;
 		regulator-always-on;
 	};
+
+	csi_mclk_helper {
+		compatible = "virtual,csi-mclk-helper";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_csi_mclk>;
+		status = "okay";
+	};
 };
 
 &i2c3 {
