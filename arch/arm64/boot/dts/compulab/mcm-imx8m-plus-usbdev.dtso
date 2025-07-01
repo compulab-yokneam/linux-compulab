@@ -1,2 +1,2 @@
 #include "overlay.h"
-#include "mcm-imx8m-plus-usbdev.dtsi"
+#include "ucm-imx8m-plus-usbdev.dtsi"
