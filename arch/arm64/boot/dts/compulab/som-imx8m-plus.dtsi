@@ -231,6 +231,10 @@
 	};
 };
 
+&gpu_reserved {
+	reg = <0x0 0x58000000 0 0x10000000>;
+};
+
 &A53_0 {
 	cpu-supply = <&buck2>;
 };
@@ -882,7 +886,7 @@
 	linux,cma {
 		compatible = "shared-dma-pool";
 		reusable;
-		size = <0 0x2c000000>;
+		size = <0 0x1c000000>;
 		alloc-ranges = <0 0x40000000 0 0x80000000>;
 		linux,cma-default;
 	};
