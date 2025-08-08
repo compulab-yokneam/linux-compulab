@@ -17,6 +17,42 @@
 		brightness-levels = <255 203 158 119 88 63 45 0>;
 		default-brightness-level = <6>;
 	};
+
+	/* touch screen reset helper */
+	ts_reset: regulator-tsreset {
+		compatible = "regulator-fixed";
+		regulator-name = "tosuch-reset";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+&lpi2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	goodix_ts@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+
+		interrupt-parent = <&gpio2>;
+		interrupts = <19 IRQ_TYPE_LEVEL_HIGH>;
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+
+		irq-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+/* To be investigated; the drived does not take the device
+ * out of reset if reset-gpios is defined inside the device node
+ * as of now the ts_reset regulator allows working with the device
+ */
+		/* reset-gpios = <&pca9555 4 0>; */
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
+		status = "okay";
+	};
 };
 
 &lvds_panel {
@@ -96,6 +132,12 @@
 	pinctrl_tpm4: tpm4grp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO13__TPM4_CH2	0x51e
+		>;
+	};
+
+	pinctrl_ts: ts1grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO19__GPIO2_IO_BIT19 0x3fe
 		>;
 	};
 };
