@@ -221,6 +221,9 @@
 			  &mu7 3 1>;
 		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
 				<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+		/* cpuid and lmmid must align with SM firmware */
+		fsl,cpu-id = <1>;
+		fsl,lmm-id = <1>;
 		fsl,startup-delay-ms = <50>;
 		status = "okay";
 	};
@@ -274,14 +277,6 @@
 &dpu {
 	status = "okay";
 };
-
-#if 0
-&tpm3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_tpm3>;
-	status = "okay";
-};
-#endif
 
 &tpm6 {
 	pinctrl-names = "default";
