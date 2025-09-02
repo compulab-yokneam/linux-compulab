@@ -23,7 +23,7 @@
 #define BRD_SM_CTRL_BUTTON		0x8004	/*!< PCAL6408A-7 */
 
 / {
-	model = "NXP i.MX95 19X19 board";
+	model = "CompuLab i.MX95 19x19 SOM";
 	compatible = "compulab,ucm-imx95", "fsl,imx95";
 
 	aliases {

@@ -1,0 +1,3 @@
+&{/} {
+	model = "CompuLab i.MX95 19x19 SOM on EVK";
+};
