@@ -1,4 +1,6 @@
 &{/} {
+	model = "CompuLab i.MX95 19x19 SOM (rpmsg)";
+
 	reserved-memory {
 		#address-cells = <2>;
 		#size-cells = <2>;
