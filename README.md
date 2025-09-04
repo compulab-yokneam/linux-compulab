@@ -1,50 +1,34 @@
-# Kernel Build Manual
-
+# Building Linux Kernel
 ## Prerequisites
 It is up to developers to prepare the host machine; it requires:
-
 * [Setup Cross Compiler](https://github.com/compulab-yokneam/meta-bsp-imx8mp/blob/kirkstone/Documentation/toolchain.md#linaro-toolchain-how-to)
 
 ## CompuLab Linux Kernel setup
-
 * WorkDir:
 ```
 mkdir -p compulab-kernel/build && cd compulab-kernel
 ```
+* Set a machine:
 
-* Set a CompuLab machine:
-
-| Machine | Command Line |
+| Machine | Command line |
 |---|---|
-|ucm-imx8m-plus|```export MACHINE=compulab_v8```
-|som-imx8m-plus|```export MACHINE=compulab_v8```
-|iot-gate-imx8plus|```export MACHINE=compulab_v8```
-|iotdin-imx8p|```export MACHINE=compulab_v8```
-|ucm-imx93|```export MACHINE=ucm-imx93```
-|mcm-imx93|```export MACHINE=mcm-imx93```
-|ucm-imx93|```export MACHINE=ucm-imx95```
-
+|iot-link|export MACHINE=iot-link|
 * Clone the source code:
 ```
-git clone -b linux-compulab_v6.6.52 https://github.com/compulab-yokneam/linux-compulab.git
+git clone -b linux-compulab_v6.6.52-rt https://github.com/compulab-yokneam/linux-compulab.git
 cd linux-compulab
 ```
-
 ## Compile the Kernel
-
-* Apply the default CompuLab config:
+* Apply the CompuLab config:
 ```
-make ${MACHINE}_defconfig compulab.config
+make compulab-mx93_defconfig 
 ```
-
-* Ussue menuconfig on order to change the default CompuLab configuration:
+* To change the default CompuLab configuration run:
 ```
 make menuconfig
 ```
-
 * Build the kernel
 ```
-nice make -j`nproc`
+nice make -j`nproc` O=build/
 ```
-
 * [Deploy the CompuLab Linux Kernel to CompuLab devices](https://github.com/compulab-yokneam/Documentation/blob/master/etc/linux_kernel_deployment.md#create-deb-package)
