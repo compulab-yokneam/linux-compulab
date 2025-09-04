@@ -142,7 +142,7 @@
 
 	pinctrl_pmic: pmicirq {
 		fsl,pins = <
-			MX93_PAD_GPIO_IO24__GPIO2_IO24		0x31e
+			MX93_PAD_WDOG_ANY__GPIO1_IO15	0x31e
 		>;
 	};
 
