@@ -9,6 +9,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-ezurio.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-lvds.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-wm8962.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-rpmsg.dtbo
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-spidev.dtbo
 
 # A modern style -- all overlayed
 ucm-imx95-evk-dtbs := ucm-imx95-som.dtb \
