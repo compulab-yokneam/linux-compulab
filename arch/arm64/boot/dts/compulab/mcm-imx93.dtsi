@@ -448,7 +448,6 @@
 	bus-width = <4>;
 	non-removable;
 	wakeup-source;
-	no-1-8-v;
 	keep-power-in-suspend;
 	status = "okay";
 
