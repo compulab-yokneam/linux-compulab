@@ -4,6 +4,7 @@
  */
 
 #include <dt-bindings/leds/common.h>
+#include <dt-bindings/net/realtek-rtl8211x.h>
 
 / {
 
@@ -118,8 +119,21 @@
 			reset-deassert-us = <80000>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
+			realtek,led-modes = <
+				PHY_LED_LINK_ACTIVITY
+				PHY_LED_OFF
+				PHY_LED_LINK
+			>;
 		};
 	};
+};
+
+&eqosphy {
+	realtek,led-modes = <
+		PHY_LED_LINK_ACTIVITY
+		PHY_LED_LINK
+		PHY_LED_OFF
+	>;
 };
 
 &i2c2 {
