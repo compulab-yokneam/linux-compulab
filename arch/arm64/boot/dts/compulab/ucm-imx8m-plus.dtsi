@@ -8,6 +8,7 @@
 #include <dt-bindings/usb/pd.h>
 #include "../freescale/imx8mp.dtsi"
 #include "ucm-imx8m-plus-pinctrl.dtsi"
+#include <dt-bindings/net/realtek-rtl8211x.h>
 
 / {
 	model = "CompuLab UCM-iMX8M-Plus SoM";
@@ -100,6 +101,11 @@
 			reg = <0>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
+			realtek,led-modes = <
+				PHY_LED_LINK_ACTIVITY
+				PHY_LED_LINK
+				PHY_LED_LINK
+			>;
 		};
 	};
 
