@@ -3,6 +3,8 @@
  * Copyright 2024 CompuLab LTD.
  */
 
+#include <dt-bindings/net/realtek-rtl8211x.h>
+
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>;
@@ -24,6 +26,11 @@
 			eee-broken-1000t;
 			realtek,aldps-enable;
 			realtek,clkout-disable;
+			realtek,led-modes = <
+				PHY_LED_LINK_ACTIVITY
+				PHY_LED_OFF
+				PHY_LED_LINK
+			>;
 			interrupt-parent = <&gpio4>;
 			interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
 		};
