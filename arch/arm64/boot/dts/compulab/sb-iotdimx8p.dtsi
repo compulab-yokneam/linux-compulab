@@ -4,6 +4,7 @@
  */
 
 #include <dt-bindings/leds/common.h>
+#include <dt-bindings/net/realtek-rtl8211x.h>
 
 #define LED_PATTERN_MORSE_OK		1 270 0 90 1 270 0 90 1 270 0 290 1 270 0 90 1 90 0 90 1 270 0 1260
 #define LED_PATTERN_MORSE_SOS		1 90 0 90 1 90 0 90 1 90 0 270 1 270 0 90 1 270 0 90 1 270 0 270 1 90 0 90 1 90 0 90 1 90 0 1260
@@ -268,8 +269,21 @@
 			reset-deassert-us = <80000>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
+			realtek,led-modes = <
+				PHY_LED_LINK_ACTIVITY
+				PHY_LED_OFF
+				PHY_LED_LINK
+			>;
 		};
 	};
+};
+
+&eqosphy {
+	realtek,led-modes = <
+		PHY_LED_LINK_ACTIVITY
+		PHY_LED_LINK
+		PHY_LED_OFF
+	>;
 };
 
 &i2c3 {
