@@ -304,13 +304,13 @@
 };
 
 &lpi2c1 {
-        #address-cells = <1>;
-        #size-cells = <0>;
-        clock-frequency = <400000>;
-        pinctrl-names = "default", "sleep";
-        pinctrl-0 = <&pinctrl_lpi2c1>;
-        pinctrl-1 = <&pinctrl_lpi2c1>;
-        status = "disabled";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <400000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c1>;
+	pinctrl-1 = <&pinctrl_lpi2c1>;
+	status = "disabled";
 };
 
 &lpi2c2 {
@@ -322,11 +322,11 @@
 	pinctrl-1 = <&pinctrl_lpi2c2>;
 	status = "okay";
 
-        eeprom@50 {
-                compatible = "atmel,24c08";
-                reg = <0x50>;
-                pagesize = <16>;
-        };
+	eeprom@50 {
+		compatible = "atmel,24c08";
+		reg = <0x50>;
+		pagesize = <16>;
+	};
 
 	rtc@32 {
 		compatible = "epson,rx8900";
@@ -337,7 +337,7 @@
 		sqw = "32768_hz";
 		xt-frequency = <32772300>;
 		status = "okay";
-        };
+	};
 };
 
 &lpi2c3 {
@@ -367,7 +367,7 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c5>;
 	pinctrl-1 = <&pinctrl_lpi2c5>;
-        status = "disabled";
+	status = "disabled";
 };
 
 &lpi2c6 {
@@ -377,7 +377,7 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c6>;
 	pinctrl-1 = <&pinctrl_lpi2c6>;
-        status = "disabled";
+	status = "disabled";
 };
 
 &lpi2c7 {
@@ -387,7 +387,7 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_lpi2c7>;
 	pinctrl-1 = <&pinctrl_lpi2c7>;
-        status = "disabled";
+	status = "disabled";
 };
 
 &lpuart1 {

@@ -67,12 +67,6 @@
 };
 
 &gpio2 {
-#if 0
-	ethphy0_rst: ethphy0_rst {
-		gpios = <18 GPIO_ACTIVE_LOW>;
-		line-names = "ethphy0 rst";
-	};
-#endif
 	gpio-line-names = "", "", "", "",
 			"", "", "", "",
 			"", "", "", "",
@@ -80,7 +74,7 @@
 			"", "ethphy0 rst", "", "ts_irq",
 			"", "", "", "",
 			"", "", "", "",
-			"", "","", "";
+			"", "", "", "";
 };
 
 &gpio5 {
@@ -175,7 +169,7 @@
 };
 
 / {
-	lvds_panel: panel  {
+	lvds_panel: panel {
 		compatible = "panel-lvds";
 		backlight = <&lvds_backlight>;
 		enable-gpios = <&pca9555_20 5 GPIO_ACTIVE_HIGH>;
