@@ -28,7 +28,7 @@
 		gpio-controller;
 		#gpio-cells = <2>;
 		status = "okay";
-		gpio-line-names = "", "", "", "",
+		gpio-line-names = "", "", "", "ts_rst",
 				"", "", "", "",
 				"", "", "", "",
 				"", "","", "";
@@ -50,9 +50,12 @@
 		compatible = "goodix,gt911";
 		reg = <0x5d>;
 		interrupt-parent = <&gpio2>;
-		interrupts = <20 IRQ_TYPE_LEVEL_HIGH>;
-		irq-gpios = <&gpio2 20 GPIO_ACTIVE_HIGH>;
-		reset-gpios = <&pca9555_20 4 GPIO_ACTIVE_HIGH>;
+		interrupts = <19 IRQ_TYPE_LEVEL_HIGH>;
+		irq-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
 		status = "okay";
 	};
 
@@ -74,7 +77,7 @@
 			"", "", "", "",
 			"", "", "", "",
 			"", "", "", "",
-			"", "ethphy0 rst", "", "",
+			"", "ethphy0 rst", "", "ts_irq",
 			"", "", "", "",
 			"", "", "", "",
 			"", "","", "";
@@ -238,6 +241,17 @@
 			};
 		};
 	};
+
+	/* touch screen reset helper */
+	ts_reset: regulator-tsreset {
+		compatible = "regulator-fixed";
+		regulator-name = "tosuch-reset";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555_20 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
 };
 
 &display_pixel_link {
@@ -311,5 +325,10 @@
 			IMX95_PAD_GPIO_IO13__TPM4_CH2	0x51e
 		>;
 	};
-};
 
+	pinctrl_ts: ts1grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO19__GPIO2_IO_BIT19 0x3fe
+		>;
+	};
+};
