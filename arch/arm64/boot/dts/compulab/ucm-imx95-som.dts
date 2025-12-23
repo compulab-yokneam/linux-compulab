@@ -419,6 +419,16 @@
         status = "disabled";
 };
 
+&lpi2c8 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <1000000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c8>;
+	pinctrl-1 = <&pinctrl_lpi2c8>;
+	status = "disabled";
+};
+
 &lpuart1 {
 	/* console */
 	pinctrl-names = "default";
