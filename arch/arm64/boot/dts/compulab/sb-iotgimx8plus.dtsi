@@ -105,9 +105,6 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&fecphy>;
 	fsl,magic-packet;
-	reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
-	reset-assert-us = <10000>;
-	reset-deassert-us = <80000>;
 	status = "okay";
 
 	mdio {
@@ -117,6 +114,9 @@
 		fecphy: fec-phy@0 {
 			compatible = "ethernet-phy-ieee802.3-c22";
 			reg = <0>;
+			reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
 			realtek,led-modes = <

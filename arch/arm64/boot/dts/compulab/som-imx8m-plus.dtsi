@@ -271,9 +271,6 @@
 	snps,force_thresh_dma_mode;
 	snps,mtl-tx-config = <&mtl_tx_setup>;
 	snps,mtl-rx-config = <&mtl_rx_setup>;
-	reset-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
-	reset-assert-us = <10000>;
-	reset-deassert-us = <80000>;
 	status = "okay";
 
 	mdio {
@@ -283,6 +280,9 @@
 
 		ethphy1: ethernet-phy@4 {
 			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
 			reg = <4>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
@@ -351,9 +351,6 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy0>;
 	fsl,magic-packet;
-	reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
-	reset-assert-us = <10000>;
-	reset-deassert-us = <80000>;
 	status = "okay";
 
 	mdio {
@@ -362,6 +359,9 @@
 
 		ethphy0: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
 			reg = <5>;
 			eee-broken-1000t;
 			realtek,clkout-disable;

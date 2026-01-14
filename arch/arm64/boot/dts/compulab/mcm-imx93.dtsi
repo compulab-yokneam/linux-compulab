@@ -205,9 +205,6 @@
 	pinctrl-0 = <&pinctrl_eqos>;
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy1>;
-	reset-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
-	reset-assert-us = <10000>;
-	reset-deassert-us = <80000>;
 	status = "okay";
 
 	mdio {
@@ -218,6 +215,9 @@
 
 		ethphy1: ethernet-phy-eqos {
 			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio1 6 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
 			reg = <4>;
 			eee-broken-1000t;
 			rtl821x,aldps-disable;
