@@ -3,6 +3,19 @@
     compatible = "basler,basler-camera-vvcam", "basler-camera-vvcam";
 };
 
+&sensor_ep_0 {
+    data-lanes = <1 2 3 4>;
+    link-frequencies = /bits/ 64 <600000000>;
+    max-lane-frequency = /bits/ 64 <600000000>;
+    max-pixel-frequency = /bits/ 64 <266000000>;
+    max-data-rate = /bits/ 64 <0>;
+};
+
+&mipi_csi0_ep {
+    data-lanes = <4>;
+    csis-hs-settle = <16>;
+};
+
 &isp_0 {
 	status = "okay";
 };
