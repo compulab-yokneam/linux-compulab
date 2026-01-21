@@ -11,6 +11,12 @@
     max-data-rate = /bits/ 64 <0>;
 };
 
+&mipi_csi_0 {
+    clock-frequency = <266000000>;
+    assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_266M>;
+    assigned-clock-rates = <266000000>;
+};
+
 &mipi_csi0_ep {
     data-lanes = <4>;
     csis-hs-settle = <16>;
