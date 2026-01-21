@@ -1,4 +1,5 @@
-&basler_0 {
+&camera0 {
+    reg = <0x36>;
     compatible = "basler,basler-camera-vvcam", "basler-camera-vvcam";
 };
 
