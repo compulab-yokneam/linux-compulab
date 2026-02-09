@@ -333,6 +333,7 @@
 
 &lpm {
 	soc-supply = <&buck1>;
+    ld-mode-enabled;
 	status = "okay";
 };
 

@@ -230,7 +230,7 @@
 	assigned-clock-rates = <12288000>, <200000000>;
 	status = "disabled";
 };
-	
+
 &adc1 {
 	vref-supply = <&reg_vref_1v8>;
 	status = "okay";
@@ -292,6 +292,7 @@
 
 &lpm {
 	soc-supply = <&buck1>;
+    ld-mode-enabled;
 	status = "okay";
 };
 

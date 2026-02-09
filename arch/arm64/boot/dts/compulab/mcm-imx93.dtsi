@@ -237,6 +237,12 @@
 	status = "okay";
 };
 
+&lpm {
+	soc-supply = <&buck1>;
+    ld-mode-enabled;
+	status = "okay";
+};
+
 &gpio1 {
 	regulator-gpioexp {
 		gpio-hog;
