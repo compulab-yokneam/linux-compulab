@@ -1,0 +1,328 @@
+&lpi2c3 {
+	status = "okay";
+	wm8962: codec@1a {
+		compatible = "wlf,wm8962";
+		reg = <0x1a>;
+		clocks = <&scmi_clk IMX95_CLK_SAI3>;
+		DCVDD-supply = <&reg_audio_pwr>;
+		DBVDD-supply = <&reg_audio_pwr>;
+		AVDD-supply = <&reg_audio_pwr>;
+		CPVDD-supply = <&reg_audio_pwr>;
+		MICVDD-supply = <&reg_audio_pwr>;
+		PLLVDD-supply = <&reg_audio_pwr>;
+		SPKVDD1-supply = <&reg_audio_pwr>;
+		SPKVDD2-supply = <&reg_audio_pwr>;
+		gpio-cfg = <
+			0x0000 /* 0:Default */
+			0x0000 /* 1:Default */
+			0x0000 /* 2:FN_DMICCLK */
+			0x0000 /* 3:Default */
+			0x0000 /* 4:FN_DMICCDAT */
+			0x0000 /* 5:Default */
+		>;
+	};
+
+	pca9555_20: gpio@20 {
+		compatible = "nxp,pca9555";
+		reg = <0x20>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+		gpio-line-names = "", "", "", "ts_rst",
+				"", "", "", "",
+				"", "", "", "",
+				"", "","", "";
+	};
+
+	pca9555_21: gpio@21 {
+		compatible = "nxp,pca9555";
+		reg = <0x21>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		status = "okay";
+		gpio-line-names = "", "", "modem rst", "nvme rst",
+				"", "", "", "",
+				"", "", "", "",
+				"", "","", "";
+	};
+
+	goodix_ts: goodix@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <19 IRQ_TYPE_LEVEL_HIGH>;
+		irq-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_ts>;
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
+		status = "okay";
+	};
+
+	eeprom@54 {
+		compatible = "atmel,24c08";
+		reg = <0x54>;
+		pagesize = <16>;
+	};
+};
+
+&gpio2 {
+	gpio-line-names = "", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "ethphy0 rst", "", "ts_irq",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "";
+};
+
+&gpio5 {
+	gpio-line-names = "", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "ethphy1 rst",
+			"", "", "", "",
+			"", "", "", "",
+			"", "", "", "",
+			"", "","", "";
+};
+
+&netc_emdio {
+	status = "okay";
+
+	ethphy0: ethernet-phy@1 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <1>;
+		eee-broken-1000t;
+		reset-gpios = <&gpio2 18 GPIO_ACTIVE_LOW>;
+		//reset-gpios = <&ethphy0_rst>;
+		reset-assert-us = <10000>;
+		reset-deassert-us = <80000>;
+		realtek,clkout-disable;
+	};
+
+	ethphy1: ethernet-phy@4 {
+		compatible = "ethernet-phy-ieee802.3-c22";
+		reg = <4>;
+		eee-broken-1000t;
+		reset-gpios = <&gpio5 15 GPIO_ACTIVE_LOW>;
+		reset-assert-us = <10000>;
+		reset-deassert-us = <80000>;
+		realtek,clkout-disable;
+	};
+};
+
+&pcie0 {
+	pinctrl-0 = <&pinctrl_pcie0>;
+	pinctrl-names = "default";
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+	reset-gpio = <&pca9555_21 2 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&reg_pcie0>;
+	status = "okay";
+};
+
+&pcie1 {
+	pinctrl-0 = <&pinctrl_pcie1>;
+	pinctrl-names = "default";
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+	//reset-gpio = <&pca9555_21 3 GPIO_ACTIVE_HIGH>;
+	vpcie-supply = <&reg_slot_pwr>;
+	status = "okay";
+};
+
+#if 0
+&pcie1_ep {
+	pinctrl-0 = <&pinctrl_pcie1>;
+	pinctrl-names = "default";
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+	vpcie-supply = <&reg_slot_pwr>;
+	status = "disabled";
+};
+#endif
+/ {
+	reg_usdhc3_vmmc: regulator-usdhc3 {
+		compatible = "regulator-fixed";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_reg_usdhc3_vmmc>;
+		regulator-name = "VDD_SD3_3V3";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555_21 4 GPIO_ACTIVE_LOW>;
+		off-on-delay-us = <12000>;
+		enable-active-high;
+	};
+};
+
+&usdhc3 {
+	pinctrl-names = "default", "state_100mhz", "state_200mhz", "sleep";
+	pinctrl-0 = <&pinctrl_usdhc3>;
+	pinctrl-1 = <&pinctrl_usdhc3_100mhz>;
+	pinctrl-2 = <&pinctrl_usdhc3_200mhz>;
+	pinctrl-3 = <&pinctrl_usdhc3>;
+	vmmc-supply = <&reg_usdhc3_vmmc>;
+	bus-width = <4>;
+	non-removable;
+	keep-power-in-suspend;
+	wifi-host;
+	status = "okay";
+};
+
+/ {
+	lvds_panel: panel {
+		compatible = "panel-lvds";
+		backlight = <&lvds_backlight>;
+		enable-gpios = <&pca9555_20 5 GPIO_ACTIVE_HIGH>;
+		data-mapping = "vesa-24";
+		width-mm = <154>;
+		height-mm = <90>;
+		status = "okay";
+
+		panel-timing {
+			clock-frequency = <42105000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hback-porch = <30>;
+			hfront-porch = <30>;
+			vback-porch = <10>;
+			vfront-porch = <10>;
+			hsync-len = <30>;
+			vsync-len = <10>;
+			de-active = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
+	};
+
+	lvds_backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&tpm4 2 6666667 PWM_POLARITY_INVERTED>;
+		brightness-levels = <255 203 158 119 88 63 45 0>;
+		default-brightness-level = <6>;
+		status = "okay";
+	};
+
+	sound-wm8962 {
+		compatible = "fsl,imx-audio-wm8962";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_hp>;
+		model = "wm8962-audio";
+		audio-cpu = <&sai3>;
+		audio-codec = <&wm8962>;
+		hp-det-gpio = <&gpio2 11 GPIO_ACTIVE_HIGH>;
+		audio-routing =
+			"Headphone Jack", "HPOUTL",
+			"Headphone Jack", "HPOUTR",
+			"Ext Spk", "SPKOUTL",
+			"Ext Spk", "SPKOUTR",
+			"AMIC", "MICBIAS",
+			"IN3R", "AMIC",
+			"IN1R", "AMIC";
+	};
+
+	sound-micfil {
+		compatible = "fsl,imx-audio-card";
+		model = "micfil-audio";
+		pri-dai-link {
+			link-name = "micfil hifi";
+			format = "i2s";
+			cpu {
+				sound-dai = <&micfil>;
+			};
+		};
+	};
+
+	/* touch screen reset helper */
+	ts_reset: regulator-tsreset {
+		compatible = "regulator-fixed";
+		regulator-name = "tosuch-reset";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&pca9555_20 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+&display_pixel_link {
+	status = "okay";
+};
+
+&dpu {
+	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-rates = <0>, <4008000000>, <445333334>;
+	status = "okay";
+};
+
+&mipi_dsi {
+	status = "disabled";
+};
+
+&ldb {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	assigned-clocks = <&scmi_clk IMX95_CLK_LDBPLL_VCO>,
+			  <&scmi_clk IMX95_CLK_LDBPLL>;
+	assigned-clock-rates = <2986200000>, <497700000>;
+	/* assigned-clock-rates = <3291120000>, <1097040000>; */
+	status = "okay";
+
+	channel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&ldb0_phy {
+	status = "okay";
+};
+
+&pixel_interleaver {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	channel@0 {
+		reg = <0>;
+		status = "okay";
+	};
+};
+
+&tpm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm4>;
+	status = "okay";
+};
+
+&scmi_iomuxc {
+	pinctrl_tpm4: tpm4grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO13__TPM4_CH2	0x51e
+		>;
+	};
+
+	pinctrl_ts: ts1grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO19__GPIO2_IO_BIT19 0x3fe
+		>;
+	};
+};

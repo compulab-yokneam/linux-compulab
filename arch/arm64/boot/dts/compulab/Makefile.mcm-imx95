@@ -1,0 +1,2 @@
+DTC_FLAGS := -@
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx95-sbc.dtb
