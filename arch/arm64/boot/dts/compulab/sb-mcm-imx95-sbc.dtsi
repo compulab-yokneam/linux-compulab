@@ -207,13 +207,11 @@
 	};
 
 	sound-wm8962 {
-		compatible = "fsl,imx-audio-wm8962";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_hp>;
+		compatible = "fsl,imx-audio-wm8962x";
 		model = "wm8962-audio";
 		audio-cpu = <&sai3>;
 		audio-codec = <&wm8962>;
-		hp-det-gpio = <&gpio2 11 GPIO_ACTIVE_HIGH>;
+
 		audio-routing =
 			"Headphone Jack", "HPOUTL",
 			"Headphone Jack", "HPOUTR",
@@ -223,7 +221,6 @@
 			"IN3R", "AMIC",
 			"IN1R", "AMIC";
 	};
-
 	sound-micfil {
 		compatible = "fsl,imx-audio-card";
 		model = "micfil-audio";

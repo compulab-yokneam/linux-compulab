@@ -1,8 +1,10 @@
+#include "overlay95.h"
+
 &{/} {
 	lvds_panel: panel  {
 		compatible = "boe,hv070wsa-100";
 		backlight = <&lvds_backlight>;
-		enable-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		enable-gpios = <&pca9555_20 3 GPIO_ACTIVE_HIGH>;
 
 		port {
 			panel_in: endpoint {
@@ -24,7 +26,7 @@
 		regulator-name = "tosuch-reset";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-		gpio = <&pca9555 4 GPIO_ACTIVE_HIGH>;
+		gpio = <&pca9555_20 4 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
 		regulator-always-on;
 	};

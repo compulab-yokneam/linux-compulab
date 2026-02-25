@@ -364,7 +364,7 @@
 	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	pca9555: gpio@20 {
+	pca9555_20: gpio@20 {
 		compatible = "nxp,pca9555";
 		reg = <0x20>;
 		gpio-controller;

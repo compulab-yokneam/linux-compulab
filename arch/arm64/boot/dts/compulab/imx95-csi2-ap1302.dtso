@@ -47,16 +47,17 @@
 	};
 };
 
-&pca9555 {
+&pca9555_20 {
 	mipi-csi-poweron-hog {
 		gpio-hog;
-		gpios = <7 GPIO_ACTIVE_HIGH>;
+		gpios = <11 GPIO_ACTIVE_HIGH>;
 		output-high;
+		line-name = "CSI2_PWR_DWN";
 		status = "okay";
 	};
 };
 
-&lpi2c8 {
+&lpi2c4 {
 	#address-cells = <1>;
 	#size-cells = <0>;
 	status = "okay";
@@ -73,7 +74,7 @@
 		compatible = "onnn,ap1302";
 		reg = <0x3c>;
 		clocks = <&scmi_clk IMX95_CLK_24M>;
-		reset-gpios   = <&pca9555 8 GPIO_ACTIVE_LOW>;
+		reset-gpios   = <&pca9555_20 12 GPIO_ACTIVE_LOW>;
 		isp_en-gpios  = <&adp5585_isp 2 GPIO_ACTIVE_HIGH>;
 		orientation = <2>;
 		rotation = <0>;
@@ -97,7 +98,7 @@
 			port@2 {
 				reg = <2>;
 				isp_out: endpoint {
-					remote-endpoint = <&mipi_csi0_ep>;
+					remote-endpoint = <&mipi_csi1_ep>;
 					data-lanes = <1 2 3 4>;
 				};
 			};
@@ -120,11 +121,27 @@
 	};
 };
 
-&dphy_rx {
-	status = "okay";
+&display_stream_csr {
+    status = "disabled";
 };
 
-&mipi_csi0 {
+&display_master_csr {
+    status = "disabled";
+};
+
+&mipi_tx_phy_csr {
+    status = "disabled";
+};
+
+&mipi_dsi_intf {
+    status = "okay";
+};
+
+&combo_rx {
+    status = "okay";
+};
+
+&mipi_csi1 {
 	status = "okay";
 
 	ports {
@@ -133,7 +150,7 @@
 
 		port@0 {
 			reg = <0>;
-			mipi_csi0_ep: endpoint {
+			mipi_csi1_ep: endpoint {
 				remote-endpoint = <&isp_out>;
 				data-lanes = <1 2 3 4>;
 				clock-lanes = <0>;
@@ -142,14 +159,14 @@
 
 		port@1 {
 			reg = <1>;
-				mipi_csi0_out: endpoint {
-				remote-endpoint = <&formatter_0_in>;
+				mipi_csi1_out: endpoint {
+				remote-endpoint = <&formatter_1_in>;
 			};
 		};
 	};
 };
 
-&csi_pixel_formatter_0 {
+&csi_pixel_formatter_1 {
 	status = "okay";
 
 	ports {
@@ -159,16 +176,16 @@
 		port@0 {
 			reg = <0>;
 
-			formatter_0_in: endpoint {
-				remote-endpoint = <&mipi_csi0_out>;
+			formatter_1_in: endpoint {
+				remote-endpoint = <&mipi_csi1_out>;
 			};
 		};
 
 		port@1 {
 			reg = <1>;
 
-			formatter_0_out: endpoint {
-				remote-endpoint = <&isi_in_2>;
+			formatter_1_out: endpoint {
+				remote-endpoint = <&isi_in_3>;
 			};
 		};
 	};
@@ -181,13 +198,12 @@
 		#address-cells = <1>;
 		#size-cells = <0>;
 
-		port@2 {
-			reg = <2>;
+		port@3 {
+			reg = <3>;
 
-			isi_in_2: endpoint {
-				remote-endpoint = <&formatter_0_out>;
+			isi_in_3: endpoint {
+				remote-endpoint = <&formatter_1_out>;
 			};
 		};
 	};
 };
-
