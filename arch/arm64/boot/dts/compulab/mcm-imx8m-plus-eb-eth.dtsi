@@ -4,9 +4,6 @@
 	phy-mode = "rgmii-id";
 	phy-handle = <&ethphy1>;
 	fsl,magic-packet;
-	reset-gpios = <&gpio5 0 GPIO_ACTIVE_LOW>;
-	reset-assert-us = <10000>;
-	reset-deassert-us = <80000>;
 	status = "okay";
 
 	mdio {
@@ -15,6 +12,9 @@
 
 		ethphy1: ethernet-phy@5 {
 			compatible = "ethernet-phy-ieee802.3-c22";
+			reset-gpios = <&gpio5 0 GPIO_ACTIVE_LOW>;
+			reset-assert-us = <10000>;
+			reset-deassert-us = <80000>;
 			reg = <5>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
