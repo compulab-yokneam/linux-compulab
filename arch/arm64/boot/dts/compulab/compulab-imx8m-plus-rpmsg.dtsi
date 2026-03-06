@@ -17,9 +17,24 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 
-		m4_reserved: m4@80000000 {
+		m7_reserved: m7@80000000 {
 			no-map;
 			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		m7_ddr_alias: m7@10000000 {
+			no-map;
+			reg = <0 0x10000000 0 0x1000000>;
+		};
+
+		m7_itcm: m7@7E0000 {
+			no-map;
+			reg = <0 0x7E0000 0 0x20000>;
+		};
+
+		m7_dtcm: m7@800000 {
+			no-map;
+			reg = <0 0x800000 0 0x20000>;
 		};
 
 		vdev0vring0: vdev0vring0@55000000 {
@@ -90,7 +105,8 @@
 		mboxes = <&mu 0 1
 			  &mu 1 1
 			  &mu 3 1>;
-		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>,
+			<&m7_reserved>, <&m7_ddr_alias>, <&m7_itcm>, <&m7_dtcm>;
 		status = "okay";
 		fsl,startup-delay-ms = <500>;
 	};
