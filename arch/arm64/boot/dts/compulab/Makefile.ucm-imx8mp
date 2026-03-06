@@ -80,6 +80,11 @@ sbev-ucmimx8plus-dualhead-dtbs := sbev-ucmimx8plus-headless.dtb \
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-dualhead.dtb
 
+sbev-ucmimx8plus-rpmsg-dtbs := sbev-ucmimx8plus-headless.dtb \
+		compulab-imx8m-plus-rpmsg.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-rpmsg.dtb
+
 sbc-ucm-imx8m-plus-dtbs := ucm-imx8m-plus.dtb \
 		ucm-imx8m-plus-can.dtbo
 
