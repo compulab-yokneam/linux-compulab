@@ -502,14 +502,16 @@ static int rtl8211f_config_init(struct phy_device *phydev)
 		return ret;
 	}
 
-	ret = rtl8211f_config_leds(phydev);
-	if (ret < 0) {
+	ret  = genphy_soft_reset(phydev);
+
+	if ( rtl8211f_config_leds(phydev) < 0 ) {
 		dev_warn(dev, "Unable to apply LEDs settings from Device Tree, use defaults\n");
+		phy_write_paged(phydev, 0xd04, RTL8211F_LCR, 0x2d7b);
 	}
 	dev_dbg(dev, "Read LCR (LED Control Register): 0x%04x\n",
 		(unsigned int)phy_read_paged(phydev, 0xd04, RTL8211F_LCR));
 
-	return genphy_soft_reset(phydev);
+	return ret;
 }
 
 static int rtl821x_suspend(struct phy_device *phydev)
