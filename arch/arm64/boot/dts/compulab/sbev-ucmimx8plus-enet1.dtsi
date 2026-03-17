@@ -28,7 +28,7 @@
 			realtek,clkout-disable;
 			realtek,led-modes = <
 				PHY_LED_LINK_ACTIVITY
-				PHY_LED_OFF
+				PHY_LED_LINK
 				PHY_LED_LINK
 			>;
 			interrupt-parent = <&gpio4>;
