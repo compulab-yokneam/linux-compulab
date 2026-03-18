@@ -1,0 +1,144 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2024 Balena Ltd
+ *
+ * Device tree for CompuLab IOT-GATE-IMX8PLUS with Cortex-M7
+ * remoteproc/RPMsg support enabled.
+ *
+ * Based on CompuLab compulab-imx8m-plus-rpmsg.dtsi reference.
+ */
+
+/dts-v1/;
+
+#include "iot-gate-imx8plus.dts"
+
+/ {
+	model = "CompuLab IOT-GATE-IMX8PLUS (M7 remoteproc)";
+	compatible = "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		ranges;
+
+		/*
+		 * M7 firmware memory: 16MB at 0x80000000 (DRAM).
+		 * Remoteproc loads firmware ELF segments here.
+		 */
+		m4_reserved: m4@80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		/* Virtio vring buffers for RPMsg communication */
+		vdev0vring0: vdev0vring0@55000000 {
+			reg = <0 0x55000000 0 0x8000>;
+			no-map;
+		};
+
+		vdev0vring1: vdev0vring1@55008000 {
+			reg = <0 0x55008000 0 0x8000>;
+			no-map;
+		};
+
+		/* Resource table shared between Linux and M7 */
+		rsc_table: rsc_table@550ff000 {
+			reg = <0 0x550ff000 0 0x1000>;
+			no-map;
+		};
+
+		/* Shared DMA buffer pool for RPMsg data payloads */
+		vdevbuffer: vdevbuffer@55400000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x55400000 0 0x100000>;
+			no-map;
+		};
+	};
+
+	/*
+	 * Cortex-M7 remoteproc node.
+	 * MU (Messaging Unit) mailboxes provide the kick mechanism.
+	 * startup-delay-ms gives M7 time to init before first kick.
+	 */
+	imx8mp-cm7 {
+		compatible = "fsl,imx8mn-cm7";
+		rsc-da = <0x55000000>;
+		fsl,startup-delay-ms = <500>;
+		clocks = <&clk IMX8MP_CLK_M7_DIV>;
+		mbox-names = "tx", "rx", "rxdb";
+		mboxes = <&mu 0 1
+			  &mu 1 1
+			  &mu 3 1>;
+		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>, <&rsc_table>;
+		status = "okay";
+	};
+};
+
+/* Disable peripherals shared with or reserved for the M7 */
+&flexcan1 {
+	status = "disabled";
+};
+
+&flexcan2 {
+	status = "disabled";
+};
+
+&flexspi {
+	status = "disabled";
+};
+
+&pwm4 {
+	status = "disabled";
+};
+
+&sai3 {
+	status = "disabled";
+};
+
+&micfil {
+	status = "disabled";
+};
+
+&sdma3 {
+	status = "disabled";
+};
+
+&uart3 {
+	status = "disabled";
+};
+
+&uart4 {
+	status = "disabled";
+};
+
+/*
+ * Override pinctrl_ie_di4o4: release GPIO4 DIO pads for M7 use.
+ * GPIO4 pads (IN2/GPIO4_IO31, IN3/GPIO4_IO29, OUT0/GPIO4_IO30,
+ * OUT3/GPIO4_IO12) are removed so Linux does not claim them.
+ * GPIO5 pads (IN0/GPIO5_IO03, IN1/GPIO5_IO00, OUT1/GPIO5_IO04)
+ * and GPIO1 OUT2 (GPIO1_IO01) remain under Linux control.
+ */
+&pinctrl_ie_di4o4 {
+	fsl,pins = <
+		MX8MP_IOMUXC_SPDIF_TX__GPIO5_IO03		0x00  /* DI4O4 IN0 */
+		MX8MP_IOMUXC_SAI3_TXC__GPIO5_IO00		0x00  /* DI4O4 IN1 */
+		MX8MP_IOMUXC_SPDIF_RX__GPIO5_IO04		0x100 /* DI4O4 OUT1 */
+		MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01		0x100 /* DI4O4 OUT2 */
+	>;
+};
+
+/*
+ * Reserve M7 DIO pins in the GPIO4 controller.
+ * gpio-reserved-ranges marks these pin offsets as invalid in gpiolib's
+ * valid_mask, so Linux cannot request or access them — preventing
+ * register-level conflicts with the M7 firmware.
+ * Linux retains GPIO4_IO20 (USB2), IO24 (Ethernet PHY reset), IO28 (LED).
+ *
+ * Pin 12: DO3 (SAI1_TXD0)
+ * Pin 29: DI3 (SAI3_RXC)
+ * Pin 30: DO0 (SAI3_RXD)
+ * Pin 31: DI2 (SAI3_TXFS)
+ */
+&gpio4 {
+	gpio-reserved-ranges = <12 1>, <29 3>;
+};
