@@ -12,21 +12,9 @@ It is up to developers to prepare the host machine; it requires:
 mkdir -p compulab-kernel/build && cd compulab-kernel
 ```
 
-* Set a CompuLab machine:
-
-| Machine | Command Line |
-|---|---|
-|ucm-imx8m-plus|```export MACHINE=compulab_v8```
-|som-imx8m-plus|```export MACHINE=compulab_v8```
-|iot-gate-imx8plus|```export MACHINE=compulab_v8```
-|iotdin-imx8p|```export MACHINE=compulab_v8```
-|ucm-imx93|```export MACHINE=ucm-imx93```
-|mcm-imx93|```export MACHINE=mcm-imx93```
-|ucm-imx93|```export MACHINE=ucm-imx95```
-
 * Clone the source code:
 ```
-git clone -b linux-compulab_v6.6.52 https://github.com/compulab-yokneam/linux-compulab.git
+git clone -b linux-compulab_v6.6.52-rt-iot-link https://github.com/compulab-yokneam/linux-compulab.git
 cd linux-compulab
 ```
 
@@ -34,7 +22,7 @@ cd linux-compulab
 
 * Apply the default CompuLab config:
 ```
-make ${MACHINE}_defconfig compulab.config
+make compulab-mx93_defconfig compulab-mx93-extra.config nxp-wlan.config rt.config
 ```
 
 * Ussue menuconfig on order to change the default CompuLab configuration:
