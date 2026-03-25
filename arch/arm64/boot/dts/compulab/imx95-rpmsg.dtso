@@ -1,5 +1,9 @@
 #include "overlay95.h"
 
+&cl_devicetree {
+	overlays { imx95-rpmsg; };
+};
+
 &{/} {
 	model = "CompuLab i.MX95 19x19 SOM (rpmsg)";
 

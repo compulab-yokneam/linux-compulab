@@ -1,5 +1,9 @@
 #include "overlay95.h"
 
+&cl_devicetree {
+	overlays { imx95-lvds; };
+};
+
 &{/} {
 	lvds_panel: panel  {
 		compatible = "boe,hv070wsa-100";

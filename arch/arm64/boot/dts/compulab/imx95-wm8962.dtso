@@ -1,5 +1,9 @@
 #include "overlay95.h"
 
+&cl_devicetree {
+	overlays { imx95-wm8962; };
+};
+
 &{/} {
 
 	reg_audio_pwr: regulator-audio-pwr {

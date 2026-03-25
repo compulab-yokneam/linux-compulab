@@ -7,3 +7,9 @@
 
 #include "mcm-imx95-som.dtsi"
 #include "sb-mcm-imx95-sbc.dtsi"
+
+&{/} {
+	cl_devicetree: cl-devicetree {
+		mcm-imx95-sbc;
+	};
+};

@@ -9,6 +9,10 @@
 #include <dt-bindings/gpio/gpio.h>
 #include "../freescale/imx95-clock.h"
 
+&cl_devicetree {
+	overlays { imx95-csi2-ap1302; };
+};
+
 &{/} {
 	reg_dvdd_1v2: regulator-dvdd {
 		compatible = "regulator-fixed";

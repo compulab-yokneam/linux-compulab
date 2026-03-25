@@ -263,6 +263,10 @@
 			sound-dai = <&bt_sco_codec 1>;
 		};
 	};
+
+	cl_devicetree: cl-devicetree {
+		ucm-imx95-som;
+	};
 };
 
 &adc1 {

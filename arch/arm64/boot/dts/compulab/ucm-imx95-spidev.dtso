@@ -1,2 +1,6 @@
 #include "overlay95.h"
 #include "ucm-imx95-spidev.dtsi"
+
+&cl_devicetree {
+	overlays { ucm-imx95-spidev; };
+};
