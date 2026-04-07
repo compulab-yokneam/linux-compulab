@@ -3,7 +3,6 @@ DTC_FLAGS := -@
 # An old school style -- all included
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-ezurio.dtb
 
 # overlays
 dtb-$(CONFIG_ARCH_MXC) += imx95-lvds.dtbo
