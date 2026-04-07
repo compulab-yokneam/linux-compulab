@@ -2,7 +2,6 @@
 config WLAN_VENDOR_NXP
 	bool "NXP WiFi-Ex Driver"
 	depends on CFG80211
-	select NXP_MWIFIEX
 	default n
 	help
 	  If you have a wireless card belonging to this class, say Y.
