@@ -14,6 +14,20 @@
 		>;
 	};
 
+	pinctrl0_p20_uarta_1: set0_p20_uarta_1 {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART1_RXD__UART1_DCE_RX	0x140	/* P20P2 */
+			MX8MP_IOMUXC_UART1_TXD__UART1_DCE_TX	0x140	/* P20P4 */
+		>;
+	};
+
+	pinctrl0_p20_uarta_3: set0_p20_uarta_3 {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART3_TXD__UART3_DCE_TX	0x140	/* P20P3 */
+			MX8MP_IOMUXC_UART3_RXD__UART3_DCE_RX	0x140	/* P20P6 */
+		>;
+	};
+
 	pinctrl1_p20_uarta: set1_p20_uarta {
 		fsl,pins = <
 			/* GPIO */
@@ -27,8 +41,16 @@
 
 &uart1 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl0_p20_uarta>;
+	pinctrl-0 = <&pinctrl0_p20_uarta_1>;
 	assigned-clocks = <&clk IMX8MP_CLK_UART1>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+	status = "okay";
+};
+
+&uart3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl0_p20_uarta_3>;
+	assigned-clocks = <&clk IMX8MP_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
 	status = "okay";
 };
