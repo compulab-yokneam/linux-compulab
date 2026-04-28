@@ -17,7 +17,6 @@
 #include "ucm-imx8m-plus-som.dts"
 #include "ucm-imx8m-plus-mmc.dtsi"
 #include "ucm-imx8m-plus-pcie.dtsi"
-#include "ucm-imx8m-plus-mmc.dtsi"
 #include "sb-ucmimx8plus.dtsi"
 
 / {
