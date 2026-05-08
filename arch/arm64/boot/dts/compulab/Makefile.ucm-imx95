@@ -11,6 +11,8 @@ dtb-$(CONFIG_ARCH_MXC) += imx95-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-spidev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-ap1302.dtbo
 dtb-$(CONFIG_ARCH_MXC) += imx95-csi2-ap1302.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-imx477.dtbo
 
 # A modern style -- all overlayed
 ucm-imx95-evk-dtbs := ucm-imx95-som.dtb \
@@ -34,3 +36,13 @@ ucm-imx95-evk-csi2-ap1302-dtbs := ucm-imx95-evk.dtb \
 		imx95-csi2-ap1302.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi2-ap1302.dtb
+
+ucm-imx95-evk-csi1-imx219-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi1-imx219.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi1-imx219.dtb
+
+ucm-imx95-evk-csi1-imx477-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi1-imx477.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi1-imx477.dtb
