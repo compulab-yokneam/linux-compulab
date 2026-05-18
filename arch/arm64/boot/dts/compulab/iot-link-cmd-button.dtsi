@@ -1,0 +1,25 @@
+
+/ {
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_cmd_button>;
+		autorepeat; // continuously fire events if the button is held down, not for reset function
+
+		back {
+			gpios = <&gpio2 26 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_PROG1>;
+			label = "Key Prog1";
+			debounce-interval = <50>;
+			wakeup-source;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_cmd_button: pinctrl_cmd_button {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO26__GPIO2_IO26 0x31e
+		>;
+	};
+};
