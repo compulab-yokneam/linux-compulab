@@ -1,0 +1,27 @@
+&dsi_backlight {
+	status = "okay";
+};
+
+&i2c5 {
+	status = "okay";
+};
+
+&mipi_ts {
+	status = "okay";
+};
+
+&pwm1 {
+	status = "okay";
+};
+
+&mipi_dsi {
+	status = "okay";
+};
+
+&mipi_panel {
+	status = "okay";
+};
+
+&lcdif1 {
+	status = "okay";
+};

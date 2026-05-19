@@ -1,0 +1,34 @@
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	camera0: camera0@i2c {
+		csi_id = <0x00>;
+		status = "okay";
+
+		port {
+			sensor_ep_0: endpoint {
+				clock-lanes = <0>;
+				remote-endpoint = <&mipi_csi0_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	port@0 {
+		reg = <0>;
+		mipi_csi0_ep: endpoint {
+			remote-endpoint = <&sensor_ep_0>;
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};

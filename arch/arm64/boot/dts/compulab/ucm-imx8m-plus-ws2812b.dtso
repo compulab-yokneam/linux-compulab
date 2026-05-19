@@ -1,0 +1,7 @@
+#include "overlay.h"
+#include "compulab-imx8m-plus-ws2812b.dtsi"
+
+/ {
+	model = "CompuLab UCM-iMX8M-Plus (ws28l2b on spi2)";
+	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";
+};

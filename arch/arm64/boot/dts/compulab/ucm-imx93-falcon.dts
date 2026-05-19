@@ -1,0 +1,12 @@
+#include "ucm-imx93.dts"
+
+/ {
+	 memory {
+		 reg = <0x00 0x80000000 0x00 0x80000000>;
+		 device_type = "memory";
+	 };
+
+	 chosen {
+		 bootargs = "console=ttyLP0,115200 earlycon root=/dev/mmcblk1p2 rootwait rw";
+	 };
+ };

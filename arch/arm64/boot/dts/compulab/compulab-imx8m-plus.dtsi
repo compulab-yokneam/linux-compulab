@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 CompuLab Ltd.
+ */
+
+#include <dt-bindings/usb/pd.h>
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+#include "../freescale/imx8mp.dtsi"
+#include "../freescale/imx8mp-nxp-display.dtsi"
+#include "../freescale/imx8mp-nxp-capture.dtsi"

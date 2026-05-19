@@ -1,0 +1,22 @@
+#include "overlay.h"
+#include "som-imx8m-plus_mipi-csi2.dtsi"
+
+&sensor_mipi2 {
+	compatible = "econ,ar0521", "ar0521";
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_1 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};
