@@ -166,6 +166,8 @@
 #define RTL_8251B				0x001cc862
 #define RTL_8261C				0x001cc890
 
+#include "realtek_extra.h"
+
 /* RTL8211E and RTL8211F support up to three LEDs */
 #define RTL8211x_LED_COUNT			3
 
@@ -637,6 +639,8 @@ static int rtl8211f_config_clk_out(struct phy_device *phydev)
 	if (ret)
 		return ret;
 
+	rtl8211f_config_leds(phydev);
+
 	return genphy_soft_reset(phydev);
 }
 
@@ -997,6 +1001,8 @@ static int rtl8211e_led_hw_control_set(struct phy_device *phydev, u8 index,
 static int rtl8211e_config_init(struct phy_device *phydev)
 {
 	u16 val;
+
+	rtl8211x_config_init(phydev);
 
 	/* enable TX/RX delay for rgmii-* modes, and disable them for rgmii. */
 	switch (phydev->interface) {
