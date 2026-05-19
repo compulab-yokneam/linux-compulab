@@ -1,0 +1,95 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 CompuLab Ltd.
+ */
+
+#include "iot-gate-imx8plus-m2tpm.dts"
+
+/* IOT-GATE-IMX8PLUS with M.2 connector + IMU IMC42605 + SLB9670 TPM extension module in M.2 Expansion Connector */
+/* 
+ * M.2 P1 connector pinout:
+ * ----+------------
+ *  ## | Signal
+ * ----+------------
+ *  03 | USB_DP
+ *  05 | USB_DN
+ *  15 | ECSPI2_SS0
+ *  17 | ECSPI2_MISO
+ *  21 | ECSPI2_SCLK
+ *  23 | ECSPI2_MOSI
+ *  34 | I2C5_SDA
+ *  36 | I2C5_SCL
+ *  46 | BT_PERST
+ *  48 | W_DISABLE1
+ *  50 | TPM_PIRQn
+ *  52 | TPM_RSTn
+ *  54 | ICM_INT1
+ *  58 | ICM_INT2
+ * ----+----------------
+ *
+ * M.2 P2 connector pinout:
+ * ----+-----------------------
+ *  ## | Signal     | Pin Name
+ * ----+------------+----------
+ *  03 | USB_DP     | USB_D+
+ *  05 | USB_DN     | USB_D-
+ *  52 | BT_PERST   | PERST#
+ *  56 | W_DISABLE1 | W_DIS1#
+ * ----+-----------------------
+ */
+
+&tpm_nreset {
+	reset-gpios = <&gpio2 14 GPIO_ACTIVE_HIGH>;
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_gpio2_pinmux>;
+	gpio-line-names = "", "", "", "", "", "", "", "",
+			"", "", "", "", "", "W_DISABLE1", "TPM_RSTn", "ICM_INT1",
+			"ICM_INT2", "BT_PERST", "", "", "", "", "", "",
+			"", "", "", "", "", "", "", "";
+};
+
+&i2c5 {
+	/delete-node/ eeprom_m2;
+
+	pca9555_m2: pca9555-m2@21 {
+		compatible = "nxp,pca9555";
+		gpio-controller;
+		#gpio-cells = <2>;
+		reg = <0x21>;
+	};
+
+	icm42605_m2: imu-m2@68 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_imu_int>;
+		compatible = "invensense,icm42605";
+		reg = <0x68>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <15 IRQ_TYPE_EDGE_FALLING>;
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	pinctrl_gpio2_pinmux: gpio2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_CLK__GPIO2_IO13			0x100 /* W _DISABLE1 */
+			MX8MP_IOMUXC_SD2_DATA2__GPIO2_IO17			0x100 /* BT_PERST */
+		>;
+	};
+
+	pinctrl_tpm_nrst: tpmnrstgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_CMD__GPIO2_IO14			0x110 /* TPM_RSTn */
+		>;
+	};
+
+	pinctrl_imu_int: imuintgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_DATA0__GPIO2_IO15			0x146 /* ICM_INT1 */
+			MX8MP_IOMUXC_SD2_DATA1__GPIO2_IO16			0x146 /* ICM_INT2 */
+		>;
+	};
+};

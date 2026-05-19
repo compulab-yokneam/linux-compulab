@@ -1,0 +1,30 @@
+#include "overlay.h"
+#include "som-imx8m-plus_mipi-csi1.dtsi"
+
+&cameradev {
+	status = "okay";
+};
+
+&sensor_mipi1 {
+	compatible = "econ,ar1335_af", "ar1335_af";
+};
+
+&mipi1_ep {
+	data-lanes = <1 2 3 4>;
+};
+
+&mipi1_sensor_ep {
+	data-lanes = <4>;
+};
+
+&isi_0 {
+	status = "okay";
+
+	cap_device {
+		status = "okay";
+	};
+
+	m2m_device {
+		status = "okay";
+	};
+};

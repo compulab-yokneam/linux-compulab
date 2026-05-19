@@ -1,0 +1,6 @@
+#include "overlay.h"
+
+&{/} {
+	model = "CompuLab MCM-iMX8M-Plus (full)";
+	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
+};

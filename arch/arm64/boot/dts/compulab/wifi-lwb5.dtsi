@@ -1,0 +1,58 @@
+&uart4 { /* bluetooth */
+	bluetooth_lwb5: bluetooth {
+		compatible = "brcm,bcm4330-bt";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_bt>;
+		max-speed = <3000000>;
+		device-wakeup-gpios = <&gpio2 7 GPIO_ACTIVE_HIGH>;
+		host-wakeup-gpios = <&gpio2 8 GPIO_ACTIVE_HIGH>;
+		shutdown-gpios = <&gpio2 6 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+
+&usdhc1_pwrseq {
+	reset-gpios =	<&gpio2 10 GPIO_ACTIVE_LOW>; // WIFI res
+};
+
+&usdhc1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc1>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc1_100mhz>, <&pinctrl_usdhc1_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc1_200mhz>, <&pinctrl_usdhc1_gpio>;
+	bus-width = <4>;
+	non-removable;
+	wifi-host;
+	pm-ignore-notify;
+	cap-power-off-card;
+	status = "okay";
+	mmc-pwrseq = <&usdhc1_pwrseq>;
+	keep-power-in-suspend;
+	wakeup-source;
+	fsl,sdio-async-interrupt-enable;
+	brcmf: wifi@1 {
+		compatible = "brcm,bcm4329-fmac";
+		reg = <1>;
+		interrupt-parent = <&gpio2>;
+		interrupts = <9 IRQ_TYPE_LEVEL_HIGH>;
+		interrupt-names = "host-wake";
+		reset-gpios =	<&gpio2 10 GPIO_ACTIVE_LOW>; // WIFI res
+		status = "okay";
+	};
+};
+
+&iomuxc {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_hog_1>;
+
+	wifi-lwb5 {
+		pinctrl_usdhc1_gpio: usdhc1grpgpio {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10	0x06
+			>;
+		};
+	};
+};
+

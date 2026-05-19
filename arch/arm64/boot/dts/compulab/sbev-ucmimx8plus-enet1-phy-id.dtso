@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 CompuLab Ltd.
+ */
+
+#include "overlay.h"
+
+&fec {
+	phy-mode = "rgmii-id";
+};

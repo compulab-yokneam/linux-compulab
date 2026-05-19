@@ -1,0 +1,22 @@
+&iomuxc {
+	mcm-imx8m-mini-rs485 {
+		pinctrl_uart4_rs485: uart4grp_rs485 {
+			fsl,pins = <
+				MX8MM_IOMUXC_ECSPI2_MISO_GPIO5_IO12      0x140
+				MX8MM_IOMUXC_ECSPI2_MOSI_UART4_DCE_TX    0x140
+				MX8MM_IOMUXC_ECSPI2_SCLK_UART4_DCE_RX    0x140
+			>;
+		};
+	};
+};
+
+&uart4 { /* rs485 */
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart4_rs485>;
+	assigned-clocks = <&clk IMX8MM_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
+        linux,rs485-enabled-at-boot-time;
+        rs485-rts-active-high;
+        rts-gpios = <&gpio5 12 GPIO_ACTIVE_HIGH>;
+	status = "okay";
+};

@@ -1,0 +1,114 @@
+&{/} {
+	lvds_panel: panel  {
+		compatible = "panel-lvds";
+		backlight = <&lvds_backlight>;
+		enable-gpios = <&pca9555 3 GPIO_ACTIVE_HIGH>;
+		data-mapping = "vesa-24";
+		width-mm = <154>;
+		height-mm = <90>;
+		status = "okay";
+
+		panel-timing {
+			clock-frequency = <42105000>;
+			hactive = <1024>;
+			vactive = <600>;
+			hback-porch = <30>;
+			hfront-porch = <30>;
+			vback-porch = <10>;
+			vfront-porch = <10>;
+			hsync-len = <30>;
+			vsync-len = <10>;
+			de-active = <1>;
+		};
+
+		port {
+			panel_in: endpoint {
+				remote-endpoint = <&lvds0_out>;
+			};
+		};
+	};
+
+	lvds_backlight: backlight {
+		compatible = "pwm-backlight";
+		pwms = <&tpm4 2 6666667 PWM_POLARITY_INVERTED>;
+		brightness-levels = <255 203 158 119 88 63 45 0>;
+		default-brightness-level = <6>;
+	};
+};
+
+&lvds_backlight {
+	status = "okay";
+};
+
+&display_pixel_link {
+	status = "okay";
+};
+
+&dpu {
+	assigned-clocks = <&scmi_clk IMX95_CLK_DISP1PIX>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1_VCO>,
+			  <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-parents = <&scmi_clk IMX95_CLK_VIDEOPLL1>;
+	assigned-clock-rates = <0>, <4008000000>, <445333334>;
+	status = "okay";
+};
+
+&mipi_dsi {
+	status = "disabled";
+};
+
+&ldb {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	assigned-clocks = <&scmi_clk IMX95_CLK_LDBPLL_VCO>,
+			  <&scmi_clk IMX95_CLK_LDBPLL>;
+	assigned-clock-rates = <2986200000>, <497700000>;
+	/* assigned-clock-rates = <3291120000>, <1097040000>; */
+	status = "okay";
+
+	channel@0 {
+		#address-cells = <1>;
+		#size-cells = <0>;
+		reg = <0>;
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+
+			lvds0_out: endpoint {
+				remote-endpoint = <&panel_in>;
+			};
+		};
+	};
+};
+
+&ldb0_phy {
+	status = "okay";
+};
+
+&pixel_interleaver {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	channel@0 {
+		reg = <0>;
+		status = "okay";
+	};
+};
+
+&tpm4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_tpm4>;
+	status = "okay";
+};
+
+&scmi_iomuxc {
+	pinctrl_tpm4: tpm4grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO13__TPM4_CH2	0x51e
+		>;
+	};
+};
