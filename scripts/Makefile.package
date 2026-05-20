@@ -189,6 +189,12 @@ tar-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar
 tar%-pkg: linux-$(KERNELRELEASE)-$(ARCH).tar.% FORCE
 	@:
 
+cpl-pkgs := cpl-targz-pkg cpl-tarbz2-pkg cpl-tarxz-pkg cpl-tarzst-pkg
+PHONY += $(cpl-pkgs)
+$(cpl-pkgs):
+	$(MAKE) -f $(srctree)/Makefile
+	+$(CONFIG_SHELL) $(srctree)/scripts/package/buildcpl $@
+
 # perf-tar*-src-pkg - generate a source tarball with perf source
 # ---------------------------------------------------------------------------
 
@@ -250,6 +256,10 @@ help:
 	@echo '  perf-tarbz2-src-pkg - Build the perf source tarball with bz2 compression'
 	@echo '  perf-tarxz-src-pkg  - Build the perf source tarball with xz compression'
 	@echo '  perf-tarzst-src-pkg - Build the perf source tarball with zst compression'
+	@echo '  cpl-targz-pkg       - Build the kernel as a gzip compressed tarball (CompuLab layout)'
+	@echo '  cpl-tarbz2-pkg      - Build the kernel as a bzip2 compressed tarball (CompuLab layout)'
+	@echo '  cpl-tarxz-pkg       - Build the kernel as a xz compressed tarball (CompuLab layout)'
+	@echo '  cpl-tarzst-pkg      - Build the kernel as a zstd compressed tarball (CompuLab layout)'
 
 PHONY += FORCE
 FORCE:
