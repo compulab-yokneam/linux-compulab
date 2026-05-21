@@ -1,18 +1,6 @@
-#include <dt-bindings/usb/pd.h>
 #include "../freescale/imx95.dtsi"
 
 &scmi_iomuxc {
-#if 0
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_hog>;
-
-	pinctrl_hog: hog1grp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO15__GPIO2_IO_BIT15		0xc51e
-			IMX95_PAD_GPIO_IO14__GPIO2_IO_BIT14		0xc51e
-		>;
-	};
-#endif
 	pinctrl_pwrled: pwrledgrp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO24__GPIO2_IO_BIT24		0xc51e
@@ -42,12 +30,6 @@
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO25__CAN2_TX			0x39e
 			IMX95_PAD_GPIO_IO27__CAN2_RX			0x39e
-		>;
-	};
-
-	pinctrl_hp: hpgrp {
-		fsl,pins = <
-			IMX95_PAD_GPIO_IO11__GPIO2_IO_BIT11		0x31e
 		>;
 	};
 
@@ -100,6 +82,13 @@
 		>;
 	};
 
+	pinctrl_lpi2c8: lpi2c8grp {
+		fsl,pins = <
+			IMX95_PAD_GPIO_IO10__LPI2C8_SDA			0x40000b9e
+			IMX95_PAD_GPIO_IO11__LPI2C8_SCL			0x40000b9e
+		>;
+	};
+
 	pinctrl_uart1: uart1grp {
 		fsl,pins = <
 			IMX95_PAD_UART1_RXD__AONMIX_TOP_LPUART1_RX      0x31e
@@ -118,14 +107,14 @@
 
 	pinctrl_pcie0: pcie0grp {
 		fsl,pins = <
-			IMX95_PAD_GPIO_IO32__HSIOMIX_TOP_PCIE1_CLKREQ_B		0x40000b1e
+			IMX95_PAD_GPIO_IO32__HSIOMIX_TOP_PCIE1_CLKREQ_B		0x4000031e
 			IMX95_PAD_GPIO_IO35__GPIO5_IO_BIT15                     0x3fe
 		>;
 	};
 
 	pinctrl_pcie1: pcie1grp {
 		fsl,pins = <
-			/*IMX95_PAD_GPIO_IO35__HSIOMIX_TOP_PCIE2_CLKREQ_B	0x40000b1e*/
+			IMX95_PAD_GPIO_IO35__HSIOMIX_TOP_PCIE2_CLKREQ_B		0x4000031e
 			IMX95_PAD_GPIO_IO18__GPIO2_IO_BIT18                    0x3fe
 		>;
 	};
@@ -139,11 +128,16 @@
 		>;
 	};
 
+	pinctrl_emdio: emdiogrp{
+		fsl,pins = <
+			IMX95_PAD_ENET1_MDC__NETCMIX_TOP_NETC_MDC		0x57e
+			IMX95_PAD_ENET1_MDIO__NETCMIX_TOP_NETC_MDIO		0x97e
+		>;
+	};
+
 	pinctrl_enetc0: enetc0grp {
 		fsl,pins = <
 			IMX95_PAD_GPIO_IO33__GPIO5_IO_BIT13			0x3fe
-			IMX95_PAD_ENET1_MDC__NETCMIX_TOP_NETC_MDC		0x57e
-			IMX95_PAD_ENET1_MDIO__NETCMIX_TOP_NETC_MDIO		0x97e
 			IMX95_PAD_ENET1_TD3__NETCMIX_TOP_ETH0_RGMII_TD3		0x57e
 			IMX95_PAD_ENET1_TD2__NETCMIX_TOP_ETH0_RGMII_TD2		0x57e
 			IMX95_PAD_ENET1_TD1__NETCMIX_TOP_ETH0_RGMII_TD1		0x57e

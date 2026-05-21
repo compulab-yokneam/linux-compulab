@@ -1,10 +1,48 @@
 DTC_FLAGS := -@
+
+# An old school style -- all included
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95.dtb
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-lvds.dtbo
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-ezurio.dtb
 
+# overlays
+dtb-$(CONFIG_ARCH_MXC) += imx95-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-wm8962.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-rpmsg.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-spidev.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-ap1302.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi2-ap1302.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx95-csi1-imx477.dtbo
+
+# A modern style -- all overlayed
 ucm-imx95-evk-dtbs := ucm-imx95-som.dtb \
-		ucm-imx95-lvds.dtbo
+		imx95-lvds.dtbo \
+		imx95-wm8962.dtbo \
+		ucm-imx95-evk.dtbo
 
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk.dtb
+
+ucm-imx95-rpmsg-dtbs := ucm-imx95-som.dtb \
+		imx95-rpmsg.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-rpmsg.dtb
+
+ucm-imx95-evk-csi1-ap1302-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi1-ap1302.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi1-ap1302.dtb
+
+ucm-imx95-evk-csi2-ap1302-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi2-ap1302.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi2-ap1302.dtb
+
+ucm-imx95-evk-csi1-imx219-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi1-imx219.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi1-imx219.dtb
+
+ucm-imx95-evk-csi1-imx477-dtbs := ucm-imx95-evk.dtb \
+		imx95-csi1-imx477.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx95-evk-csi1-imx477.dtb

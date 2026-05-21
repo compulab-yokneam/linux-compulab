@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2023 NXP
+ * Copyright 2024 NXP
  */
 
 /dts-v1/;
@@ -10,11 +10,12 @@
 #include <dt-bindings/leds/common.h>
 #include <dt-bindings/pwm/pwm.h>
 #include <dt-bindings/usb/pd.h>
+#include "../freescale/imx95-clock.h"
 #include "../freescale/imx95.dtsi"
 #include "ucm-imx95-pinctrl.dtsi"
 
-#define FALLING_EDGE		BIT(0)
-#define RISING_EDGE		BIT(1)
+#define FALLING_EDGE		1
+#define RISING_EDGE		2
 
 #define BRD_SM_CTRL_SD3_WAKE		0x8000	/*!< PCAL6408A-0 */
 #define BRD_SM_CTRL_PCIE1_WAKE		0x8001	/*!< PCAL6408A-4 */
@@ -23,10 +24,13 @@
 #define BRD_SM_CTRL_BUTTON		0x8004	/*!< PCAL6408A-7 */
 
 / {
-	model = "NXP i.MX95 19X19 board";
+	model = "CompuLab i.MX95 19x19 SOM";
 	compatible = "compulab,ucm-imx95", "fsl,imx95";
 
 	aliases {
+		mmc0 = &usdhc1;
+		mmc1 = &usdhc2;
+		serial0 = &lpuart1;
 		ethernet0 = &enetc_port0;
 		ethernet1 = &enetc_port1;
 	};
@@ -41,6 +45,11 @@
 			compatible = "xen,linux-zimage", "xen,multiboot-module";
 			reg = <0x00000000 0x9e000000 0x00000000 0x2000000>;
 		};
+	};
+
+	memory@80000000 {
+		device_type = "memory";
+		reg = <0x0 0x80000000 0 0x80000000>;
 	};
 
 	gpio-leds {
@@ -59,16 +68,9 @@
 
 	fan0: pwm-fan {
 		compatible = "pwm-fan";
-		cooling-min-state = <0>;
-		cooling-max-state = <3>;
 		#cooling-cells = <2>;
 		pwms = <&tpm6 2 4000000 PWM_POLARITY_INVERTED>;
 		cooling-levels = <64 128 192 255>;
-	};
-
-	memory@80000000 {
-		device_type = "memory";
-		reg = <0x0 0x80000000 0 0x80000000>;
 	};
 
 	reserved-memory {
@@ -78,14 +80,19 @@
 
 		linux_cma: linux,cma {
 			compatible = "shared-dma-pool";
-			reusable;
+			alloc-ranges = <0 0x80000000 0 0x7f000000>;
 			size = <0 0x3c000000>;
-			alloc-ranges = <0 0x80000000 0 0x7F000000>;
 			linux,cma-default;
+			reusable;
 		};
 
 		vpu_boot: vpu_boot@a0000000 {
 			reg = <0 0xa0000000 0 0x100000>;
+			no-map;
+		};
+
+		mali_protected: mali_protected {
+			reg = <0 0xa0100000 0 0x1000000>;
 			no-map;
 		};
 
@@ -126,20 +133,6 @@
 		regulator-name = "audio-pwr";
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
-	};
-
-	reg_1p8v: regulator-1p8v {
-		compatible = "regulator-fixed";
-		regulator-max-microvolt = <1800000>;
-		regulator-min-microvolt = <1800000>;
-		regulator-name = "+V1.8_SW";
-	};
-
-	reg_3p3v: regulator-3p3v {
-		compatible = "regulator-fixed";
-		regulator-max-microvolt = <3300000>;
-		regulator-min-microvolt = <3300000>;
-		regulator-name = "+V3.3_SW";
 	};
 
 	reg_can1_stby: regulator-can1-stby {
@@ -234,26 +227,11 @@
 			  &mu7 3 1>;
 		memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
 				<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+		/* cpuid and lmmid must align with SM firmware */
+		fsl,cpu-id = <1>;
+		fsl,lmm-id = <1>;
 		fsl,startup-delay-ms = <50>;
 		status = "okay";
-	};
-
-	sound-wm8962 {
-		compatible = "fsl,imx-audio-wm8962";
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_hp>;
-		model = "wm8962-audio";
-		audio-cpu = <&sai3>;
-		audio-codec = <&wm8962>;
-		hp-det-gpio = <&gpio2 11 GPIO_ACTIVE_HIGH>;
-		audio-routing =
-			"Headphone Jack", "HPOUTL",
-			"Headphone Jack", "HPOUTR",
-			"Ext Spk", "SPKOUTL",
-			"Ext Spk", "SPKOUTR",
-			"AMIC", "MICBIAS",
-			"IN3R", "AMIC",
-			"IN1R", "AMIC";
 	};
 
 	sound-micfil {
@@ -291,6 +269,12 @@
 			sound-dai = <&bt_sco_codec 1>;
 		};
 	};
+
+	mali_pma: protected-memory-allocator {
+		 compatible = "arm,protected-memory-allocator";
+		 memory-region = <&mali_protected>;
+	};
+
 };
 
 &adc1 {
@@ -306,10 +290,8 @@
 	status = "okay";
 };
 
-&tpm3 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_tpm3>;
-	status = "okay";
+&mali {
+	protected-memory-allocator = <&mali_pma>;
 };
 
 &tpm6 {
@@ -327,14 +309,17 @@
 	status = "disabled";
 };
 
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_flexcan2>;
+	status = "okay";
+};
+
 &flexspi1 {
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_flexspi1>;
 	pinctrl-1 = <&pinctrl_flexspi1>;
 	status = "disabled";
-
-	/* TODO: switch to use reset-gpios */
-	//reset-gpios = <&gpio5 11 GPIO_ACTIVE_LOW>;
 
 	pinctrl-assert-gpios = <&gpio5 11 GPIO_ACTIVE_HIGH>;
 
@@ -395,28 +380,6 @@
 	pinctrl-1 = <&pinctrl_lpi2c3>;
 	status = "okay";
 
-	wm8962: codec@1a {
-		compatible = "wlf,wm8962";
-		reg = <0x1a>;
-		clocks = <&scmi_clk IMX95_CLK_SAI3>;
-		DCVDD-supply = <&reg_audio_pwr>;
-		DBVDD-supply = <&reg_audio_pwr>;
-		AVDD-supply = <&reg_audio_pwr>;
-		CPVDD-supply = <&reg_audio_pwr>;
-		MICVDD-supply = <&reg_audio_pwr>;
-		PLLVDD-supply = <&reg_audio_pwr>;
-		SPKVDD1-supply = <&reg_audio_pwr>;
-		SPKVDD2-supply = <&reg_audio_pwr>;
-		gpio-cfg = <
-			0x0000 /* 0:Default */
-			0x0000 /* 1:Default */
-			0x0000 /* 2:FN_DMICCLK */
-			0x0000 /* 3:Default */
-			0x0000 /* 4:FN_DMICCDAT */
-			0x0000 /* 5:Default */
-		>;
-	};
-
 	pca9555: gpio@20 {
 		compatible = "nxp,pca9555";
 		reg = <0x20>;
@@ -470,6 +433,16 @@
 	pinctrl-0 = <&pinctrl_lpi2c7>;
 	pinctrl-1 = <&pinctrl_lpi2c7>;
         status = "disabled";
+};
+
+&lpi2c8 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <1000000>;
+	pinctrl-names = "default", "sleep";
+	pinctrl-0 = <&pinctrl_lpi2c8>;
+	pinctrl-1 = <&pinctrl_lpi2c8>;
+	status = "disabled";
 };
 
 &lpuart1 {
@@ -569,18 +542,26 @@
 	status = "okay";
 };
 
-&netc_prb_ierb {
-	netc-interfaces = <NXP_NETC_RGMII
-			   NXP_NETC_RGMII>;
+&neoisp0 {
+	status = "okay";
+};
+
+&netcmix_blk_ctrl {
+	status = "okay";
+};
+
+&netc_blk_ctrl {
+	status = "okay";
 };
 
 &netc_emdio {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_emdio>;
 	status = "okay";
 
 	ethphy0: ethernet-phy@1 {
 		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <1>;
-		eee-broken-1000t;
 		reset-gpios = <&gpio5 13 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <10000>;
 		reset-deassert-us = <80000>;
@@ -590,7 +571,6 @@
 	ethphy1: ethernet-phy@4 {
 		compatible = "ethernet-phy-ieee802.3-c22";
 		reg = <4>;
-		eee-broken-1000t;
 		reset-gpios = <&gpio4 14 GPIO_ACTIVE_LOW>;
 		reset-assert-us = <10000>;
 		reset-deassert-us = <80000>;
@@ -606,7 +586,7 @@
 };
 
 &thermal_zones {
-	a55 {
+	a55-thermal {
 		trips {
 			atrip2: trip2 {
 				temperature = <55000>;
@@ -734,17 +714,17 @@
 	status = "okay";
 };
 
-&scmi_misc {
-	wakeup-sources = <BRD_SM_CTRL_SD3_WAKE		1
-			  BRD_SM_CTRL_PCIE1_WAKE	1
-			  BRD_SM_CTRL_BT_WAKE		1
-			  BRD_SM_CTRL_PCIE2_WAKE	1
-			  BRD_SM_CTRL_BUTTON		1>;
-};
-
 &vpuctrl {
 	boot = <&vpu_boot>;
 	sram = <&sram1>;
+};
+
+&scmi_misc {
+	nxp,ctrl-ids = <BRD_SM_CTRL_SD3_WAKE	FALLING_EDGE
+			BRD_SM_CTRL_PCIE1_WAKE	FALLING_EDGE
+			BRD_SM_CTRL_BT_WAKE	FALLING_EDGE
+			BRD_SM_CTRL_PCIE2_WAKE	FALLING_EDGE
+			BRD_SM_CTRL_BUTTON	FALLING_EDGE>;
 };
 
 &wdog3 {
@@ -754,18 +734,25 @@
 &pcie0 {
 	pinctrl-0 = <&pinctrl_pcie0>;
 	pinctrl-names = "default";
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
 	reset-gpio = <&gpio5 15 GPIO_ACTIVE_LOW>;
 	vpcie-supply = <&reg_pcie0>;
+	supports-clkreq;
 	status = "okay";
+};
+
+&pcie0_ep {
+	pinctrl-0 = <&pinctrl_pcie0>;
+	pinctrl-names = "default";
+	vpcie-supply = <&reg_pcie0>;
+	status = "disabled";
 };
 
 &pcie1 {
 	pinctrl-0 = <&pinctrl_pcie1>;
 	pinctrl-names = "default";
-	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
 	reset-gpio = <&gpio2 18 GPIO_ACTIVE_LOW>;
 	vpcie-supply = <&reg_slot_pwr>;
+	supports-clkreq;
 	status = "okay";
 };
 

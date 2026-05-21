@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2026 CompuLab Ltd.
+ * Copyright 2024 CompuLab
  */
 
 #include "ucm-imx95-som.dts"
-#include "ucm-imx95-lvds.dtsi"
+#include "imx95-lvds.dtsi"
+#include "imx95-wm8962.dtsi"
