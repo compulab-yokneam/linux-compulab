@@ -1,0 +1,85 @@
+&{/} {
+	model = "CompuLab i.MX95 19x19 SOM (rpmsg)";
+
+	reserved-memory {
+		#address-cells = <2>;
+		#size-cells = <2>;
+		m7_reserved: m7@80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		micfil_reserved: micfil-rpmsg@81000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x81000000 0 0x100000>;
+			no-map;
+		};
+
+		audio_reserved: audio-rpmsg@c0000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xc0000000 0 0x10000000>;
+			no-map;
+		};
+	};
+
+	sound-wm8962 {
+		status = "disabled";
+	};
+
+	sound-micfil {
+		status = "disabled";
+	};
+
+	sound-bt-sco {
+		status = "disabled";
+	};
+};
+
+&reg_audio_pwr {
+	/delete-property/ gpio;
+};
+
+&sai3 {
+	status = "disabled";
+};
+
+&micfil {
+	status = "disabled";
+};
+
+&edma1{
+	status = "disabled";
+};
+
+&edma2{
+	status = "disabled";
+};
+
+&lpuart5 {
+	status = "disabled";
+};
+
+&lpi2c2 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c3 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c5 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c6 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c7 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};

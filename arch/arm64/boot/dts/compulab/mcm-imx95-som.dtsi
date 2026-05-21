@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: (GPL-2.0+ OR MIT)
 /*
- * Copyright 2026 CompuLab Ltd.
+ * Copyright 2025 Compulab
  */
 
 #include <dt-bindings/phy/phy-imx8-pcie.h>
@@ -471,11 +471,6 @@
 
 &netc_timer {
 	status = "okay";
-};
-
-&netc_prb_ierb {
-	netc-interfaces = <NXP_NETC_RGMII
-			   NXP_NETC_RGMII>;
 };
 
 &usb2 {
