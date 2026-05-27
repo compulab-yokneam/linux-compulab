@@ -1,0 +1,17 @@
+#include "overlay.h"
+#include "../freescale/imx93-pinfunc.h"
+
+&lpuart5 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart5_rs485>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_uart5_rs485: uart5grp {
+		fsl,pins = <
+			MX93_PAD_GPIO_IO01__LPUART5_RX		0x31e
+			MX93_PAD_GPIO_IO00__LPUART5_TX		0x31e
+		>;
+	};
+};

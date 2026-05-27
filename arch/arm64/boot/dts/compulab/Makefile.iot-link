@@ -1,0 +1,6 @@
+dtb-$(CONFIG_SOC_IMX9) += iot-link.dtb
+dtb-$(CONFIG_SOC_IMX9) += iot-link-cam.dtb
+dtb-$(CONFIG_SOC_IMX9) += iot-link-btattach.dtb
+# overlays
+dtb-$(CONFIG_SOC_IMX9) += iot-link-fars485.dtbo
+dtb-$(CONFIG_SOC_IMX9) += iot-link-fbrs485.dtbo

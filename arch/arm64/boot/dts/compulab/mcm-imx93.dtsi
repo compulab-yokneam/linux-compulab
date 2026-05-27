@@ -18,8 +18,10 @@
 		rtc1 = &bbnsm_rtc;
 		ethernet0 = &eqos;
 	};
+
 	chosen {
 		stdout-path = &lpuart1;
+		bootargs = "console=ttyLP0,115200 earlycon root=/dev/sda2 rootwait rw net.ifnames=0";
 	};
 
 	leds:leds {
