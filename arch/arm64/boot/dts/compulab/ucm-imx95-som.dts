@@ -672,6 +672,21 @@
 	};
 };
 
+&cpu_alert0 {
+	temperature = <95000>;
+};
+
+&cpu_crit0 {
+	temperature = <105000>;
+};
+&ana_alert {
+	temperature = <95000>;
+};
+
+&ana_crit0 {
+	temperature = <105000>;
+};
+
 &usb3 {
 	status = "okay";
 };
