@@ -1,0 +1,17 @@
+#include "overlay.h"
+#include "../freescale/imx93-pinfunc.h"
+
+&flexcan1 {
+       pinctrl-names = "default";
+       pinctrl-0 = <&pinctrl_flexcan1>;
+       status = "okay";
+};
+
+&iomuxc {
+       pinctrl_flexcan1: flexcan1grp {
+               fsl,pins = <
+                       MX93_PAD_SAI1_TXD0__CAN1_TX     0x139e
+                       MX93_PAD_SAI1_TXC__CAN1_RX      0x139e
+               >;
+       };
+};
