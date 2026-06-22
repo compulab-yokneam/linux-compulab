@@ -18,3 +18,15 @@ iotdin-imx8p-usbdev-dtbs := iotdin-imx8p.dtb ucm-imx8m-plus-usbdev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-usbdev.dtb
 # Overlays
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
+
+# IOT-GATE-IMX8PV2 overlays
+## Common
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-hdmi.dtbo
+
+# IOT-GATE-IMX8PV2 device tree
+dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8pv2-headless.dtb
+
+iot-gate-imx8pv2-dtbs := iot-gate-imx8pv2-headless.dtb \
+		iotg-imx8pv2-hdmi.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8pv2.dtb
