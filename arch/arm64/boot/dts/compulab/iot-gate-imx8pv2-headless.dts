@@ -5,7 +5,9 @@
 
 #include "ucm-imx8m-plus.dtsi"
 #include "ucm-imx8m-plus-pcie.dtsi"
+#include "ucm-imx8m-plus-can.dtsi"
 #include "sb-iotgimx8pv2.dtsi"
+#include "iotg-imx8pv2-sio.dtsi"
 
 / {
 	model = "CompuLab IOT-GATE-IMX8PV2";

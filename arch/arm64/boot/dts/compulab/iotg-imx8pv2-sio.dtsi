@@ -1,0 +1,212 @@
+/*
+ * Copyright 2026 CompuLab
+ */
+
+/******** IOT-GATE-IMX8PV2 Industrial I/O ********/
+
+/* EN_5V_ISO1 */
+&{/} {
+	reg_en_5v_iso1: regulator-en-5v-iso1 {
+		compatible = "regulator-fixed";
+		regulator-name = "5V_EN_ISO1_REG";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		gpio = <&pca9555_sb 15 GPIO_ACTIVE_HIGH>;
+		regulator-always-on;
+		/* By default, it remains disabled and can only be enabled
+		   by adding an ad-hoc device tree overlay with the
+		   'enable-active-high' property specified
+		*/
+	};
+};
+
+/******** Industrial I/O Part A ********/
+/* MUX SEL A */
+&gpio4 {
+	status = "okay";
+
+	sel_a: sel-a {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sel_a>;
+		gpio-hog;
+		gpios = <30 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+};
+
+/* CAN A */
+can_a: &flexcan2 {
+	status = "disabled";
+};
+
+/* RS485 A */
+rs485_a: &uart3 {
+	status = "disabled";
+};
+/******** Industrial I/O Part A - End ********/
+
+/******** Industrial I/O Part B ********/
+/* MUX SEL B */
+&gpio5 {
+	status = "okay";
+
+	sel_b: sel-b {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sel_b>;
+		gpio-hog;
+		gpios = <1 GPIO_ACTIVE_HIGH>;
+		status = "disabled";
+	};
+};
+
+/* CAN B */
+can_b: &flexcan1 {
+	status = "disabled";
+};
+
+/* RS485 B */
+rs485_b: &uart1 {
+	status = "disabled";
+};
+/******** Industrial I/O Part B - End ********/
+
+/******** Industrial I/O: DIxOx ********/
+/******** Digital Inputs ********/
+/*
+ * By default, all Digital Inputs (DIs) are enabled.
+ * In this implementation, the underlying GPIOs are configured
+ * as inputs with the pull-down enabled.
+ * As a result, these GPIOs are accessible from userspace.
+ *
+ * To disable a specific DI, the corresponding GPIO must be hogged
+ * as an input by means of an ad-hoc device tree overlay.
+ */
+
+&gpio3 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_di0_di1>;
+	status = "okay";
+
+	di0_dis: di_0_dis@0 {
+		gpio-hog;
+		gpios = <19 GPIO_ACTIVE_HIGH>;
+		input;
+		line-name = "DI0 disabled";
+		status = "disabled";
+	};
+	di1_dis: di_1_dis@1 {
+		gpio-hog;
+		gpios = <20 GPIO_ACTIVE_HIGH>;
+		input;
+		line-name = "DI1 disabled";
+		status = "disabled";
+	};
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_di2_di3>;
+	status = "okay";
+
+	di2_dis: di_2_dis@2 {
+		gpio-hog;
+		gpios = <20 GPIO_ACTIVE_HIGH>;
+		input;
+		line-name = "DI2 disabled";
+		status = "disabled";
+	};
+	di3_dis: di_3_dis@3 {
+		gpio-hog;
+		gpios = <10 GPIO_ACTIVE_HIGH>;
+		input;
+		line-name = "DI3 disabled";
+		status = "disabled";
+	};
+};
+/******** Digital Inputs - End ********/
+
+/******** Digital Ouputs ********/
+/*
+ * By default, all Digital Outputs (DOs) are disabled.
+ * In this implementation, all underlying GPIOs are configured
+ * as outputs driven to the low state (gpio-hog).
+ * As a result, these GPIOs cannot be accessed from userspace.
+ *
+ * To enable a specific DO, the underlying output GPIO must be un-hogged
+ * by means of an ad-hoc device tree overlay.
+ */
+&pca9555_sb {
+	do0_dis: do_0_dis@0 {
+		gpio-hog;
+		gpios = <4 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "DO0 disabled";
+		status = "okay";
+	};
+	do1_dis: do_1_dis@1 {
+		gpio-hog;
+		gpios = <5 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "DO1 disabled";
+		status = "okay";
+	};
+	do2_dis: do_2_dis@2 {
+		gpio-hog;
+		gpios = <6 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "DO2 disabled";
+		status = "okay";
+};
+	do3_dis: do_3_dis@3 {
+		gpio-hog;
+		gpios = <7 GPIO_ACTIVE_HIGH>;
+		output-low;
+		line-name = "DO3 disabled";
+		status = "okay";
+	};
+};
+/******** Digital Ouputs - End ********/
+/******** Industrial I/O: DIxOx - End ********/
+
+&iomuxc {
+	pinctrl_flexcan1: flexcan1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_TX__CAN1_TX				0x154
+			MX8MP_IOMUXC_SAI2_TXC__CAN1_RX				0x154
+		>;
+	};
+
+	pinctrl_di0_di1: di0di1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19			0x100 /* DI0 */
+			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20			0x100 /* DI1 */
+		>;
+	};
+	pinctrl_di2_di3: di2di3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20				0x100 /* DI2 */
+			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10			0x100 /* DI3 */
+		>;
+	};
+
+	pinctrl_sel_a: selagrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_RXD__GPIO4_IO30			0x140 /* SEL_A */
+		>;
+	};
+
+	pinctrl_sel_b: selbgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_TXD__GPIO5_IO01			0x140 /* SEL_B */
+		>;
+	};
+
+	pinctrl_uart1: uart1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_RXC__UART1_DCE_RX			0x140
+			MX8MP_IOMUXC_SAI2_RXFS__UART1_DCE_TX			0x140
+		>;
+	};
+};
+
+/******** IOT-GATE-IMX8PV2 Industrial I/O - End ********/

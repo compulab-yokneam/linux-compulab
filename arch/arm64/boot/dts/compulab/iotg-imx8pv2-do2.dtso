@@ -1,0 +1,13 @@
+#include "overlay.h"
+
+/* Disable Digital Input 2 by applying a hog configuration to the underlying GPIO. */
+
+&di2_dis {
+	status = "okay";
+};
+
+/* Enable Digital Output 2 by removing the hog configuration from the underlying GPIO. */
+&do2_dis {
+	status = "disabled";
+};
+

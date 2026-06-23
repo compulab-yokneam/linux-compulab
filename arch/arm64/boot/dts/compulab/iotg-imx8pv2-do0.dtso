@@ -1,0 +1,13 @@
+#include "overlay.h"
+
+/* Disable Digital Input 0 by applying a hog configuration to the underlying GPIO. */
+
+&di0_dis {
+	status = "okay";
+};
+
+/* Enable Digital Output 0 by removing the hog configuration from the underlying GPIO. */
+&do0_dis {
+	status = "disabled";
+};
+

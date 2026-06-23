@@ -1,0 +1,13 @@
+#include "overlay.h"
+
+/* Disable Digital Input 3 by applying a hog configuration to the underlying GPIO. */
+
+&di3_dis {
+	status = "okay";
+};
+
+/* Enable Digital Output 3 by removing the hog configuration from the underlying GPIO. */
+&do3_dis {
+	status = "disabled";
+};
+

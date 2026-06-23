@@ -1,0 +1,23 @@
+#include "overlay.h"
+
+/* Enable ISO1_5V */
+&reg_en_5v_iso1 {
+	enable-active-high;
+};
+
+/* Enable CAN A interface */
+&can_a {
+	status = "okay";
+};
+
+/* Disable RS485 A interface */
+&rs485_a {
+	status = "disabled";
+};
+
+/* Select CAN signals on the MUX-A */
+&sel_a {
+	output-low;
+	line-name = "SEL_A_CAN";
+	status = "okay";
+};

@@ -26,6 +26,15 @@ dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-hdmi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-modem.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-nvme.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-wifi.dtbo
+## User-defined configuration
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-can-a.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-rs485-a.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-can-b.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-rs485-b.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-do0.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-do1.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-do2.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-do3.dtbo
 
 # IOT-GATE-IMX8PV2 device tree
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8pv2-headless.dtb
