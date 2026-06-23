@@ -4,6 +4,7 @@
  */
 
 #include "ucm-imx8m-plus.dtsi"
+#include "ucm-imx8m-plus-pcie.dtsi"
 #include "sb-iotgimx8pv2.dtsi"
 
 / {

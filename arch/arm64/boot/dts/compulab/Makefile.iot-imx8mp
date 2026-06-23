@@ -24,6 +24,7 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-hdmi.dtbo
 ## Optional device configuration
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-modem.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-wifi.dtbo
 
 # IOT-GATE-IMX8PV2 device tree
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8pv2-headless.dtb
