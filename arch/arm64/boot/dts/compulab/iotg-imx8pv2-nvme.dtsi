@@ -1,0 +1,29 @@
+/*
+ * Copyright 2026 CompuLab
+ */
+
+/* PCIE_MUX_SEL: '0' - WIFI, '1' - NVME/HAILO */
+&pcie_mux_sel {
+	output-low;
+	line-name = "PCIE_SEL_NVME";
+	status = "okay";
+};
+
+&pcie {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_pcie>;
+	reset-gpio = <&gpio5 5 GPIO_ACTIVE_LOW>;
+	status = "okay";
+};
+
+&pcie_phy {
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_pcie: pciegrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_EXT_CLK__GPIO5_IO05			0x140
+		>;
+	};
+};
