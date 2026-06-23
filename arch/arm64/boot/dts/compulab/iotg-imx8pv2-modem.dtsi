@@ -1,0 +1,23 @@
+/*
+ * Copyright 2026 CompuLab
+ */
+
+/*
+ * The modem emergency reset mechanism for the Compulab IOT-GATE-IMX8PV2.
+ * The modem reset circuit is implemented as a gpio-led device
+ * with the 'oneshot' trigger bound to it.
+ */
+
+&{/} {
+	modem_rst_ctrl: modem-rst-ctrl {
+		compatible = "gpio-leds";
+		status = "okay";
+
+		modem_rst: modem-rst {
+			label = "MODEM_RSTn";
+			gpios = <&pca9555_sb 11 GPIO_ACTIVE_HIGH>;
+			linux,default-trigger = "oneshot";
+			led-pattern = <300 300>;
+		};
+	};
+};
