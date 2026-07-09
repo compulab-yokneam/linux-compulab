@@ -22,6 +22,7 @@ dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
 # IOT-GATE-IMX8PV2 overlays
 ## Common
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-cmd-button.dtbo
 ## Optional device configuration
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-modem.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotg-imx8pv2-nvme.dtbo

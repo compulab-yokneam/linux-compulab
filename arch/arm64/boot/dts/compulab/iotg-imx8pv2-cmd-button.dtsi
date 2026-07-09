@@ -1,0 +1,31 @@
+/*
+ * Copyright 2026 CompuLab
+ */
+
+/*
+ * Configure the CMD button on the Compulab IOT-GATE-IMX8PV2.
+ * The CMD button is implemented as gpio-keys device.
+ */
+
+&{/} {
+	gpio_keys: gpio-keys {
+		compatible = "gpio-keys";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpiokeys>;
+		autorepeat;
+
+		config-button {
+			label = "config-button";
+			gpios = <&gpio4 12 GPIO_ACTIVE_LOW>;
+			linux,code = <KEY_CONFIG>;
+		};
+	};
+};
+
+&iomuxc {
+	pinctrl_gpiokeys: gpiokeysgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI1_TXD0__GPIO4_IO12			0x140 /* SYS_CONFIG pushbutton */
+		>;
+	};
+};
