@@ -21,6 +21,7 @@ dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-can.dtbo
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx8m-plus-cma.dtbo
 dtb-$(CONFIG_ARCH_MXC) += compulab-imx8m-plus-rpmsg.dtbo
 dtb-$(CONFIG_ARCH_MXC) += compulab-imx8m-plus-thermal.dtbo
+dtb-$(CONFIG_ARCH_MXC) += compulab-imx8m-gpio-wdt.dtbo
 
 # sbev-ucmimx8plus
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus.dtbo
@@ -56,6 +57,11 @@ sbev-ucmimx8plus-headless-dtbs := ucm-imx8m-plus-sbev.dtb \
 		sbev-ucmimx8plus-p18_gpio.dtbo \
 		sbev-ucmimx8plus-p19_uart-b.dtbo \
 		sbev-ucmimx8plus-p20_uart-a.dtbo
+
+sbev-ucmimx8plus-wdt-dtbs := ucm-imx8m-plus-sbev.dtb \
+		compulab-imx8m-gpio-wdt.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-wdt.dtb
 
 dtb-$(CONFIG_ARCH_MXC) += sbev-ucmimx8plus-headless.dtb
 

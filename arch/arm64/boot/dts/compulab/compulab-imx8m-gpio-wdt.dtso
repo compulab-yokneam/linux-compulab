@@ -1,0 +1,25 @@
+#include "overlay.h"
+#include <dt-bindings/gpio/gpio.h>
+
+&{/} {
+    overlay_desc = "CompuLab SOM with wdt-gpio-ext";
+    watchdog {
+        compatible = "linux,wdt-gpio-ext";
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpio_wdt>;
+        ping-gpios = <&gpio1 0 GPIO_ACTIVE_LOW>;
+        enable-gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>; 
+        hw_algo = "level";
+        hw_margin_ms = <1600>;
+        status = "okay";
+    };
+};
+
+&iomuxc {
+    pinctrl_gpio_wdt: gpio_wdt {
+        fsl,pins = <
+            MX8MP_IOMUXC_GPIO1_IO00__GPIO1_IO00     0x1c2
+            MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01     0x1c2
+        >;
+    };
+};
