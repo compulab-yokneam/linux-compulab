@@ -8,7 +8,19 @@
 #include "ucm-imx8m-plus-pcie.dtsi"
 #include "sb-iotdimx8p.dtsi"
 
+/delete-node/ &gpu_reserved;
+/delete-node/ &dsp_reserved_heap;
+/delete-node/ &dsp_reserved;
+
 / {
 	model = "CompuLab IOTDIN-IMX8P";
 	compatible = "compulab,iotdin-imx8p", "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+};
+
+&mix_gpu_ml {
+	/delete-property/ memory-region;
+};
+
+&dsp {
+	/delete-property/ memory-region;
 };
