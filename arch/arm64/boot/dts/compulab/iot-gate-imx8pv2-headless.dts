@@ -12,4 +12,7 @@
 / {
 	model = "CompuLab IOT-GATE-IMX8PV2";
 	compatible = "compulab,iot-gate-imx8pv2", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+	prod.info {
+		prod.name = "iot-gate-imx8pv2";
+	};
 };
