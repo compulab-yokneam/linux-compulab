@@ -11,4 +11,7 @@
 / {
 	model = "CompuLab IOTDIN-IMX8P";
 	compatible = "compulab,iotdin-imx8p", "compulab,iot-gate-imx8plus", "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
+	prod.info {
+		prod.name = "iotdin-imx8p";
+	};
 };
