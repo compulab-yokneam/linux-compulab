@@ -1,0 +1,4 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+
+#include "overlay952.h"
+#include "imx952-spidev.dtsi"

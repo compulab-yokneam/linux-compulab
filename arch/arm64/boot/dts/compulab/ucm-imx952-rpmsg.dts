@@ -1,0 +1,127 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 NXP
+ */
+
+/dts-v1/;
+
+#include "ucm-imx952-som.dts"
+
+/ {
+	model = "CompuLab i.MX952 19x19 SOM (RPMsg)";
+
+	reserved-memory {
+		linux_cma: linux,cma {
+			compatible = "shared-dma-pool";
+			alloc-ranges = <0 0x80000000 0 0x7F000000>;
+			size = <0 0x2e000000>;
+			linux,cma-default;
+			reusable;
+		};
+
+		m7_reserved: m7@80000000 {
+			no-map;
+			reg = <0 0x80000000 0 0x1000000>;
+		};
+
+		micfil_reserved: micfil-rpmsg@81000000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0x81000000 0 0x100000>;
+			no-map;
+		};
+
+	};
+
+	rpmsg_micfil: rpmsg-micfil {
+		compatible = "fsl,imx95-rpmsg-audio";
+		model = "micfil-audio";
+		fsl,rpmsg-channel-name = "rpmsg-micfil-channel";
+		fsl,enable-lpa;
+		fsl,rpmsg-in;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_pdm>;
+		assigned-clocks = <&scmi_clk IMX952_CLK_AUDIOPLL1_VCO>,
+				  <&scmi_clk IMX952_CLK_AUDIOPLL2_VCO>,
+				  <&scmi_clk IMX952_CLK_AUDIOPLL1>,
+				  <&scmi_clk IMX952_CLK_AUDIOPLL2>,
+				  <&scmi_clk IMX952_CLK_PDM>;
+		assigned-clock-parents = <0>, <0>, <0>, <0>,
+					<&scmi_clk IMX952_CLK_AUDIOPLL1>;
+		assigned-clock-rates = <3932160000>, <3612672000>,
+				       <393216000>, <361267200>,
+				       <49152000>;
+		clocks = <&scmi_clk IMX952_CLK_BUSAON>,
+			 <&scmi_clk IMX952_CLK_PDM>,
+			 <&scmi_clk IMX952_CLK_BUSAON>,
+			 <&scmi_clk IMX952_CLK_AUDIOPLL1>,
+			 <&scmi_clk IMX952_CLK_AUDIOPLL2>;
+		clock-names = "ipg", "mclk", "dma", "pll8k", "pll11k";
+		memory-region = <&micfil_reserved>;
+	};
+
+	sound-bt-sco {
+		status = "disabled";
+	};
+
+	sound-micfil {
+		status = "disabled";
+	};
+
+	rpmsg_gpioa: gpio-rpbus-0 {
+		compatible = "fsl,imx-rpmsg-gpio";
+		port_idx = <2>;
+		gpio-controller;
+		#gpio-cells = <2>;
+		#interrupt-cells = <2>;
+		interrupt-controller;
+		interrupt-parent = <&rpmsg_gpioa>;
+	};
+};
+
+&amix {
+	status = "disabled";
+};
+
+&gpio2 {
+	status = "disabled";
+};
+
+&sai3 {
+	status = "disabled";
+};
+
+&lpi2c2 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c3 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c6 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&lpi2c7 {
+	/delete-property/ dmas;
+	/delete-property/ dma-names;
+};
+
+&micfil {
+	status = "disabled";
+};
+
+&lpspi7 {
+	cs-gpios = <&rpmsg_gpioa 4 GPIO_ACTIVE_LOW>;
+};
+
+&edma1 {
+	status = "disabled";
+};
+
+&edma2 {
+	status = "disabled";
+};

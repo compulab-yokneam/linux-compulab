@@ -1,0 +1,8 @@
+DTC_FLAGS := -@
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-som.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952.dtb
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-rpmsg.dtb
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-spidev.dtbo
