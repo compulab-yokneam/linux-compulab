@@ -627,7 +627,7 @@
 };
 
 &usb1 {
-	dr_mode = "peripheral";
+	dr_mode = "host";
 	hnp-disable;
 	srp-disable;
 	adp-disable;
