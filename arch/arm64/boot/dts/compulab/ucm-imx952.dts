@@ -4,4 +4,5 @@
  */
 
 #include "ucm-imx952-som.dts"
-#include "ucm-imx952-lvds.dtsi"
+#include "imx952-lvds.dtsi"
+#include "imx952-wm8962.dtsi"

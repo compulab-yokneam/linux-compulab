@@ -1,8 +1,47 @@
 DTC_FLAGS := -@
 
+# An old school style -- all included
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx952.dtb
+
+# overlays
+dtb-$(CONFIG_ARCH_MXC) += imx952-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-wm8962.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-rpmsg.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-spidev.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-csi1-ap1302.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-csi2-ap1302.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-csi1-imx219.dtbo
+dtb-$(CONFIG_ARCH_MXC) += imx952-csi1-imx477.dtbo
+
+# A modern style -- all overlayed
+ucm-imx952-evk-dtbs := ucm-imx952-som.dtb \
+		imx952-lvds.dtbo \
+		imx952-wm8962.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-evk.dtb
+
+ucm-imx952-rpmsg-dtbs := ucm-imx952-som.dtb \
+		imx952-rpmsg.dtbo
+
 dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-rpmsg.dtb
 
-dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-lvds.dtbo
-dtb-$(CONFIG_ARCH_MXC) += imx952-spidev.dtbo
+ucm-imx952-evk-csi1-ap1302-dtbs := ucm-imx952-evk.dtb \
+		imx952-csi1-ap1302.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-evk-csi1-ap1302.dtb
+
+ucm-imx952-evk-csi2-ap1302-dtbs := ucm-imx952-evk.dtb \
+		imx952-csi2-ap1302.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-evk-csi2-ap1302.dtb
+
+ucm-imx952-evk-csi1-imx219-dtbs := ucm-imx952-evk.dtb \
+		imx952-csi1-imx219.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-evk-csi1-imx219.dtb
+
+ucm-imx952-evk-csi1-imx477-dtbs := ucm-imx952-evk.dtb \
+		imx952-csi1-imx477.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += ucm-imx952-evk-csi1-imx477.dtb
