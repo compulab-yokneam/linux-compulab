@@ -4,6 +4,8 @@
  * Copyright 2023,2026 NXP
  */
 
+#include <linux/aperture.h>
+#include <linux/delay.h>
 #include <linux/module.h>
 #include <linux/of.h>
 #include <linux/of_device.h>
@@ -60,6 +62,12 @@ static int dpu95_load(struct dpu95_drm_device *dpu_drm)
 	ret = dpu95_ld_load(dpu_drm);
 	if (ret)
 		return ret;
+
+	/* Remove the firmware framebuffer only when the DPU is ready to bind. */
+	ret = aperture_remove_all_conflicting_devices(DRIVER_NAME);
+	if (ret)
+		return dev_err_probe(dpu_drm->base.dev, ret,
+				     "failed to remove firmware framebuffer\n");
 
 	ret = dpu95_bliteng_load(dpu_drm);
 	if (ret)
@@ -146,12 +154,42 @@ static int dpu95_runtime_suspend(struct device *dev)
 	return 0;
 }
 
+static void dpu95_cycle_output_clocks(struct dpu95_soc *dpu)
+{
+	int ret;
+
+	/*
+	 * Clock providers do not account for clocks left enabled by firmware.
+	 * Take and release one reference to force an off transition before the
+	 * native driver programs either output path.
+	 */
+	ret = clk_prepare_enable(dpu->clk_pix);
+	if (ret)
+		dev_warn(dpu->dev, "failed to cycle pixel clock: %d\n", ret);
+	else
+		clk_disable_unprepare(dpu->clk_pix);
+
+	ret = clk_prepare_enable(dpu->clk_ldb_vco);
+	if (ret) {
+		dev_warn(dpu->dev, "failed to cycle LDB VCO clock: %d\n", ret);
+		return;
+	}
+
+	ret = clk_prepare_enable(dpu->clk_ldb);
+	if (ret)
+		dev_warn(dpu->dev, "failed to cycle LDB clock: %d\n", ret);
+	else
+		clk_disable_unprepare(dpu->clk_ldb);
+
+	clk_disable_unprepare(dpu->clk_ldb_vco);
+}
+
 static int dpu95_runtime_resume(struct device *dev)
 {
 	struct drm_device *drm = dev_get_drvdata(dev);
 	struct dpu95_drm_device *dpu_drm = to_dpu95_drm_device(drm);
 	struct dpu95_soc *dpu = &dpu_drm->dpu_soc;
-	int ret;
+	int i, ret;
 
 	ret = clk_prepare_enable(dpu->clk_axi);
 	if (ret) {
@@ -181,6 +219,21 @@ static int dpu95_runtime_resume(struct device *dev)
 		clk_disable_unprepare(dpu->clk_axi);
 		return ret;
 	}
+
+	/*
+	 * Firmware may leave a display pipeline scanning out.  Stop both
+	 * FrameGens before resetting the DPU submodules and clearing their
+	 * interrupt state, otherwise the first atomic enable can miss the
+	 * shadow-load events and never synchronize its primary channel.
+	 */
+	for (i = 0; i < ARRAY_SIZE(dpu->fg); i++)
+		if (dpu->fg[i])
+			dpu95_fg_disable(dpu->fg[i]);
+
+	/* Let the firmware-started pipeline finish its disable sequence. */
+	usleep_range(40000, 50000);
+
+	dpu95_cycle_output_clocks(dpu);
 
 	dpu95_irq_hw_init(dpu);
 
