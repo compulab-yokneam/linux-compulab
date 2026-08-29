@@ -1,0 +1,459 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0-only
+#
+# Provision this file from the base image or companion package as:
+#   /etc/kernel/postinst.d/compulab-boot-update
+#
+# linux-image postinst scripts invoke it as:
+#   compulab-boot-update KERNEL_RELEASE KERNEL_IMAGE
+
+set -Eeuo pipefail
+
+readonly BACKUP_ROOT=/boot/kernel-backup.d
+readonly WORK_ROOT=/var/tmp
+
+release=
+package_image=
+dtb_dir=
+work_dir=
+new_image=
+boot_mount=
+boot_device=
+root_device=
+boot_mounted=0
+boot_mounted_by_us=0
+boot_modified=0
+install_complete=0
+backup_created=0
+backup_dir=
+backup_files_dir=
+
+die() {
+	printf 'ERROR: %s\n' "$*" >&2
+	exit 1
+}
+
+warn() {
+	printf 'WARNING: %s\n' "$*" >&2
+}
+
+is_block_device() {
+	[[ -b $1 ]]
+}
+
+canonical_mount_source() {
+	local source=$1
+
+	# findmnt appends a subvolume in brackets for some filesystems.
+	source=${source%%\[*}
+	readlink -f -- "$source"
+}
+
+source_for_path() {
+	local source
+
+	source=$(findmnt --noheadings --raw --output SOURCE --target "$1") || return 1
+	canonical_mount_source "$source"
+}
+
+partition_number() {
+	local device=$1
+	local device_name=${device##*/}
+	local part=
+
+	if command -v lsblk >/dev/null 2>&1; then
+		part=$(lsblk --nodeps --noheadings --raw --output PARTN "$device" 2>/dev/null) ||
+			part=
+		part=${part//[[:space:]]/}
+		if [[ -n $part ]]; then
+			printf '%s\n' "$part"
+			return 0
+		fi
+	fi
+
+	if [[ -r /sys/class/block/$device_name/partition ]]; then
+		read -r part <"/sys/class/block/$device_name/partition" || part=
+		if [[ -n $part ]]; then
+			printf '%s\n' "$part"
+			return 0
+		fi
+	fi
+
+	if [[ $device_name =~ p([0-9]+)$ ]] ||
+	   [[ $device_name =~ [^0-9]([0-9]+)$ ]]; then
+		printf '%s\n' "${BASH_REMATCH[1]}"
+		return 0
+	fi
+	return 1
+}
+
+parent_block_device() {
+	local device=$1
+	local device_name=${device##*/}
+	local parent_name=
+	local sysfs_path
+
+	if command -v lsblk >/dev/null 2>&1; then
+		parent_name=$(lsblk --nodeps --noheadings --raw --output PKNAME \
+			"$device" 2>/dev/null) || parent_name=
+		parent_name=${parent_name//[[:space:]]/}
+	fi
+
+	if [[ -z $parent_name && -r /sys/class/block/$device_name/partition ]]; then
+		sysfs_path=$(readlink -f -- "/sys/class/block/$device_name") || sysfs_path=
+		if [[ -n $sysfs_path ]]; then
+			parent_name=${sysfs_path%/*}
+			parent_name=${parent_name##*/}
+		fi
+	fi
+
+	if [[ -z $parent_name ]]; then
+		if [[ $device_name =~ ^(.+)p[0-9]+$ ]] ||
+		   [[ $device_name =~ ^(.+[^0-9])[0-9]+$ ]]; then
+			parent_name=${BASH_REMATCH[1]}
+		fi
+	fi
+
+	[[ -n $parent_name ]] || return 1
+	readlink -f -- "/dev/$parent_name"
+}
+
+partition_device() {
+	local parent=$1
+	local part=$2
+	local parent_name=${parent##*/}
+	local candidate
+
+	if [[ $parent_name =~ [0-9]$ ]]; then
+		candidate=/dev/${parent_name}p${part}
+	else
+		candidate=/dev/${parent_name}${part}
+	fi
+	candidate=$(readlink -f -- "$candidate") || return 1
+	is_block_device "$candidate" || return 1
+	[[ $(partition_number "$candidate") == "$part" ]] || return 1
+	printf '%s\n' "$candidate"
+}
+
+managed_boot_files() {
+	find "$boot_mount" -mindepth 1 -maxdepth 1 \
+		\( -type f -o -type l \) \
+		\( -name 'Image*' -o -name '*.dtb*' -o \
+		   -name 'kernel*' -o -name 'config*' \) -print0
+}
+
+clear_managed_boot_files() {
+	local files=()
+
+	mapfile -d '' files < <(managed_boot_files)
+	((${#files[@]} == 0)) || rm -f -- "${files[@]}"
+}
+
+restore_boot_backup() {
+	[[ -n $backup_files_dir && -d $backup_files_dir ]] || {
+		warn 'Cannot roll back the boot partition: no verified backup is available'
+		return 1
+	}
+
+	warn "Restoring the boot partition from $backup_files_dir"
+	clear_managed_boot_files || return 1
+	cp -a -- "$backup_files_dir"/. "$boot_mount"/ || return 1
+	sync
+}
+
+rollback_boot_update() {
+	if ((backup_created)); then
+		restore_boot_backup
+	else
+		warn 'Removing partial boot payload from failed initial deployment'
+		clear_managed_boot_files
+		sync
+	fi
+}
+
+cleanup() {
+	local status=$?
+	local cleanup_failed=0
+	local unmount_failed=0
+
+	trap - EXIT INT TERM
+	set +e
+	if ((status != 0 && boot_mounted && boot_modified && !install_complete)); then
+		rollback_boot_update || cleanup_failed=1
+	fi
+	if ((boot_mounted_by_us)); then
+		umount -- "$boot_mount" || {
+			warn "Unable to unmount temporary boot mount $boot_mount"
+			cleanup_failed=1
+			unmount_failed=1
+		}
+		if ((!unmount_failed)); then
+			boot_mounted=0
+			boot_mounted_by_us=0
+		fi
+	fi
+	if ((!boot_mounted_by_us)) && [[ -n $work_dir && -d $work_dir ]]; then
+		case $work_dir in
+			/var/tmp/compulab-kernel-postinst.*) rm -rf -- "$work_dir" ;;
+			*) warn "Refusing to remove unexpected work directory: $work_dir" ;;
+		esac
+	fi
+	if ((status == 0 && cleanup_failed)); then
+		status=1
+	fi
+	exit "$status"
+}
+
+require_commands() {
+	local command
+	local missing=()
+
+	for command in awk cat chmod cmp cp date df du find findmnt gzip \
+		ln lsblk mkdir mktemp mount mv readlink rm sync umount uname; do
+		command -v "$command" >/dev/null 2>&1 || missing+=("$command")
+	done
+	((${#missing[@]} == 0)) ||
+		die "Required commands are missing: ${missing[*]}"
+}
+
+qualify_root_device() {
+	local root_source
+	local root_part
+
+	# A folder-backed root is expected in some chroots. Treat it as a successful
+	# no-op; only a real partition 2 is eligible for a boot-partition update.
+	if ! command -v findmnt >/dev/null 2>&1 ||
+	   ! command -v readlink >/dev/null 2>&1; then
+		printf 'Skipping CompuLab boot update: root filesystem cannot be inspected\n'
+		return 2
+	fi
+
+	if ! root_source=$(findmnt --noheadings --raw --output SOURCE --target /); then
+		printf 'Skipping CompuLab boot update: cannot determine the root filesystem source\n'
+		return 2
+	fi
+	if ! root_device=$(canonical_mount_source "$root_source"); then
+		printf 'Skipping CompuLab boot update: root filesystem source is not resolvable: %s\n' \
+			"$root_source"
+		return 2
+	fi
+	if ! is_block_device "$root_device"; then
+		printf 'Skipping CompuLab boot update: root filesystem source is not a block device: %s\n' \
+			"$root_device"
+		return 2
+	fi
+	if ! root_part=$(partition_number "$root_device"); then
+		printf 'Skipping CompuLab boot update: cannot determine partition number for %s\n' \
+			"$root_device"
+		return 2
+	fi
+	if [[ $root_part != 2 ]]; then
+		printf 'Skipping CompuLab boot update: root device %s is partition %s, not partition 2\n' \
+			"$root_device" "${root_part:-unknown}"
+		return 2
+	fi
+	return 0
+}
+
+resolve_boot_device() {
+	local parent_device
+	local work_source
+	local path_source
+
+	parent_device=$(parent_block_device "$root_device") ||
+		die "Cannot determine parent device for $root_device"
+	is_block_device "$parent_device" || die "Parent device is not a block device: $parent_device"
+	boot_device=$(partition_device "$parent_device" 1) ||
+		die "Cannot find partition 1 on $parent_device"
+	[[ $boot_device != "$root_device" ]] || die 'Boot and root devices resolve to the same partition'
+
+	path_source=$(source_for_path /boot) || die 'Cannot determine filesystem for /boot'
+	if [[ $path_source == "$boot_device" ]]; then
+		boot_mount=/boot
+		boot_mounted=1
+	elif [[ $path_source != "$root_device" ]]; then
+		die "/boot must reside on $root_device or be mounted from $boot_device (found $path_source)"
+	fi
+	work_source=$(source_for_path "$WORK_ROOT") || die "Cannot determine filesystem for $WORK_ROOT"
+	[[ $work_source == "$root_device" ]] ||
+		die "$WORK_ROOT must reside on root partition $root_device (found $work_source)"
+	printf 'Root partition: %s\nBoot partition: %s\n' "$root_device" "$boot_device"
+	if ((boot_mounted)); then
+		printf 'Using existing boot partition mount: %s\n' "$boot_mount"
+	fi
+}
+
+mount_boot_partition() {
+	local mounted_source
+
+	mkdir -p -- "$boot_mount"
+	mount -- "$boot_device" "$boot_mount"
+	boot_mounted=1
+	boot_mounted_by_us=1
+	mounted_source=$(source_for_path "$boot_mount") || die 'Cannot verify temporary boot mount'
+	[[ $mounted_source == "$boot_device" ]] ||
+		die "Unexpected device mounted at $boot_mount: $mounted_source"
+}
+
+create_boot_backup() {
+	local current_kernel=$1
+	local current_files=()
+	local source
+	local destination
+	local stamp
+
+	mapfile -d '' current_files < <(managed_boot_files)
+	if ((${#current_files[@]} == 0)); then
+		printf 'No existing boot payload found; skipping backup for initial deployment\n'
+		return 0
+	fi
+
+	mkdir -p -- "$BACKUP_ROOT"
+	stamp=$(date -u +%Y%m%d%H%M%S)
+	backup_dir=$BACKUP_ROOT/${current_kernel}-${stamp}
+	if [[ -e $backup_dir ]]; then
+		backup_dir=$(mktemp -d "$BACKUP_ROOT/${current_kernel}-${stamp}.XXXXXX")
+	else
+		mkdir -- "$backup_dir"
+	fi
+	chmod 700 "$backup_dir"
+	backup_files_dir=$backup_dir/files
+	mkdir -- "$backup_files_dir"
+
+	cp -a -- "${current_files[@]}" "$backup_files_dir"/
+
+	for source in "${current_files[@]}"; do
+		destination=$backup_files_dir/${source##*/}
+		if [[ -L $source ]]; then
+			[[ -L $destination && $(readlink -- "$source") == $(readlink -- "$destination") ]] ||
+				die "Backup verification failed for $source"
+		else
+			cmp -s -- "$source" "$destination" || die "Backup verification failed for $source"
+		fi
+	done
+	sync
+	backup_created=1
+	printf 'Verified boot backup: %s\n' "$backup_dir"
+}
+
+check_boot_space() {
+	local current_files=()
+	local required_kb
+	local available_kb
+	local reclaimable_kb=0
+	local file
+
+	mapfile -d '' current_files < <(managed_boot_files)
+	required_kb=$(du -sk -- "$new_image" "$dtb_dir" | awk '{ total += $1 } END { print total + 0 }')
+	available_kb=$(df -Pk -- "$boot_mount" | awk 'NR == 2 { print $4 }')
+	for file in "${current_files[@]}"; do
+		reclaimable_kb=$((reclaimable_kb + $(du -sk -- "$file" | awk '{ print $1 }')))
+	done
+	((required_kb <= available_kb + reclaimable_kb)) ||
+		die "New boot payload needs ${required_kb} KiB; only " \
+			"$((available_kb + reclaimable_kb)) KiB is available after cleanup"
+}
+
+install_boot_payload() {
+	local dtbs=()
+	local file
+	local installed_image=$boot_mount/Image-$release
+
+	mapfile -d '' dtbs < <(
+		find "$dtb_dir" -mindepth 1 -maxdepth 1 -type f \
+			\( -name '*.dtb' -o -name '*.dtbo' \) -print0
+	)
+	boot_modified=1
+	clear_managed_boot_files
+	cp -a -- "$new_image" "$installed_image"
+	if ! ln -sfn -- "Image-$release" "$boot_mount/Image" 2>/dev/null; then
+		rm -f -- "$boot_mount/Image"
+		mv -- "$installed_image" "$boot_mount/Image"
+	fi
+	cp -a -- "${dtbs[@]}" "$boot_mount"/
+	sync
+
+	cmp -s -- "$new_image" "$boot_mount/Image" || die 'Installed kernel Image failed verification'
+	for file in "${dtbs[@]}"; do
+		cmp -s -- "$file" "$boot_mount/${file##*/}" ||
+			die "Installed device tree failed verification: ${file##*/}"
+	done
+	install_complete=1
+}
+
+main() {
+	local current_kernel
+	local dtbs=()
+	local root_status
+
+	[[ $# -eq 2 ]] || die "Usage: $0 KERNEL_RELEASE KERNEL_IMAGE"
+	if [[ -n ${DEB_MAINT_PARAMS:-} && ${DEB_MAINT_PARAMS%% *} != configure ]]; then
+		printf 'Skipping CompuLab boot update for postinst action: %s\n' \
+			"${DEB_MAINT_PARAMS%% *}"
+		return 0
+	fi
+	if [[ ${COMPULAB_SKIP_BOOT_UPDATE:-0} == 1 ]]; then
+		printf 'Skipping CompuLab boot update because COMPULAB_SKIP_BOOT_UPDATE=1\n'
+		return 0
+	fi
+	if qualify_root_device; then
+		:
+	else
+		root_status=$?
+		((root_status == 2)) && return 0
+		return "$root_status"
+	fi
+	[[ $EUID -eq 0 ]] || die 'This updater must be run as root'
+	release=$1
+	package_image=$2
+	dtb_dir=/usr/lib/linux-image-$release/compulab
+	[[ $release =~ ^[A-Za-z0-9._+-]+$ ]] || die "Invalid kernel release: $release"
+	[[ -f $package_image && -s $package_image ]] ||
+		die "Packaged kernel image is missing or empty: $package_image"
+	[[ -d $dtb_dir ]] || die "Packaged device-tree directory is missing: $dtb_dir"
+	require_commands
+	gzip -t -- "$package_image" || die "Packaged kernel is not a valid gzip file: $package_image"
+
+	current_kernel=$(uname -r)
+	mapfile -d '' dtbs < <(
+		find "$dtb_dir" -mindepth 1 -maxdepth 1 -type f \
+			\( -name '*.dtb' -o -name '*.dtbo' \) -print0
+	)
+	((${#dtbs[@]} > 0)) || die "No device trees found in $dtb_dir"
+
+	resolve_boot_device
+	work_dir=$(mktemp -d "$WORK_ROOT/compulab-kernel-postinst.XXXXXX")
+	trap cleanup EXIT
+	trap 'exit 130' INT
+	trap 'exit 143' TERM
+	new_image=$work_dir/Image-$release
+	gzip -dc -- "$package_image" >"$new_image"
+	[[ -s $new_image ]] || die 'Decompressed kernel Image is empty'
+
+	if ((!boot_mounted)); then
+		boot_mount=$work_dir/boot-partition
+		mkdir -- "$boot_mount"
+		mount_boot_partition
+	fi
+	create_boot_backup "$current_kernel"
+	check_boot_space
+	printf 'Replacing boot-partition kernel and device trees\n'
+	install_boot_payload
+	if ((boot_mounted_by_us)); then
+		umount -- "$boot_mount"
+		boot_mounted=0
+		boot_mounted_by_us=0
+	fi
+	rm -rf -- "$work_dir"
+	work_dir=
+	trap - EXIT INT TERM
+
+	printf 'Kernel %s deployed to the boot partition successfully.\n' "$release"
+	if ((backup_created)); then
+		printf 'Verified boot backup: %s\n' "$backup_dir"
+	else
+		printf 'Initial deployment completed; no previous boot payload required backup.\n'
+	fi
+}
+
+main "$@"
