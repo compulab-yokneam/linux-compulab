@@ -1,0 +1,218 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0-only
+
+set -Eeuo pipefail
+
+readonly package_name=compulab-kernel-hooks
+
+die() {
+	printf 'ERROR: %s\n' "$*" >&2
+	exit 1
+}
+
+usage() {
+	cat <<'EOF'
+Usage: scripts/package/build-compulab-debs [OPTIONS] [--] [MAKE_ARGUMENT ...]
+
+Build the normal kernel binary Debian packages, then create a companion
+compulab-kernel-hooks package containing the CompuLab KDEB postinst hook.
+The hook package version comes from scripts/package/compulab-kernel-hooks.version
+and can be overridden with the COMPULAB_KERNEL_HOOKS_VERSION environment variable.
+The maintainer defaults to CompuLab Ltd. <compulab@compulab.com> and can be
+overridden with the COMPULAB_KERNEL_HOOKS_MAINTAINER environment variable.
+
+Options:
+  --hooks-only         Build only compulab-kernel-hooks; do not run bindeb-pkg.
+  -h, --help           Show this help.
+
+All remaining arguments are passed to make. For example:
+  scripts/package/build-compulab-debs -j8
+  scripts/package/build-compulab-debs O=/tmp/linux-build -j8
+EOF
+}
+
+require_commands() {
+	local build_kernel=$1
+	local command
+	local commands=(
+		awk cat chmod dirname dpkg dpkg-deb du find install md5sum mkdir
+		mktemp readlink rm sort
+	)
+	local missing=()
+
+	((build_kernel)) && commands+=(make)
+	for command in "${commands[@]}"; do
+		command -v "$command" >/dev/null 2>&1 || missing+=("$command")
+	done
+	((${#missing[@]} == 0)) || die "Required commands are missing: ${missing[*]}"
+}
+
+resolve_path() {
+	local base=$1
+	local path=$2
+
+	case $path in
+	/*) readlink -m -- "$path" ;;
+	*) readlink -m -- "$base/$path" ;;
+	esac
+}
+
+write_control_file() {
+	local control_file=$1
+	local package_version=$2
+	local maintainer=$3
+	local installed_size=$4
+
+	cat >"$control_file" <<EOF
+Package: $package_name
+Version: $package_version
+Section: kernel
+Priority: optional
+Architecture: all
+Maintainer: $maintainer
+Installed-Size: $installed_size
+Depends: bash, coreutils, findutils, gzip, mount, util-linux, mawk | gawk
+Description: CompuLab kernel boot-partition update hooks
+ This package installs a KDEB postinst hook that creates a verified backup of
+ the active boot-partition kernel and device trees before deploying files from
+ a newly installed CompuLab linux-image package.
+EOF
+}
+
+write_md5sums() {
+	local package_root=$1
+	local file
+
+	(
+		cd "$package_root"
+		while IFS= read -r -d '' file; do
+			md5sum "${file#./}"
+		done < <(find ./etc ./usr -type f -print0 | sort -z)
+	) >"$package_root/DEBIAN/md5sums"
+}
+
+build_hook_package() {
+	local output_dir=$1
+	local hook_source=$2
+	local source_tree=$3
+	local hook_package_version=$4
+	local maintainer=$5
+	local package_root
+	local package_file
+	local filename_version
+	local installed_size
+	local cleanup_command
+
+	[[ -x $hook_source ]] || die "KDEB hook is missing or not executable: $hook_source"
+
+	dpkg --validate-version "$hook_package_version" >/dev/null 2>&1 ||
+		die "Invalid CompuLab kernel hooks package version: $hook_package_version"
+	[[ $maintainer != *$'\n'* && $maintainer == *'<'*'>' ]] ||
+		die "Invalid CompuLab kernel hooks maintainer: $maintainer"
+
+	package_root=$(mktemp -d /tmp/compulab-kernel-hooks.XXXXXX)
+	printf -v cleanup_command 'rm -rf -- %q' "$package_root"
+	trap "$cleanup_command" EXIT
+	mkdir -p -- \
+		"$package_root/DEBIAN" \
+		"$package_root/etc/kernel/postinst.d" \
+		"$package_root/usr/share/doc/$package_name"
+	install -m 0755 -- "$hook_source" \
+		"$package_root/etc/kernel/postinst.d/compulab-boot-update"
+	install -m 0644 -- "$source_tree/COPYING" \
+		"$package_root/usr/share/doc/$package_name/copyright"
+	installed_size=$(du -sk -- "$package_root/etc" "$package_root/usr" |
+		awk '{ total += $1 } END { print total }')
+	write_control_file "$package_root/DEBIAN/control" "$hook_package_version" \
+		"$maintainer" "$installed_size"
+	write_md5sums "$package_root"
+	find "$package_root" -type d -exec chmod 0755 {} +
+	chmod 0644 "$package_root/DEBIAN/control" "$package_root/DEBIAN/md5sums"
+
+	filename_version=${hook_package_version//:/%3a}
+	package_file=$output_dir/${package_name}_${filename_version}_all.deb
+	dpkg-deb --root-owner-group --build "$package_root" "$package_file"
+	rm -rf -- "$package_root"
+	trap - EXIT
+
+	printf '\nCreated CompuLab kernel hooks package:\n'
+	printf '  %s\n' "$package_file"
+	printf '\nInstall it before configuring a new kernel package:\n'
+	printf '  sudo apt install %q\n' "$package_file"
+}
+
+main() {
+	local script_dir
+	local srctree
+	local hook_source
+	local objtree
+	local object_output=${KBUILD_OUTPUT:-}
+	local output_dir
+	local hook_package_version
+	local maintainer=${COMPULAB_KERNEL_HOOKS_MAINTAINER:-CompuLab Ltd. <compulab@compulab.com>}
+	local build_kernel=1
+	local arg
+	local make_args=()
+
+	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+	srctree=$(cd -- "$script_dir/../.." && pwd -P)
+	hook_source=$script_dir/compulab-boot-update
+	if [[ -n ${COMPULAB_KERNEL_HOOKS_VERSION:-} ]]; then
+		hook_package_version=$COMPULAB_KERNEL_HOOKS_VERSION
+	else
+		[[ -r $script_dir/compulab-kernel-hooks.version ]] ||
+			die 'CompuLab kernel hooks version file is missing'
+		hook_package_version=$(<"$script_dir/compulab-kernel-hooks.version")
+	fi
+
+	while (($#)); do
+		case $1 in
+		--hook-only|--hooks-only)
+			build_kernel=0
+			shift
+			;;
+		-h|--help)
+			usage
+			return 0
+			;;
+		--)
+			shift
+			make_args+=("$@")
+			break
+			;;
+		*)
+			make_args+=("$1")
+			shift
+			;;
+		esac
+	done
+
+	for arg in "${make_args[@]}"; do
+		case $arg in
+		O=*) object_output=${arg#O=} ;;
+		KBUILD_OUTPUT=*) object_output=${arg#KBUILD_OUTPUT=} ;;
+		KDEB_HOOKDIR=*)
+			die 'Do not override KDEB_HOOKDIR; the package uses /etc/kernel/postinst.d'
+			;;
+		esac
+	done
+
+	require_commands "$build_kernel"
+	if [[ -n $object_output ]]; then
+		objtree=$(resolve_path "$srctree" "$object_output")
+	else
+		objtree=$srctree
+	fi
+	output_dir=$(dirname -- "$objtree")
+	mkdir -p -- "$output_dir"
+
+	if ((build_kernel)); then
+		printf 'Building kernel binary Debian packages\n'
+		make -C "$srctree" "${make_args[@]}" bindeb-pkg
+	fi
+
+	build_hook_package "$output_dir" "$hook_source" "$srctree" \
+		"$hook_package_version" "$maintainer"
+}
+
+main "$@"
