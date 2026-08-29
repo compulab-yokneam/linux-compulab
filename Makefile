@@ -276,7 +276,8 @@ no-dot-config-targets := $(clean-targets) \
 			 cscope gtags TAGS tags help% %docs check% coccicheck \
 			 $(version_h) headers headers_% archheaders archscripts \
 			 %asm-generic kernelversion %src-pkg dt_binding_check \
-			 outputmakefile rustavailable rustfmt rustfmtcheck
+			 outputmakefile rustavailable rustfmt rustfmtcheck \
+			 compulab-kernel-hooks-pkg
 # Installation targets should not require compiler. Unfortunately, vdso_install
 # is an exception where build artifacts may be updated. This must be fixed.
 no-compiler-targets := $(no-dot-config-targets) install dtbs_install \
@@ -1540,6 +1541,9 @@ distclean: mrproper
 # ---------------------------------------------------------------------------
 
 %src-pkg: FORCE
+	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.package $@
+PHONY += compulab-kernel-hooks-pkg
+compulab-kernel-hooks-pkg: FORCE
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.package $@
 %pkg: include/config/kernel.release FORCE
 	$(Q)$(MAKE) -f $(srctree)/scripts/Makefile.package $@

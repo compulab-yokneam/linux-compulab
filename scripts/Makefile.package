@@ -152,6 +152,17 @@ deb-pkg srcdeb-pkg bindeb-pkg:
 		--no-check-builddeps) \
 	$(DPKG_FLAGS))
 
+COMPULAB_KERNEL_HOOKS_VERSION ?= $(shell cat $(srctree)/scripts/package/compulab-kernel-hooks.version)
+export COMPULAB_KERNEL_HOOKS_VERSION
+
+PHONY += compulab-bindeb-pkg
+compulab-bindeb-pkg: bindeb-pkg
+	$(Q)$(srctree)/scripts/package/build-compulab-debs --hooks-only O=$(CURDIR)
+
+PHONY += compulab-kernel-hooks-pkg
+compulab-kernel-hooks-pkg:
+	$(Q)$(srctree)/scripts/package/build-compulab-debs --hooks-only O=$(CURDIR)
+
 # snap-pkg
 # ---------------------------------------------------------------------------
 PHONY += snap-pkg
@@ -251,6 +262,8 @@ help:
 	@echo '  deb-pkg             - Build both source and binary deb kernel packages'
 	@echo '  srcdeb-pkg          - Build only the source kernel deb package'
 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
+	@echo '  compulab-bindeb-pkg - Build binary kernel debs and the CompuLab hook package'
+	@echo '  compulab-kernel-hooks-pkg - Build only the CompuLab hook package'
 	@echo '  snap-pkg            - Build only the binary kernel snap package'
 	@echo '                        (will connect to external hosts)'
 	@echo '  dir-pkg             - Build the kernel as a plain directory structure'
