@@ -11,13 +11,13 @@
 	memory-region = <&ele_reserved>;
 };
 
-
 / {
 	aliases {
 		rtc0 = &ab1805_rtc;
 		rtc1 = &bbnsm_rtc;
 		ethernet0 = &eqos;
 	};
+
 	chosen {
 		stdout-path = &lpuart1;
 	};
@@ -476,11 +476,7 @@
 	status = "okay";
 };
 
-&cameradev {
-	status = "disabled";
-};
-
-&isi_0 {
+&isi {
 	status = "okay";
 
 	cap_device {

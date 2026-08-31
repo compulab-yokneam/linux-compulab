@@ -13,11 +13,7 @@
 	compatible = "compulab,ucm-imx93", "fsl,imx93";
 };
 
-&cameradev {
-	status = "okay";
-};
-
-&isi_0 {
+&isi {
 	status = "okay";
 
 	cap_device {

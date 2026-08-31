@@ -218,8 +218,8 @@
 	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai1>;
-	assigned-clocks = <&clk IMX91_CLK_SAI1>;
-	assigned-clock-parents = <&clk IMX91_CLK_AUDIO_PLL>;
+	assigned-clocks = <&clk IMX93_CLK_SAI1>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
 	fsl,sai-mclk-direction-output;
 	status = "okay";
@@ -229,8 +229,8 @@
 	pinctrl-names = "default", "sleep";
 	pinctrl-0 = <&pinctrl_sai3>;
 	pinctrl-1 = <&pinctrl_sai3_sleep>;
-	assigned-clocks = <&clk IMX91_CLK_SAI3>;
-	assigned-clock-parents = <&clk IMX91_CLK_AUDIO_PLL>;
+	assigned-clocks = <&clk IMX93_CLK_SAI3>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <12288000>;
 	fsl,sai-mclk-direction-output;
 	status = "disabled";
@@ -240,8 +240,8 @@
 	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_pdm>;
-	assigned-clocks = <&clk IMX91_CLK_PDM>;
-	assigned-clock-parents = <&clk IMX91_CLK_AUDIO_PLL>;
+	assigned-clocks = <&clk IMX93_CLK_PDM>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
 	assigned-clock-rates = <49152000>;
 	status = "disabled";
 };
@@ -250,16 +250,16 @@
 	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_spdif>;
-	clocks = <&clk IMX91_CLK_BUS_WAKEUP>,
-		<&clk IMX91_CLK_SPDIF_GATE>,
-		<&clk IMX91_CLK_DUMMY>,
-		<&clk IMX91_CLK_AUD_XCVR_GATE>,
-		<&clk IMX91_CLK_AUDIO_PLL>;
+	clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
+		<&clk IMX93_CLK_SPDIF_GATE>,
+		<&clk IMX93_CLK_DUMMY>,
+		<&clk IMX93_CLK_AUD_XCVR_GATE>,
+		<&clk IMX93_CLK_AUDIO_PLL>;
 	clock-names = "ipg", "phy", "spba", "pll_ipg", "pll8k";
-	assigned-clocks = <&clk IMX91_CLK_SPDIF>,
-			 <&clk IMX91_CLK_AUDIO_XCVR>;
-	assigned-clock-parents = <&clk IMX91_CLK_AUDIO_PLL>,
-			 <&clk IMX91_CLK_SYS_PLL_PFD1_DIV2>;
+	assigned-clocks = <&clk IMX93_CLK_SPDIF>,
+			 <&clk IMX93_CLK_AUDIO_XCVR>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>,
+			 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
 	assigned-clock-rates = <12288000>, <200000000>;
 	status = "disabled";
 };
@@ -273,14 +273,6 @@
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_flexcan2>;
 	xceiver-supply = <&reg_can2_stby>;
-	status = "okay";
-};
-
-&mu1 {
-	status = "okay";
-};
-
-&mu2 {
 	status = "okay";
 };
 
@@ -488,7 +480,7 @@
 	codec: wm8962@1a {
 		compatible = "wlf,wm8962";
 		reg = <0x1a>;
-		clocks = <&clk IMX91_CLK_SAI1_GATE>;
+		clocks = <&clk IMX93_CLK_SAI1_GATE>;
 		DCVDD-supply = <&reg_audio_pwr>;
 		DBVDD-supply = <&reg_audio_pwr>;
 		AVDD-supply = <&reg_audio_pwr>;
