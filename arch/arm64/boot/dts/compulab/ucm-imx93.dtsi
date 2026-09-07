@@ -66,13 +66,6 @@
 			linux,cma-default;
 		};
 
-		/* UCM-i.MX93 may have 1 GiB RAM, ending at 0xc0000000. */
-		ethosu_mem: ethosu-region@a8000000 {
-			compatible = "shared-dma-pool";
-			reusable;
-			reg = <0x0 0xa8000000 0x0 0x08000000>;
-		};
-
 		vdev0vring0: vdev0vring0@a4000000 {
 			reg = <0 0xa4000000 0 0x8000>;
 			no-map;
@@ -111,13 +104,6 @@
 		};
 	};
 
-	ethosu {
-		compatible = "arm,ethosu";
-		fsl,cm33-proc = <&cm33>;
-		memory-region = <&ethosu_mem>;
-		power-domains = <&mlmix>;
-	};
-
 	reg_can2_stby: regulator-can2-stby {
 		compatible = "regulator-fixed";
 		regulator-name = "can2-stby";
@@ -135,6 +121,7 @@
 		regulator-min-microvolt = <3300000>;
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
+		off-on-delay-us = <12000>;
 		enable-active-high;
 	};
 
@@ -143,6 +130,14 @@
 		regulator-name = "vref_1v8";
 		regulator-min-microvolt = <1800000>;
 		regulator-max-microvolt = <1800000>;
+	};
+
+	reg_3v3_per: regulator-3v3-per {
+		compatible = "regulator-fixed";
+		regulator-name = "3V3_PER";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		regulator-always-on;
 	};
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
@@ -507,7 +502,7 @@
                 reg = <0>;
                 mipi_csi_ep: endpoint {
                         remote-endpoint = <&ar1335_mipi_ep>;
-                        data-lanes = <2>;
+				data-lanes = <1 2>;
                         cfg-clk-range = <28>;
                         hs-clk-range = <0x2b>;
                         bus-type = <4>;
