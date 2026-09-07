@@ -96,7 +96,7 @@
 &fec {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_fec>, <&pinctrl_fec_phy_reset>;
-	phy-mode = "rgmii-id";
+	phy-mode = "rgmii-rxid";
 	phy-handle = <&fecphy>;
 	fsl,magic-packet;
 	reset-gpios = <&gpio4 24 GPIO_ACTIVE_LOW>;
