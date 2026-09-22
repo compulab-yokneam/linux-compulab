@@ -1,0 +1,7 @@
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sb-iotgimx8plus-rev2 = "sb-iotgimx8plus-rev2";
+};
+
+#include "sb-iotgimx8plus-rev2.dtsi"

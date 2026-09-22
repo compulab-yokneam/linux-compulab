@@ -1,0 +1,62 @@
+/*
+ * Copyright 2026 CompuLab
+ */
+
+&{/} {
+	w1_00: w1-00 {
+		compatible = "w1-gpio";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_w1_00>;
+		gpios = <&gpio2 15 GPIO_ACTIVE_HIGH>;
+
+		w1_eeprom: w1_eeprom@0 {
+			compatible = "maxim,ds2431";
+			/* This should not really be enabled, as the W1 bus driver can detect any attached device */
+			status = "disabled";
+		};
+	};
+};
+
+&gpio1 {
+
+	/* Drive SD2_VSEL low to configure LDO5 for a 3.3V output (NVCC_SD2) */
+	sd2_vsel_3v3: sd2-vsel-3v3 {
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sd2_vsel_3v3>;
+		gpio-hog;
+		output-low;
+		line-name = "SD2_VSEL_3V3";
+		gpios = <4 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+	};
+};
+
+/* Disable flexcan1 and uart4 which are not used on rev 2.x */
+&flexcan1 {
+	/* CAN slot C */
+	status = "disabled";
+};
+&uart4 {
+	/* IE-RS232/RS485 slot C */
+	status = "disabled";
+};
+
+&usdhc2 {
+	/* Disable USDHC2, which is not used on rev 2.x */
+	status = "disabled";
+};
+
+
+&iomuxc {
+	pinctrl_sd2_vsel_3v3: sd2vsel3v3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x100 /* SD2_VSEL */
+		>;
+	};
+
+	pinctrl_w1_00: w1grp-00 {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD2_DATA0__GPIO2_IO15			0x140
+		>;
+	};
+};
