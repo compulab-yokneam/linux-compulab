@@ -28,3 +28,7 @@
 &mipi_csi {
         status = "okay";
 };
+
+&dphy_rx {
+	status = "okay";
+};

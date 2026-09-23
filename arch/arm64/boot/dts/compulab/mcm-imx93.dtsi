@@ -3,24 +3,10 @@
  * Copyright 2026 CompuLab Ltd.
  */
 
-#include <dt-bindings/usb/pd.h>
-#include "../freescale/imx93.dtsi"
+#include "compulab-imx93.dtsi"
 #include "mcm-imx93-pinctrl.dtsi"
 
-&ele_fw2 {
-	memory-region = <&ele_reserved>;
-};
-
 / {
-	aliases {
-		rtc0 = &ab1805_rtc;
-		rtc1 = &bbnsm_rtc;
-		ethernet0 = &eqos;
-	};
-
-	chosen {
-		stdout-path = &lpuart1;
-	};
 
 	leds:leds {
 		compatible = "gpio-leds";
@@ -33,70 +19,6 @@
 		};
 	};
 
-	reserved-memory {
-		#address-cells = <2>;
-		#size-cells = <2>;
-		ranges;
-
-		linux,cma {
-			compatible = "shared-dma-pool";
-			reusable;
-			alloc-ranges = <0 0x80000000 0 0x95ffffff>;
-			size = <0 0x8000000>;
-			linux,cma-default;
-		};
-
-		ethosu_mem: ethosu_region@C0000000 {
-			compatible = "shared-dma-pool";
-			reusable;
-			reg = <0x0 0xC0000000 0x0 0x10000000>;
-		};
-
-		vdev0vring0: vdev0vring0@a4000000 {
-			reg = <0 0xa4000000 0 0x8000>;
-			no-map;
-		};
-
-		vdev0vring1: vdev0vring1@a4008000 {
-			reg = <0 0xa4008000 0 0x8000>;
-			no-map;
-		};
-
-		vdev1vring0: vdev1vring0@a4000000 {
-			reg = <0 0xa4010000 0 0x8000>;
-			no-map;
-		};
-
-		vdev1vring1: vdev1vring1@a4018000 {
-			reg = <0 0xa4018000 0 0x8000>;
-			no-map;
-		};
-
-		rsc_table: rsc_table@2021f000 {
-			reg = <0 0x2021f000 0 0x1000>;
-			no-map;
-		};
-
-		vdevbuffer: vdevbuffer@84020000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa4020000 0 0x100000>;
-			no-map;
-		};
-
-		ele_reserved: ele-reserved@a4120000 {
-			compatible = "shared-dma-pool";
-			reg = <0 0xa4120000 0 0x100000>;
-			no-map;
-		};
-	};
-
-	ethosu {
-		compatible = "arm,ethosu";
-		fsl,cm33-proc = <&cm33>;
-		memory-region = <&ethosu_mem>;
-		power-domains = <&mlmix>;
-	};
-
 	reg_usdhc2_vmmc: regulator-usdhc2 {
 		compatible = "regulator-fixed";
 		pinctrl-names = "default";
@@ -106,13 +28,6 @@
 		regulator-max-microvolt = <3300000>;
 		gpio = <&gpio3 7 GPIO_ACTIVE_HIGH>;
 		enable-active-high;
-	};
-
-	reg_vref_1v8: regulator-adc-vref {
-		compatible = "regulator-fixed";
-		regulator-name = "vref_1v8";
-		regulator-min-microvolt = <1800000>;
-		regulator-max-microvolt = <1800000>;
 	};
 
 	usdhc3_pwrseq: usdhc3_pwrseq {
@@ -195,11 +110,6 @@
 	status = "disabled";
 };
 
-&adc1 {
-	vref-supply = <&reg_vref_1v8>;
-	status = "okay";
-};
-
 &eqos {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_eqos>;
@@ -223,34 +133,6 @@
 			rtl821x,aldps-disable;
 			rtl821x,clkout-disable;
 		};
-	};
-};
-
-&cm33 {
-	mbox-names = "tx", "rx", "rxdb";
-	mboxes = <&mu1 0 1
-		  &mu1 1 1
-		  &mu1 3 1>;
-	memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
-			<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
-	fsl,startup-delay-ms = <500>;
-	status = "okay";
-};
-
-&lpm {
-	soc-supply = <&buck1>;
-    ld-mode-enabled;
-	status = "okay";
-};
-
-&gpio1 {
-	regulator-gpioexp {
-		gpio-hog;
-		gpios = <8 GPIO_ACTIVE_HIGH>;
-		line-name = "exp_npwren";
-		output-high;
-		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_gpioexp>;
 	};
 };
 
@@ -347,21 +229,7 @@
 				regulator-always-on;
 			};
 
-			ldo2: LDO2 {
-				regulator-name = "LDO2";
-				regulator-min-microvolt = <800000>;
-				regulator-max-microvolt = <1150000>;
-				regulator-boot-on;
-				regulator-always-on;
-			};
 
-			ldo3: LDO3 {
-				regulator-name = "LDO3";
-				regulator-min-microvolt = <800000>;
-				regulator-max-microvolt = <3300000>;
-				regulator-boot-on;
-				regulator-always-on;
-			};
 
 			ldo4: LDO4 {
 				regulator-name = "LDO4";
@@ -382,44 +250,6 @@
 	};
 };
 
-&lpuart1 { /* console */
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_uart1>;
-	status = "okay";
-};
-
-&media_blk_ctrl {
-	status = "okay";
-};
-
-&mu1 {
-	status = "okay";
-};
-
-&mu2 {
-	status = "okay";
-};
-
-&usbotg1 {
-	dr_mode = "otg";
-	disable-over-current;
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
-	status = "okay";
-};
-
-&usbotg2 {
-	dr_mode = "host";
-	hnp-disable;
-	srp-disable;
-	adp-disable;
-	/*usb-role-switch;*/
-	disable-over-current;
-	samsung,picophy-pre-emp-curr-control = <3>;
-	samsung,picophy-dc-vol-level-adjust = <7>;
-	status = "okay";
-};
-
 &usdhc1 {
 	pinctrl-names = "default", "state_100mhz", "state_200mhz";
 	pinctrl-0 = <&pinctrl_usdhc1_50mhz>;
@@ -428,19 +258,6 @@
 	bus-width = <8>;
 	non-removable;
 	status = "okay";
-};
-
-&usdhc2 {
-	pinctrl-names = "default", "state_100mhz", "state_200mhz";
-	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-1 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	pinctrl-2 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
-	cd-gpios = <&gpio3 00 GPIO_ACTIVE_LOW>;
-	vmmc-supply = <&reg_usdhc2_vmmc>;
-	bus-width = <4>;
-	status = "okay";
-	no-sdio;
-	no-mmc;
 };
 
 &usdhc3 {
@@ -468,28 +285,12 @@
 	};
 };
 
-&wdog3 {
-	status = "okay";
-};
-
-&epxp {
-	status = "okay";
-};
-
 &isi {
 	status = "okay";
 
 	cap_device {
 		status = "okay";
 	};
-};
-
-&cpu_alert {
-	temperature = <95000>;
-};
-
-&cpu_crit {
-	temperature = <105000>;
 };
 
 &iomuxc {
