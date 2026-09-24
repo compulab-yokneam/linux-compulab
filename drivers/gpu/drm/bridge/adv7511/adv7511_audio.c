@@ -14,6 +14,9 @@
 
 #include "adv7511.h"
 
+#define ADV7511_AUDIO_DAI_ID_I2S	0
+#define ADV7511_AUDIO_DAI_ID_SPDIF	1
+
 static void adv7511_calc_cts_n(unsigned int f_tmds, unsigned int fs,
 			       unsigned int *cts, unsigned int *n)
 {
@@ -207,6 +210,7 @@ static int adv7511_hdmi_i2s_get_dai_id(struct snd_soc_component *component,
 					struct device_node *endpoint)
 {
 	struct of_endpoint of_ep;
+	const char *audio_input;
 	int ret;
 
 	ret = of_graph_parse_endpoint(endpoint, &of_ep);
@@ -217,8 +221,14 @@ static int adv7511_hdmi_i2s_get_dai_id(struct snd_soc_component *component,
 	 * HDMI sound should be located as reg = <2>
 	 * Then, it is sound port 0
 	 */
-	if (of_ep.port == 2)
-		return 0;
+	if (of_ep.port == 2) {
+		if (!of_property_read_string(endpoint, "adi,audio-input",
+					     &audio_input) &&
+		    !strcmp(audio_input, "spdif"))
+			return ADV7511_AUDIO_DAI_ID_SPDIF;
+
+		return ADV7511_AUDIO_DAI_ID_I2S;
+	}
 
 	return -EINVAL;
 }

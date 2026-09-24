@@ -109,6 +109,16 @@ properties:
         description: Audio port for the HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
 
+        properties:
+          endpoint:
+            type: object
+            properties:
+              adi,audio-input:
+                description: HDMI audio input routed to the ADV7533/ADV7535.
+                enum:
+                  - i2s
+                  - spdif
+
 required:
   - compatible
   - reg
