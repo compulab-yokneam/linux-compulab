@@ -384,6 +384,8 @@ struct adv7511 {
 	u8 num_dsi_lanes;
 	u8 channel_id;
 	bool use_timing_gen;
+	u32 max_mode_clock_khz;
+	u32 max_mode_height;
 
 	enum adv7511_type type;
 	struct platform_device *audio_pdev;
