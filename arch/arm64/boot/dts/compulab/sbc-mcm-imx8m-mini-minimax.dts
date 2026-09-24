@@ -1,0 +1,10 @@
+/dts-v1/;
+
+#include "mcm-imx8m-mini.dtsi"
+#include "sb-mcm-imx8-minimax.dtsi"
+
+/ {
+	model = "CompuLab MCM i.MX8MM on SB-MCM8M MINIMAX";
+	compatible = "cpl,sbc-mcm-imx8m-mini-minimax", "cpl,sbc-mcm-imx8m-mini",
+		     "cpl,mcm-imx8m-mini", "fsl,imx8mm";
+};

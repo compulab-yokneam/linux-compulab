@@ -1,0 +1,315 @@
+/*
+ * Copyright (C) 2018 CompuLab Ltd.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+
+#include "../freescale/imx8mm-pinfunc.h"
+
+/ {
+	clocks {
+		clk40m: clk@1 {
+			compatible = "fixed-clock";
+			#reg = <1>;
+			#clock-cells = <0>;
+			clock-frequency = <40000000>;
+			clock-output-names = "clk40m";
+		};
+	};
+
+	sound-hdmi {
+		compatible = "audio-graph-card";
+		label = "minimax-hdmi";
+		dais = <&spdif1_port>;
+	};
+};
+
+&usdhc2 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	/*
+	 * Sona NX611M Wi-Fi SDIO is wired to MCM MMC/SD/SDIO port #2:
+	 * EXT_SD2_CLK/CMD/DATA[0..3] on CMiMX8M pins 70/69/72/73/68/67.
+	 */
+	pinctrl-names = "default", "state_100mhz", "state_200mhz";
+	pinctrl-0 = <&pinctrl_usdhc2>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-1 = <&pinctrl_usdhc2_100mhz>, <&pinctrl_usdhc2_gpio>;
+	pinctrl-2 = <&pinctrl_usdhc2_200mhz>, <&pinctrl_usdhc2_gpio>;
+	non-removable;
+	wifi-host;
+	pm-ignore-notify;
+	/* Keep the NX611M SDIO bus at 3.3 V signaling. */
+	no-1-8-v;
+	bus-width = <4>;
+	mmc-pwrseq = <&usdhc1_pwrseq>;
+	/delete-property/ vmmc-supply;
+	status = "okay";
+	wakeup-source;
+	fsl,sdio-async-interrupt-enable;
+};
+
+&usdhc1_pwrseq {
+	reset-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>,	/* WIFI_DIS */
+		      <&gpio2 6 GPIO_ACTIVE_LOW>;	/* BT_DIS */
+	post-power-on-delay-ms = <1000>;
+	status = "okay";
+};
+
+&reg_usdhc2_vmmc {
+	status = "disabled";
+};
+
+&iomuxc {
+	sb-mcm-imx8 {
+		pinctrl_usdhc2_gpio: usdhc2grpgpio {
+			fsl,pins = <
+				/* WIFI_DIS, PMWBNX611.3 to CMiMX8M.121. */
+				MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x06
+				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6		0x06
+			>;
+		};
+
+		pinctrl_usdhc2: usdhc2grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x190
+				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d0
+				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d0
+				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d0
+				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d0
+				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d0
+			>;
+		};
+
+		pinctrl_usdhc2_100mhz: usdhc2grp100mhz {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x194
+				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d4
+				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d4
+				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d4
+				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d4
+				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d4
+			>;
+		};
+
+		pinctrl_usdhc2_200mhz: usdhc2grp200mhz {
+			fsl,pins = <
+				MX8MM_IOMUXC_SD2_CLK_USDHC2_CLK		0x196
+				MX8MM_IOMUXC_SD2_CMD_USDHC2_CMD		0x1d6
+				MX8MM_IOMUXC_SD2_DATA0_USDHC2_DATA0	0x1d6
+				MX8MM_IOMUXC_SD2_DATA1_USDHC2_DATA1	0x1d6
+				MX8MM_IOMUXC_SD2_DATA2_USDHC2_DATA2	0x1d6
+				MX8MM_IOMUXC_SD2_DATA3_USDHC2_DATA3	0x1d6
+			>;
+		};
+
+		pinctrl_uart2_bt: uart2btgrp {
+			fsl,pins = <
+				MX8MM_IOMUXC_UART2_RXD_UART2_DCE_RX	0x140
+				MX8MM_IOMUXC_UART2_TXD_UART2_DCE_TX	0x140
+			>;
+		};
+
+		pinctrl_ecspi1: ecspi1grp {
+			fsl,pins = <
+				MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK	0x02
+				MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI	0x02
+				MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO	0x102
+			>;
+		};
+
+		pinctrl_ecspi1_cs: ecspi1_csgrp {
+			fsl,pins = <
+				/* SPI#1_SEL, PMSPICANTB4#1.2 to CMiMX8M.46. */
+				MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9	0x40000
+				/* SPI#2_SEL, PMSPICANTB4#2.2 to CMiMX8M.58. */
+				MX8MM_IOMUXC_I2C3_SCL_GPIO5_IO18	0x40000
+			>;
+		};
+
+		pinctrl_can_int: canintgrp {
+			fsl,pins = <
+				/* CAN_INT, shared by both PMSPICANTB4 modules. */
+				MX8MM_IOMUXC_SAI1_TXFS_GPIO4_IO10	0x00
+			>;
+		};
+
+		pinctrl_spdif1: spdif1grp {
+			fsl,pins = <
+				/* SPDIF_TX, PMDSIHDMI.24 to CMiMX8M.82. */
+				MX8MM_IOMUXC_SPDIF_TX_SPDIF1_OUT	0x02
+			>;
+		};
+	};
+};
+
+&spdif1 {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_spdif1>;
+	status = "okay";
+
+	ports {
+		spdif1_port: port {
+			spdif1_to_adv7535: endpoint {
+				remote-endpoint = <&adv7535_audio>;
+			};
+		};
+	};
+};
+
+&ecspi1 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	fsl,spi-num-chipselects = <2>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1 &pinctrl_ecspi1_cs &pinctrl_can_int>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>, <&gpio5 18 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	can0: can@0 {
+		compatible = "microchip,mcp2518fd";
+		reg = <0>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <10000000>;
+		clocks = <&clk40m>;
+	};
+
+	can1: can@1 {
+		compatible = "microchip,mcp2518fd";
+		reg = <1>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <10 IRQ_TYPE_LEVEL_LOW>;
+		spi-max-frequency = <10000000>;
+		clocks = <&clk40m>;
+	};
+};
+
+&uart4 {
+	/* UART4 pins overlap SPI#2_SEL; Bluetooth is routed to UART2. */
+	status = "disabled";
+
+	bluetooth {
+		status = "disabled";
+	};
+};
+
+&uart2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_uart2_bt>;
+	status = "okay";
+
+	bluetooth {
+		compatible = "nxp,88w8987-bt";
+		max-speed = <3000000>;
+		status = "okay";
+	};
+};
+
+&i2c1 {
+	clock-frequency = <100000>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_i2c1>;
+	status = "okay";
+
+	adv_bridge: hdmi@3d {
+		compatible = "adi,adv7535";
+		reg = <0x3d 0x66>;
+		reg-names = "main", "edid";
+		adi,addr-cec = <0x3b>;
+		adi,dsi-lanes = <4>;
+		adi,dsi-channel = <0>;
+
+		/*
+		 * Keep EDID-based mode selection, but filter this board's
+		 * ADV7535 HDMI output to the highest verified working mode.
+		 */
+		adi,max-mode-clock-khz = <74250>;
+		adi,max-mode-height = <720>;
+
+		ports {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			port@0 {
+				reg = <0>;
+
+				adv7535_from_dsim: endpoint {
+					remote-endpoint = <&dsim_to_adv7535>;
+				};
+			};
+
+			port@1 {
+				reg = <1>;
+
+				adv7535_out: endpoint {
+					remote-endpoint = <&hdmi_connector_in>;
+				};
+			};
+
+			port@2 {
+				reg = <2>;
+
+				adv7535_audio: endpoint {
+					adi,audio-input = "spdif";
+					remote-endpoint = <&spdif1_to_adv7535>;
+				};
+			};
+		};
+	};
+};
+
+&mipi_dsi {
+	status = "okay";
+
+	/*
+	 * The SoC dtsi provides the LCDIF input as a top-level port@0.
+	 * Recreate it under ports{} so the DSI host has a normalized
+	 * two-port graph: port@0 from LCDIF and port@1 to ADV7535.
+	 */
+	/delete-node/ port@0;
+
+	ports {
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		port@0 {
+			reg = <0>;
+
+			dsim_from_lcdif: endpoint {
+				remote-endpoint = <&lcdif_to_dsim>;
+			};
+		};
+
+		port@1 {
+			reg = <1>;
+
+			dsim_to_adv7535: endpoint {
+				remote-endpoint = <&adv7535_from_dsim>;
+				attach-bridge;
+			};
+		};
+	};
+};
+
+/ {
+	hdmi-connector {
+		compatible = "hdmi-connector";
+		label = "hdmi";
+		type = "a";
+
+		port {
+			hdmi_connector_in: endpoint {
+				remote-endpoint = <&adv7535_out>;
+			};
+		};
+	};
+};
