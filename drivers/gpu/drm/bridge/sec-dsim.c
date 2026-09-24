@@ -1674,8 +1674,11 @@ sec_mipi_dsim_bridge_mode_valid(struct drm_bridge *bridge,
 		if (ret)
 			return MODE_CLOCK_RANGE;
 
-		if (dsim->pms_delta != 0)
-			return MODE_CLOCK_RANGE;
+		/*
+		 * sec_mipi_dsim_check_pll_out() keeps the selected PMS values.
+		 * Do not require a zero clock delta here: HDMI bridge timings
+		 * can still be valid with the closest DSI PLL clock.
+		 */
 	}
 
 	if (pdata->mode_valid)
