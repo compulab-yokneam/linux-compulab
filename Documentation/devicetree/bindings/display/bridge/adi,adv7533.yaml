@@ -89,6 +89,20 @@ properties:
     $ref: /schemas/types.yaml#/definitions/uint32
     enum: [ 1, 2, 3, 4 ]
 
+  adi,max-mode-clock-khz:
+    description:
+      Optional board-specific maximum pixel clock, in kHz, for HDMI mode
+      filtering. If present and non-zero, modes with a higher pixel clock
+      are rejected even if the bridge silicon could otherwise support them.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
+  adi,max-mode-height:
+    description:
+      Optional board-specific maximum vertical active resolution for HDMI
+      mode filtering. If present and non-zero, modes with a larger vdisplay
+      are rejected even if the bridge silicon could otherwise support them.
+    $ref: /schemas/types.yaml#/definitions/uint32
+
   ports:
     description:
       The ADV7533/35 has two video ports and one audio port.
@@ -108,6 +122,16 @@ properties:
       port@2:
         description: Audio port for the HDMI output.
         $ref: /schemas/graph.yaml#/properties/port
+
+        properties:
+          endpoint:
+            type: object
+            properties:
+              adi,audio-input:
+                description: HDMI audio input routed to the ADV7533/ADV7535.
+                enum:
+                  - i2s
+                  - spdif
 
 required:
   - compatible

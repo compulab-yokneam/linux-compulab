@@ -137,6 +137,13 @@ enum drm_mode_status adv7533_mode_valid(struct adv7511 *adv,
 	struct mipi_dsi_device *dsi = adv->dsi;
 	u8 bpp = mipi_dsi_pixel_format_to_bpp(dsi->format);
 
+	/* Optional board limits for ADV7533/ADV7535 HDMI mode filtering. */
+	if (adv->max_mode_clock_khz && mode->clock > adv->max_mode_clock_khz)
+		return MODE_CLOCK_HIGH;
+
+	if (adv->max_mode_height && mode->vdisplay > adv->max_mode_height)
+		return MODE_VIRTUAL_Y;
+
 	/* Check max clock for either 7533 or 7535 */
 	if (mode->clock > (adv->type == ADV7533 ? 80000 : 148500))
 		return MODE_CLOCK_HIGH;
@@ -206,6 +213,12 @@ int adv7533_parse_dt(struct device_node *np, struct adv7511 *adv)
 
 	of_property_read_u32(np, "adi,dsi-channel", &channel_id);
 	of_property_read_u32(np, "adi,dsi-lanes", &num_lanes);
+
+	/* Optional caps used to reject EDID modes above board-verified limits. */
+	of_property_read_u32(np, "adi,max-mode-clock-khz",
+			     &adv->max_mode_clock_khz);
+	of_property_read_u32(np, "adi,max-mode-height",
+			     &adv->max_mode_height);
 
 	if (num_lanes < 1 || num_lanes > 4) {
 		dev_err(dev, "Invalid dsi-lanes: %d\n", num_lanes);
