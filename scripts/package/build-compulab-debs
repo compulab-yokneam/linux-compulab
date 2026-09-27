@@ -71,11 +71,12 @@ Priority: optional
 Architecture: all
 Maintainer: $maintainer
 Installed-Size: $installed_size
-Depends: bash, coreutils, findutils, gzip, mount, util-linux, mawk | gawk
+Depends: bash, coreutils, diffutils, findutils, gzip, mount, util-linux, mawk | gawk
 Description: CompuLab kernel boot-partition update hooks
  This package installs a KDEB postinst hook that creates a verified backup of
  the active boot-partition kernel and device trees before deploying files from
- a newly installed CompuLab linux-image package.
+ a newly installed CompuLab linux-image package. Device trees are also copied
+ to the root filesystem's /boot directory.
 EOF
 }
 
