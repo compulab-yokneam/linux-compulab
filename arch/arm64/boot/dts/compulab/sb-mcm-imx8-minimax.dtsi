@@ -57,7 +57,8 @@
 };
 
 &usdhc1_pwrseq {
-	reset-gpios = <&gpio2 19 GPIO_ACTIVE_HIGH>,	/* WIFI_DIS */
+	reset-gpios = <&gpio2 20 GPIO_ACTIVE_LOW>,	/* WIFI_NPD */
+		      <&gpio2 19 GPIO_ACTIVE_HIGH>,	/* WIFI_DIS */
 		      <&gpio2 6 GPIO_ACTIVE_LOW>;	/* BT_DIS */
 	post-power-on-delay-ms = <1000>;
 	status = "okay";
@@ -73,6 +74,8 @@
 			fsl,pins = <
 				/* WIFI_DIS, PMWBNX611.3 to CMiMX8M.121. */
 				MX8MM_IOMUXC_SD2_RESET_B_GPIO2_IO19	0x06
+				/* WIFI_NPD, routed to CMiMX8M.71. */
+				MX8MM_IOMUXC_SD2_WP_GPIO2_IO20		0x06
 				MX8MM_IOMUXC_SD1_DATA4_GPIO2_IO6		0x06
 			>;
 		};
