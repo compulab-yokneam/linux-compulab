@@ -68,8 +68,36 @@
 	status = "disabled";
 };
 
+&gpio4 {
+	gpio-line-names = "", "", "", "", "", "", "", "",
+			  "", "", "", "", "", "", "", "",
+			  "", "", "", "", "", "", "", "DI2_3",
+			  "DI2_2", "", "DI2_1", "DI2_0", "DI1_3", "DI1_2", "", "DI1_1";
+};
+
+&gpio5 {
+	gpio-line-names = "", "DI1_0";
+};
+
 &iomuxc {
+	pinctrl-0 = <&pinctrl_hog_1 &pinctrl_minimax_di>;
+
 	sb-mcm-imx8 {
+		pinctrl_minimax_di: minimaxdigrp {
+			fsl,pins = <
+				/* GPIO#1_D[0..3], PMGPI4TB6#1 opto inputs. */
+				MX8MM_IOMUXC_SAI3_TXD_GPIO5_IO1		0x00
+				MX8MM_IOMUXC_SAI3_TXFS_GPIO4_IO31	0x00
+				MX8MM_IOMUXC_SAI3_RXC_GPIO4_IO29	0x00
+				MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28	0x00
+				/* GPIO#2_D[0..3], PMGPI4TB6#2 opto inputs. */
+				MX8MM_IOMUXC_SAI2_MCLK_GPIO4_IO27	0x00
+				MX8MM_IOMUXC_SAI2_TXD0_GPIO4_IO26	0x00
+				MX8MM_IOMUXC_SAI2_TXFS_GPIO4_IO24	0x00
+				MX8MM_IOMUXC_SAI2_RXD0_GPIO4_IO23	0x00
+			>;
+		};
+
 		pinctrl_usdhc2_gpio: usdhc2grpgpio {
 			fsl,pins = <
 				/* WIFI_DIS, PMWBNX611.3 to CMiMX8M.121. */
