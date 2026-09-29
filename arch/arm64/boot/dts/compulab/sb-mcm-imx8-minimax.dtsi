@@ -70,7 +70,7 @@
 
 &gpio4 {
 	gpio-line-names = "", "", "", "", "", "", "", "",
-			  "", "", "", "", "", "", "", "",
+			  "", "", "", "", "", "LED_G", "", "",
 			  "", "", "", "", "", "", "", "DI2_3",
 			  "DI2_2", "", "DI2_1", "DI2_0", "DI1_3", "DI1_2", "", "DI1_1";
 };
@@ -85,6 +85,8 @@
 	sb-mcm-imx8 {
 		pinctrl_minimax_di: minimaxdigrp {
 			fsl,pins = <
+				/* LED_G, PMPWRA50552J.10 to CMiMX8M.97. */
+				MX8MM_IOMUXC_SAI1_TXD1_GPIO4_IO13	0x00
 				/* GPIO#1_D[0..3], PMGPI4TB6#1 opto inputs. */
 				MX8MM_IOMUXC_SAI3_TXD_GPIO5_IO1		0x00
 				MX8MM_IOMUXC_SAI3_TXFS_GPIO4_IO31	0x00
