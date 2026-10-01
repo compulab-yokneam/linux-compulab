@@ -1,74 +1,17 @@
 #include "overlay.h"
 
-&{/} {
-    model = "CompuLab UCM-iMX8M-Plus with ov5647 on EB-EVCAMRPI MIPI-CSI1 22-pin connector J1";
+&{/chosen/overlays} {
+	overlay-csi1-isp0-ov5647 = "OV5647 camera on CSI1/ISP0 (J1)";
 };
 
 &i2c5 {
-    #address-cells = <1>;
-    #size-cells = <0>;
-    status = "okay";
+	#address-cells = <1>;
+	#size-cells = <0>;
 
-    camera0: camera0@i2c {
-	compatible = "ovti,ov5647";
-	reg = <0x36>;
-        clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
-        clock-names = "xclk";
-        assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
-        assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
-        assigned-clock-rates = <24000000>;
-        csi_id = <0>;
-        pwn-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
-        rst-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
-        mclk = <24000000>;
-        mclk_source = <0>;
-        mipi_csi;
-        camera_mipi_lanes = <2>;
-        status = "okay";
-
-        port {
-            sensor_ep_0: endpoint {
-                clock-lanes = <0>;
-                data-lanes = <1 2>;
-                clock-noncontinuous;
-                link-frequencies = /bits/ 64 <500000000>;
-                remote-endpoint = <&mipi_csi0_ep>;
-            };
-        };
-    };
+	camera0: camera@36 {
+		compatible = "ovti,ov5647";
+		reg = <0x36>;
+	};
 };
 
-&mipi_csi_0 {
-    #address-cells = <1>;
-    #size-cells = <0>;
-    status = "okay";
-
-    port@0 {
-        reg = <0>;
-        mipi_csi0_ep: endpoint {
-            data-lanes = <2>;
-            csis-hs-settle = <16>;
-            remote-endpoint = <&sensor_ep_0>;
-        };
-    };
-};
-
-&cameradev {
-    status = "okay";
-};
-
-&isi_0 {
-    status = "disabled";
-};
-
-&isi_1 {
-    status = "disabled";
-};
-
-&isp_0 {
-    status = "okay";
-};
-
-&dewarp {
-    status = "okay";
-};
+#include "sbev-ucmimx8plus-csi1-isp0-camera-common.dtsi"

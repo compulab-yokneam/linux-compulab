@@ -1,0 +1,17 @@
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-csi2-isp1-ov5647 = "OV5647 camera on CSI2/ISP1 (J2)";
+};
+
+&i2c6 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+
+	camera1: camera@36 {
+		compatible = "ovti,ov5647";
+		reg = <0x36>;
+	};
+};
+
+#include "sbev-ucmimx8plus-csi2-isp1-camera-common.dtsi"

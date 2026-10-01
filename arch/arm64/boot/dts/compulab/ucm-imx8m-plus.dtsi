@@ -13,6 +13,11 @@
 	model = "CompuLab UCM-iMX8M-Plus SoM";
 	compatible = "compulab,ucm-imx8m-plus-som", "fsl,imx8mp";
 
+	chosen {
+		overlays {
+		};
+	};
+
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
