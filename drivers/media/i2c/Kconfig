@@ -60,6 +60,28 @@ config VIDEO_AR0521
 	  To compile this driver as a module, choose M here: the
 	  module will be called ar0521.
 
+config VIDEO_ECAM131
+	tristate "e-con Systems e-CAM131_CUMI1335 camera support"
+	depends on OF_GPIO
+	help
+	  This is a Video4Linux2 driver for the e-con Systems
+	  e-CAM131_CUMI1335_MOD camera module. The module contains an AR1335
+	  sensor and an on-board ISP, and sends UYVY over MIPI CSI-2.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called ar1335.
+
+config VIDEO_ECAM0521
+	tristate "e-con Systems CUMI0521 camera support"
+	depends on OF_GPIO
+	help
+	  This is a Video4Linux2 driver for the e-con Systems
+	  e-CAM54/e-CAM55 CUMI0521 camera module. The module contains an
+	  AR0521 sensor and an on-board ISP, and sends UYVY over MIPI CSI-2.
+
+	  To compile this driver as a module, choose M here: the module will
+	  be called ecam0521.
+
 config VIDEO_GC0308
 	tristate "GalaxyCore GC0308 sensor support"
 	select V4L2_CCI_I2C

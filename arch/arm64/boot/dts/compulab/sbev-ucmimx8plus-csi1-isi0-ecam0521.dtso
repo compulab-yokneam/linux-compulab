@@ -1,0 +1,72 @@
+// SPDX-License-Identifier: GPL-2.0-only OR MIT
+
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-csi1-isi0-ecam0521 =
+		"e-CAM54_CUMI0521 camera on CSI1/ISI0 (J1)";
+};
+
+&i2c5 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	camera0: camera@42 {
+		compatible = "econ,ecam54-cumi0521";
+		reg = <0x42>;
+		clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		clock-names = "xclk";
+		assigned-clocks = <&clk IMX8MP_CLK_IPP_DO_CLKO2>;
+		assigned-clock-parents = <&clk IMX8MP_CLK_24M>;
+		assigned-clock-rates = <24000000>;
+		mclk = <24000000>;
+		mclk_source = <0>;
+		csi_id = <0>;
+		pwn-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
+		rst-gpios = <&pca9555 7 GPIO_ACTIVE_HIGH>;
+		status = "okay";
+
+		port {
+			sensor_ep_0: endpoint {
+				clock-lanes = <0>;
+				data-lanes = <1 2>;
+				link-frequencies = /bits/ 64 <600000000>;
+				remote-endpoint = <&mipi_csi0_ep>;
+			};
+		};
+	};
+};
+
+&mipi_csi_0 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	port@0 {
+		reg = <0>;
+
+		mipi_csi0_ep: endpoint {
+			data-lanes = <2>;
+			csis-hs-settle = <23>;
+			csis-clk-settle = <2>;
+			csis-wclk;
+			remote-endpoint = <&sensor_ep_0>;
+		};
+	};
+};
+
+&cameradev {
+	status = "okay";
+};
+
+&isi_0 {
+	status = "okay";
+	dma-coherent;
+	bsl,dma-invalidate;
+	fsl,chain_buf;
+
+	cap_device {
+		status = "okay";
+	};
+};
