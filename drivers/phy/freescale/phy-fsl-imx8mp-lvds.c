@@ -84,6 +84,34 @@ struct imx8mp_lvds_phy_priv {
 	const struct imx8mp_lvds_phy_devdata *devdata;
 };
 
+static bool firmware_framebuffer_active(void)
+{
+	struct device_node *np;
+
+	if (!IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF))
+		return false;
+
+	for_each_compatible_node(np, NULL, "simple-framebuffer") {
+		struct device_node *display;
+		bool active;
+
+		if (!of_device_is_available(np))
+			continue;
+
+		display = of_parse_phandle(np, "display", 0);
+		active = display && of_property_read_bool(display,
+						 "compulab,video-handoff");
+		of_node_put(display);
+
+		if (active) {
+			of_node_put(np);
+			return true;
+		}
+	}
+
+	return false;
+}
+
 static inline unsigned int phy_read(struct phy *phy, unsigned int reg)
 {
 	struct imx8mp_lvds_phy_priv *priv = dev_get_drvdata(phy->dev.parent);
@@ -105,12 +133,16 @@ phy_write(struct phy *phy, unsigned int reg, unsigned int value)
 static int imx8mp_lvds_phy_init(struct phy *phy)
 {
 	struct imx8mp_lvds_phy_priv *priv = dev_get_drvdata(phy->dev.parent);
+	unsigned int val = CC_ADJ(0x2) | PRE_EMPH_EN | PRE_EMPH_ADJ(0x3);
+	bool retain = firmware_framebuffer_active();
 
 	clk_prepare_enable(priv->apb_clk);
 
 	mutex_lock(&priv->lock);
-	phy_write(phy, priv->devdata->lvds_ctrl,
-			CC_ADJ(0x2) | PRE_EMPH_EN | PRE_EMPH_ADJ(0x3));
+	if (!priv->devdata->has_disable && retain)
+		val |= phy_read(phy, priv->devdata->lvds_ctrl) &
+		       (BG_EN | CH_EN(0) | CH_EN(1));
+	phy_write(phy, priv->devdata->lvds_ctrl, val);
 	mutex_unlock(&priv->lock);
 
 	clk_disable_unprepare(priv->apb_clk);

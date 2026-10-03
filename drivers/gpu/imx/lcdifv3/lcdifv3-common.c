@@ -37,12 +37,21 @@ struct lcdifv3_soc {
 	struct clk *clk_pix;
 	struct clk *clk_disp_axi;
 	struct clk *clk_disp_apb;
+	bool firmware_enabled;
 
 	u32 thres_low_mul;
 	u32 thres_low_div;
 	u32 thres_high_mul;
 	u32 thres_high_div;
 };
+
+static bool lcdifv3_firmware_framebuffer_active(struct device_node *display)
+{
+	if (!IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF))
+		return false;
+
+	return of_property_read_bool(display, "compulab,video-handoff");
+}
 
 struct lcdifv3_soc_pdata {
 	bool hsync_invert;
@@ -679,6 +688,8 @@ static int imx_lcdifv3_probe(struct platform_device *pdev)
 	}
 
 	lcdifv3->dev = dev;
+	lcdifv3->firmware_enabled =
+		lcdifv3_firmware_framebuffer_active(dev->of_node);
 
 	imx_lcdifv3_of_parse_thres(lcdifv3);
 
@@ -742,8 +753,19 @@ static int imx_lcdifv3_runtime_resume(struct device *dev)
 		return ret;
 	}
 
-	/* clear sw_reset */
-	writel(CTRL_SW_RESET, lcdifv3->base + LCDIFV3_CTRL_CLR);
+	/*
+	 * Do not touch SW_RESET while firmware is actively scanning out the
+	 * framebuffer. The controller is already out of reset and writing the
+	 * reset alias while it is live can stall the i.MX8MP HDMI bus. The first
+	 * DRM modeset programs the retained controller and takes ownership.
+	 */
+	if (lcdifv3->firmware_enabled) {
+		dev_info(lcdifv3->dev,
+			 "preserving firmware-enabled controller\n");
+		lcdifv3->firmware_enabled = false;
+	} else {
+		writel(CTRL_SW_RESET, lcdifv3->base + LCDIFV3_CTRL_CLR);
+	}
 
 	/* enable plane FIFO panic */
 	lcdifv3_enable_plane_panic(lcdifv3);

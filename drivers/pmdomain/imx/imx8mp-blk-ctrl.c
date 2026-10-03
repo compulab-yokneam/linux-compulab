@@ -10,6 +10,7 @@
 #include <linux/device.h>
 #include <linux/module.h>
 #include <linux/of.h>
+#include <linux/of_address.h>
 #include <linux/platform_device.h>
 #include <linux/pm_domain.h>
 #include <linux/pm_runtime.h>
@@ -34,6 +35,8 @@
 #define GPR_REG3		0xc
 #define  PLL_CKE		BIT(17)
 #define  PLL_RST		BIT(31)
+
+#define IMX8MP_HDMI_LCDIF_BASE	0x32fc6000
 
 struct imx8mp_blk_ctrl_domain;
 
@@ -84,8 +87,55 @@ struct imx8mp_blk_ctrl_domain {
 	struct device *power_dev;
 	struct imx8mp_blk_ctrl *bc;
 	struct notifier_block power_nb;
+	bool retain_clocks;
 	int id;
 };
+
+static bool imx8mp_hdmi_firmware_framebuffer_active(void)
+{
+	struct device_node *framebuffer;
+
+	if (!IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF))
+		return false;
+
+	for_each_compatible_node(framebuffer, NULL, "simple-framebuffer") {
+		struct device_node *display;
+		struct resource resource;
+		bool active;
+
+		if (!of_device_is_available(framebuffer))
+			continue;
+
+		display = of_parse_phandle(framebuffer, "display", 0);
+		active = display &&
+			of_property_read_bool(display,
+					      "compulab,video-handoff") &&
+			!of_address_to_resource(display, 0, &resource) &&
+			resource.start == IMX8MP_HDMI_LCDIF_BASE;
+		of_node_put(display);
+
+		if (active) {
+			of_node_put(framebuffer);
+			return true;
+		}
+	}
+
+	return false;
+}
+
+static bool imx8mp_hdmi_firmware_domain_active(int id)
+{
+	switch (id) {
+	case IMX8MP_HDMIBLK_PD_IRQSTEER:
+	case IMX8MP_HDMIBLK_PD_LCDIF:
+	case IMX8MP_HDMIBLK_PD_PVI:
+	case IMX8MP_HDMIBLK_PD_HDMI_TX:
+	case IMX8MP_HDMIBLK_PD_HDMI_TX_PHY:
+		return true;
+	default:
+		return false;
+	}
+}
 
 struct imx8mp_blk_ctrl_reset_map {
 	unsigned int offset;
@@ -695,7 +745,17 @@ static int imx8mp_blk_ctrl_power_on(struct generic_pm_domain *genpd)
 		goto clk_disable;
 	}
 
-	clk_bulk_disable_unprepare(data->num_clks, domain->clks);
+	/*
+	 * Keep the initial clock references while adopting a firmware-enabled
+	 * display domain. They are balanced if the domain is later powered off
+	 * during system sleep or driver removal.
+	 */
+	if (domain->retain_clocks)
+		dev_info(bc->dev,
+			 "preserving firmware-enabled %s clocks\n",
+			 domain->genpd.name);
+	else
+		clk_bulk_disable_unprepare(data->num_clks, domain->clks);
 
 	return 0;
 
@@ -724,6 +784,10 @@ static int imx8mp_blk_ctrl_power_off(struct generic_pm_domain *genpd)
 	bc->power_off(bc, domain);
 
 	clk_bulk_disable_unprepare(data->num_clks, domain->clks);
+	if (domain->retain_clocks) {
+		clk_bulk_disable_unprepare(data->num_clks, domain->clks);
+		domain->retain_clocks = false;
+	}
 
 	/* power down upstream GPC domain */
 	pm_runtime_put(domain->power_dev);
@@ -756,6 +820,7 @@ static int imx8mp_blk_ctrl_probe(struct platform_device *pdev)
 	struct device *dev = &pdev->dev;
 	struct imx8mp_blk_ctrl *bc;
 	struct regmap *regmap;
+	bool retain_hdmi;
 	void __iomem *base;
 	int num_domains, i, ret;
 
@@ -806,6 +871,10 @@ static int imx8mp_blk_ctrl_probe(struct platform_device *pdev)
 
 	bc->power_off = bc_data->power_off;
 	bc->power_on = bc_data->power_on;
+	retain_hdmi =
+		of_device_is_compatible(dev->of_node,
+					"fsl,imx8mp-hdmi-blk-ctrl") &&
+		imx8mp_hdmi_firmware_framebuffer_active();
 
 	regmap = syscon_regmap_lookup_by_compatible("fsl,imx8m-noc");
 	if (!IS_ERR(regmap))
@@ -814,6 +883,7 @@ static int imx8mp_blk_ctrl_probe(struct platform_device *pdev)
 	for (i = 0; i < num_domains; i++) {
 		const struct imx8mp_blk_ctrl_domain_data *data = &bc_data->domains[i];
 		struct imx8mp_blk_ctrl_domain *domain = &bc->domains[i];
+		bool boot_on;
 		int j;
 
 		domain->data = data;
@@ -854,10 +924,38 @@ static int imx8mp_blk_ctrl_probe(struct platform_device *pdev)
 		domain->genpd.flags = data->flags;
 		domain->bc = bc;
 		domain->id = i;
+		boot_on = retain_hdmi && imx8mp_hdmi_firmware_domain_active(i);
+		if (boot_on) {
+			/*
+			 * Adopt the live block domain before registering its firmware
+			 * state with genpd. Besides taking the required runtime PM and
+			 * clock references, this initializes the block control bits that
+			 * Linux consumers need for interrupts and atomic commits.
+			 */
+			domain->retain_clocks = true;
+			ret = imx8mp_blk_ctrl_power_on(&domain->genpd);
+			if (ret) {
+				domain->retain_clocks = false;
+				dev_err_probe(dev, ret,
+					      "failed to adopt power domain\n");
+				dev_pm_genpd_remove_notifier(domain->power_dev);
+				dev_pm_domain_detach(domain->power_dev, true);
+				goto cleanup_pds;
+			}
 
-		ret = pm_genpd_init(&domain->genpd, NULL, true);
+			domain->genpd.flags |= GENPD_FLAG_RPM_ALWAYS_ON;
+		}
+
+		/*
+		 * The retained domains are already powered and configured by
+		 * firmware.  Register them as on so genpd does not reject the
+		 * always-on flag or run a destructive initial power transition.
+		 */
+		ret = pm_genpd_init(&domain->genpd, NULL, !boot_on);
 		if (ret) {
 			dev_err_probe(dev, ret, "failed to init power domain\n");
+			if (domain->retain_clocks)
+				imx8mp_blk_ctrl_power_off(&domain->genpd);
 			dev_pm_genpd_remove_notifier(domain->power_dev);
 			dev_pm_domain_detach(domain->power_dev, true);
 			goto cleanup_pds;

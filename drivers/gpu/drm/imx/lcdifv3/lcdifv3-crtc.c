@@ -8,6 +8,7 @@
 #include <linux/interrupt.h>
 #include <linux/media-bus-format.h>
 #include <linux/module.h>
+#include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/pm_runtime.h>
 #include <drm/drm_atomic.h>
@@ -296,7 +297,19 @@ static int lcdifv3_crtc_init(struct lcdifv3_crtc *lcdifv3_crtc,
 		return ret;
 	}
 
-	disable_irq(lcdifv3_crtc->vbl_irq);
+	if (IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF) &&
+	    of_property_read_bool(lcdifv3_crtc->dev->parent->of_node,
+				  "compulab,video-handoff")) {
+		/*
+		 * Firmware may leave LCDIF running with a pending vblank while its
+		 * framebuffer is handed to Linux. Do not wait for an IRQ handler
+		 * here: the DRM vblank enable path clears the pending source before
+		 * unmasking the interrupt for normal operation.
+		 */
+		disable_irq_nosync(lcdifv3_crtc->vbl_irq);
+	} else {
+		disable_irq(lcdifv3_crtc->vbl_irq);
+	}
 
 	return 0;
 }

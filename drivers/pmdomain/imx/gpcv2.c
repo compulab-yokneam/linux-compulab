@@ -1543,6 +1543,7 @@ static const struct imx_pgc_domain_data imx8mn_pgc_domain_data = {
 static int imx_pgc_domain_probe(struct platform_device *pdev)
 {
 	struct imx_pgc_domain *domain = pdev->dev.platform_data;
+	bool boot_on;
 	int ret;
 
 	domain->dev = &pdev->dev;
@@ -1579,11 +1580,27 @@ static int imx_pgc_domain_probe(struct platform_device *pdev)
 		regmap_update_bits(domain->regmap, domain->regs->map,
 				   domain->parent_bits.map, domain->parent_bits.map);
 
-	ret = pm_genpd_init(&domain->genpd, NULL, true);
+	/*
+	 * A bootloader may leave a display power domain running to retain its
+	 * framebuffer until the native display driver takes over.  Register the
+	 * marked domain as already on and keep it on during runtime. The block
+	 * controller's virtual consumers do not represent the firmware's initial
+	 * ownership, so provider synchronization could otherwise power the domain
+	 * down before the native display driver claims it.
+	 */
+	boot_on = IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF) &&
+		of_property_read_bool(domain->dev->of_node, "fsl,boot-on");
+	if (boot_on)
+		domain->genpd.flags |= GENPD_FLAG_RPM_ALWAYS_ON;
+
+	ret = pm_genpd_init(&domain->genpd, NULL, !boot_on);
 	if (ret) {
 		dev_err_probe(domain->dev, ret, "Failed to init power domain\n");
 		goto out_domain_unmap;
 	}
+
+	if (boot_on)
+		dev_info(domain->dev, "preserving bootloader-enabled domain\n");
 
 	if (IS_ENABLED(CONFIG_LOCKDEP) &&
 	    of_property_present(domain->dev->of_node, "power-domains"))

@@ -10,6 +10,20 @@ config DRM_IMX
 	help
 	  enable i.MX graphics support
 
+config COMPULAB_VIDEO_HANDOFF
+	bool "CompuLab bootloader display handoff (EXPERIMENTAL)"
+	depends on DRM_IMX
+	help
+	  Preserve a display pipeline initialized by U-Boot until the native
+	  Linux display drivers take ownership. This permits a splash screen or
+	  console framebuffer to remain visible during the transition from
+	  U-Boot to Linux on supported CompuLab i.MX platforms.
+
+	  Disable this option to use the normal Linux display-controller, PHY,
+	  interrupt, and power-domain initialization paths.
+
+	  This feature is experimental and requires matching U-Boot support.
+
 config DRM_IMX_LCDIF_MUX_DISPLAY
 	tristate "Support for LCDIF mux displays"
 	select DRM_PANEL_BRIDGE

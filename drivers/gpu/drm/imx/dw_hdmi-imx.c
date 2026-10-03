@@ -9,6 +9,7 @@
 #include <linux/mfd/syscon.h>
 #include <linux/mfd/syscon/imx6q-iomuxc-gpr.h>
 #include <linux/module.h>
+#include <linux/of.h>
 #include <linux/platform_device.h>
 #include <linux/phy/phy.h>
 #include <linux/regmap.h>
@@ -48,7 +49,36 @@ struct imx_hdmi {
 	struct regmap *regmap;
 	const struct imx_hdmi_chip_data *chip_data;
 	struct phy *phy;
+	bool firmware_enabled;
 };
+
+static bool imx_firmware_framebuffer_active(void)
+{
+	struct device_node *np;
+
+	if (!IS_ENABLED(CONFIG_COMPULAB_VIDEO_HANDOFF))
+		return false;
+
+	for_each_compatible_node(np, NULL, "simple-framebuffer") {
+		struct device_node *display;
+		bool active;
+
+		if (!of_device_is_available(np))
+			continue;
+
+		display = of_parse_phandle(np, "display", 0);
+		active = display && of_property_read_bool(display,
+						 "compulab,video-handoff");
+		of_node_put(display);
+
+		if (active) {
+			of_node_put(np);
+			return true;
+		}
+	}
+
+	return false;
+}
 
 static inline struct imx_hdmi *enc_to_imx_hdmi(struct drm_encoder *e)
 {
@@ -248,7 +278,19 @@ static int imx8mp_hdmi_phy_init(struct dw_hdmi *dw_hdmi, void *data,
 
 	dev_dbg(hdmi->dev, "%s\n", __func__);
 
-	dw_hdmi_phy_gen1_reset(dw_hdmi);
+	/*
+	 * Resetting an already running i.MX8MP HDMI PHY can stall the initial
+	 * atomic commit. Keep the firmware state for the first modeset, which
+	 * replaces the simple-framebuffer, then restore the normal reset path
+	 * for every later modeset.
+	 */
+	if (hdmi->firmware_enabled) {
+		dev_info(hdmi->dev,
+			 "preserving firmware-enabled PHY for initial modeset\n");
+		hdmi->firmware_enabled = false;
+	} else {
+		dw_hdmi_phy_gen1_reset(dw_hdmi);
+	}
 
 	/* enable PVI */
 	imx8mp_hdmi_pvi_enable(mode);
@@ -383,6 +425,9 @@ static int dw_hdmi_imx_probe(struct platform_device *pdev)
 
 	/* priv_data for mode_valid */
 	plat_data->priv_data = hdmi;
+	hdmi->firmware_enabled =
+		of_device_is_compatible(pdev->dev.of_node, "fsl,imx8mp-hdmi") &&
+		imx_firmware_framebuffer_active();
 
 	if (of_device_is_compatible(pdev->dev.of_node, "fsl,imx8mp-hdmi")) {
 		ret = imx8mp_hdmimix_setup(hdmi);
@@ -394,8 +439,9 @@ static int dw_hdmi_imx_probe(struct platform_device *pdev)
 	if (IS_ERR(hdmi->hdmi))
 		return PTR_ERR(hdmi->hdmi);
 
-	/* reset imx8mp hdmi external phy */
-	if (of_device_is_compatible(pdev->dev.of_node, "fsl,imx8mp-hdmi"))
+	/* Preserve a firmware-owned HDMI link until the first atomic modeset. */
+	if (of_device_is_compatible(pdev->dev.of_node, "fsl,imx8mp-hdmi") &&
+	    !hdmi->firmware_enabled)
 		dw_hdmi_phy_gen1_reset(hdmi->hdmi);
 
 	hdmi->bridge = of_drm_find_bridge(np);
