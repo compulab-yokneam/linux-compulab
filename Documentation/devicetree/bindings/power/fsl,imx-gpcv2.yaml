@@ -84,6 +84,14 @@ properties:
           power-domains:
             maxItems: 1
 
+          fsl,boot-on:
+            type: boolean
+            description: |
+              The boot firmware left this domain powered for an active
+              hardware handoff. The power-domain provider registers it as
+              already on and preserves that state until consumers have
+              completed probing.
+
           resets:
             description: |
               A number of phandles to resets that need to be asserted during
