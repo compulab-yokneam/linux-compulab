@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-iotg-imx8pv2-cmd-button = "IOT-GATE-iMX8Plus v2: cmd button";
+};
+
 #include "iotg-imx8pv2-cmd-button.dtsi"

@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-ldo4 = "MCM-iMX8M-Plus: LDO4";
+};
+
 #include "compulab-imx8m-plus-ldo4.dtsi"

@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-p18-gpio-config = "SBEV-UCM-iMX8Plus: p18 GPIO";
+};
+
 #include "sbev-ucmimx8plus-p18_gpio.dtsi"
 
 / {

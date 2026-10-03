@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-csi1-isp0 = "SBEV-UCM-iMX8Plus: CSI1 ISP0";
+};
+
 #include "sbev-ucmimx8plus-csi1-isp0.dtsi"
 
 &{/} {

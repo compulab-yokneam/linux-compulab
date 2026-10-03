@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-rpmsg = "MCM-iMX8M-Plus: RPMsg";
+};
+
 #include "compulab-imx8m-plus-rpmsg.dtsi"

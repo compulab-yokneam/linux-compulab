@@ -13,6 +13,10 @@
  */
 
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-thermal = "MCM-iMX8M-Plus: thermal limits";
+};
 #include "compulab-imx8m-plus-thermal.dtsi"
 
 &{/} {

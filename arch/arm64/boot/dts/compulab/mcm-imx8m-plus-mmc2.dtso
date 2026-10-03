@@ -1,8 +1,12 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-mmc2 = "MCM-iMX8M-Plus: MMC2";
+};
+
 #include "mcm-imx8m-plus-mmc2.dtsi"
 
 / {
 	model = "CompuLab MCM-iMX8M-Plus (sd-card on mmc2)";
 	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
 };
-

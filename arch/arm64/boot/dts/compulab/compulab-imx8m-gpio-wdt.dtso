@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-compulab-imx8m-gpio-wdt = "CompuLab i.MX8M: GPIO wdt";
+};
+
 #include <dt-bindings/gpio/gpio.h>
 
 &{/} {

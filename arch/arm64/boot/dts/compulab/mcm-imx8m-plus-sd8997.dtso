@@ -1,8 +1,12 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-sd8997 = "MCM-iMX8M-Plus: sd8997";
+};
+
 #include "mcm-imx8m-plus-sd8997.dtsi"
 
 / {
 	model = "CompuLab MCM-iMX8M-Plus (sd8997)";
 	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";
 };
-

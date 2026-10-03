@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-iotg-imx8pv2-modem = "IOT-GATE-iMX8Plus v2: modem";
+};
+
 #include "iotg-imx8pv2-modem.dtsi"

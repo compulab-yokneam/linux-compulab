@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-mipi = "UCM-iMX8M-Plus: MIPI";
+};
+
 #include "ucm-imx8m-plus-mipi.dtsi"
 
 &{/} {

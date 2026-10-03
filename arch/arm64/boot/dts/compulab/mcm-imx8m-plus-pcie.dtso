@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-pcie = "MCM-iMX8M-Plus: PCIe";
+};
+
 #include "mcm-imx8m-plus-pcie.dtsi"
 
 / {

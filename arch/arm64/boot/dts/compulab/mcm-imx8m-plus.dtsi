@@ -9,6 +9,9 @@
 / {
 	chosen {
 		stdout-path = &uart2;
+
+		overlays {
+		};
 	};
 
 	leds {

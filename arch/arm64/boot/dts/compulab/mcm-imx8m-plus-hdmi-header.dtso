@@ -1,5 +1,9 @@
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-hdmi-header = "MCM-iMX8M-Plus: HDMI header";
+};
+
 &{/} {
 	model = "CompuLab MCM-iMX8M-Plus (hdmi)";
 	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";

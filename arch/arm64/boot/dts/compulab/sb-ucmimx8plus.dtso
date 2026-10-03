@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sb-ucmimx8plus = "SB-UCM-iMX8Plus: carrier board";
+};
+
 #include "sb-ucmimx8plus.dtsi"

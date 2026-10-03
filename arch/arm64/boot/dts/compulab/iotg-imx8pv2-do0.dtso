@@ -1,5 +1,9 @@
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-iotg-imx8pv2-do0 = "IOT-GATE-iMX8Plus v2: do0";
+};
+
 /* Disable Digital Input 0 by applying a hog configuration to the underlying GPIO. */
 
 &di0_dis {
@@ -10,4 +14,3 @@
 &do0_dis {
 	status = "disabled";
 };
-

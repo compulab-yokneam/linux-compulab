@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-can = "MCM-iMX8M-Plus: CAN";
+};
+
 #include "mcm-imx8m-plus-can.dtsi"
 
 / {

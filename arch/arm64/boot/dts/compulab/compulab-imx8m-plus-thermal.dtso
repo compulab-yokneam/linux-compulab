@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-compulab-imx8m-plus-thermal = "CompuLab i.MX8M Plus: thermal limits";
+};
+
 #include "compulab-imx8m-plus-thermal.dtsi"

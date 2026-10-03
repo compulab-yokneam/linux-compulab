@@ -2,4 +2,8 @@
 /plugin/;
 
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-mmc = "UCM-iMX8M-Plus: MMC";
+};
 #include "ucm-imx8m-plus-mmc.dtsi"

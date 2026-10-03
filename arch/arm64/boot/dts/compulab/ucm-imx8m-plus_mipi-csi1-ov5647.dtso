@@ -1,5 +1,9 @@
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-mipi-csi1-ov5647 = "UCM-iMX8M-Plus: MIPI CSI1 OV5647";
+};
+
 &{/} {
 	model = "CompuLab UCM-iMX8M-Plus with mipi csi1 (p49) enabled";
 	compatible = "compulab,ucm-imx8m-plus", "fsl,imx8mp";

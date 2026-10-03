@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-ws2812b = "UCM-iMX8M-Plus: ws2812b";
+};
+
 #include "compulab-imx8m-plus-ws2812b.dtsi"
 
 / {

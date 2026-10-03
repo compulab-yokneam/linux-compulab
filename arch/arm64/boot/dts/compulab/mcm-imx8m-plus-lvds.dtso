@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-lvds = "MCM-iMX8M-Plus: LVDS";
+};
+
 #include "mcm-imx8m-plus-lvds.dtsi"

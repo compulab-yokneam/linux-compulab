@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-eb-audimx9 = "MCM-iMX8M-Plus: eb audimx9";
+};
+
 #include "mcm-imx8m-plus-eb-audimx9.dtsi"
 
 / {

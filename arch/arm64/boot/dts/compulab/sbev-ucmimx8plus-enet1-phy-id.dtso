@@ -5,6 +5,10 @@
 
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-enet1-phy-id = "SBEV-UCM-iMX8Plus: ENET1 PHY id";
+};
+
 &fec {
 	phy-mode = "rgmii-id";
 };

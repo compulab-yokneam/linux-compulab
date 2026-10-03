@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-hdmi = "SBEV-UCM-iMX8Plus: HDMI";
+};
+
 #include "ucm-imx8m-plus-hdmi.dtsi"
 
 &{/} {

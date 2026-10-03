@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-wm8962 = "SBEV-UCM-iMX8Plus: wm8962";
+};
+
 #include "sbev-ucmimx8plus-wm8962.dtsi"

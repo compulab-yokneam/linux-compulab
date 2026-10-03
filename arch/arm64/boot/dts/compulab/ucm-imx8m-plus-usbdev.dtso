@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-usbdev = "UCM-iMX8M-Plus: USB device";
+};
+
 #include "ucm-imx8m-plus-usbdev.dtsi"

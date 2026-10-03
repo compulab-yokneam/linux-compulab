@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-uart3 = "MCM-iMX8M-Plus: UART3";
+};
+
 #include "mcm-imx8m-plus-uart3.dtsi"
 
 / {

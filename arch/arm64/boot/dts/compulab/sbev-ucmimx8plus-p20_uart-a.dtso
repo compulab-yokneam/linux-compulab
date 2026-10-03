@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-p20-uart-a = "SBEV-UCM-iMX8Plus: p20 UART a";
+};
+
 #include "sbev-ucmimx8plus-p20_uart-a.dtsi"
 
 / {

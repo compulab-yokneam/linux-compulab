@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-leds = "SBEV-UCM-iMX8Plus: leds";
+};
+
 #include "sbev-ucmimx8plus-leds.dtsi"

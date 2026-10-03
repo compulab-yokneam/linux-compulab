@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-p16-i2c = "SBEV-UCM-iMX8Plus: p16 I2C";
+};
+
 #include "sbev-ucmimx8plus-p16_i2c.dtsi"
 
 / {

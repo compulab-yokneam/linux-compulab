@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-cma = "UCM-iMX8M-Plus: CMA";
+};
+
 #include "ucm-imx8m-plus-cma.dtsi"

@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-som-imx8m-plus-mipi-csi1-ar0521 = "SOM-iMX8M-Plus: MIPI CSI1 AR0521";
+};
+
 #include "som-imx8m-plus_mipi-csi1.dtsi"
 
 &sensor_mipi1 {

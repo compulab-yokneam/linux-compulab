@@ -3,6 +3,10 @@
 /dts-v1/;
 /plugin/;
 
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-rtc = "UCM-iMX8M-Plus: RTC";
+};
+
 &ab1805_rtc {
     xt-frequency = <32770750>;
 };

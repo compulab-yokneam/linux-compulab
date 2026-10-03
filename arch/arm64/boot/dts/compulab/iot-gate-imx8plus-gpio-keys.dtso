@@ -1,6 +1,10 @@
 /dts-v1/;
 /plugin/;
 
+&{/chosen/overlays} {
+	overlay-iot-gate-imx8plus-gpio-keys = "IOT-GATE-iMX8Plus: GPIO keys";
+};
+
 /*
  !!! WARNING !!!
  If a GPIO pin turned into a gpio-keys, it is not longer available as a regular gpio pin.

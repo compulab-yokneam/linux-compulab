@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbev-ucmimx8plus-p15-spi = "SBEV-UCM-iMX8Plus: p15 SPI";
+};
+
 #include "sbev-ucmimx8plus-p15_spi.dtsi"
 
 / {

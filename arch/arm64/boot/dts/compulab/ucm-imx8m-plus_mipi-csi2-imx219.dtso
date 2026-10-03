@@ -1,5 +1,9 @@
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-mipi-csi2-imx219 = "UCM-iMX8M-Plus: MIPI CSI2 IMX219";
+};
+
 &i2c6 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -71,4 +75,3 @@
 &dewarp {
 	status = "okay";
 };
-

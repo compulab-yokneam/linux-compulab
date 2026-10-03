@@ -1,5 +1,9 @@
 #include "overlay.h"
 
+&{/chosen/overlays} {
+	overlay-mcm-imx8m-plus-mipi-header = "MCM-iMX8M-Plus: MIPI header";
+};
+
 &{/} {
 	model = "CompuLab MCM-iMX8M-Plus (mipi}";
 	compatible = "compulab,mcm-imx8m-plus", "fsl,imx8mp";

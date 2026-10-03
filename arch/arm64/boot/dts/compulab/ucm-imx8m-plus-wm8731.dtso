@@ -1,2 +1,7 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-wm8731 = "UCM-iMX8M-Plus: wm8731";
+};
+
 #include "ucm-imx8m-plus-wm8731.dtsi"

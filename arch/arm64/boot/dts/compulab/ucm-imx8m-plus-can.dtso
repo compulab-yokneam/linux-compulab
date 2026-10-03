@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-can = "UCM-iMX8M-Plus: CAN";
+};
+
 #include "ucm-imx8m-plus-can.dtsi"
 
 &flexcan1 {

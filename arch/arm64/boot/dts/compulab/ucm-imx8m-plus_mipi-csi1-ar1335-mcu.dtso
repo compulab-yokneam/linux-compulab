@@ -1,4 +1,9 @@
 #include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-ucm-imx8m-plus-mipi-csi1-ar1335-mcu = "UCM-iMX8M-Plus: MIPI CSI1 AR1335 MCU";
+};
+
 #include "ucm-imx8m-plus_mipi-csi1.dtsi"
 
 &{/} {
