@@ -1,0 +1,30 @@
+&{/reserved-memory} {
+	#address-cells = <2>;
+	#size-cells = <2>;
+	ethosu_mem: ethosu-region@a8000000 {
+		compatible = "shared-dma-pool";
+		reusable;
+		reg = <0x0 0xa8000000 0x0 0x08000000>;
+	};
+};
+
+&{/} {
+	ethosu {
+		compatible = "arm,ethosu";
+		fsl,cm33-proc = <&cm33>;
+		memory-region = <&ethosu_mem>;
+		power-domains = <&mlmix>;
+	};
+
+};
+
+&cm33 {
+	mbox-names = "tx", "rx", "rxdb";
+	mboxes = <&mu1 0 1>,
+		 <&mu1 1 1>,
+		 <&mu1 3 1>;
+	memory-region = <&vdevbuffer>, <&vdev0vring0>, <&vdev0vring1>,
+			<&vdev1vring0>, <&vdev1vring1>, <&rsc_table>;
+	fsl,startup-delay-ms = <500>;
+	status = "okay";
+};

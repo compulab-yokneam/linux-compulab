@@ -19,6 +19,7 @@
 	lvds0_panel {
 		compatible = "boe,hv070wsa-100";
 		backlight = <&lvds_backlight>;
+		power-supply = <&reg_3v3_per>;
 		enable-gpios = <&pca9555 6 GPIO_ACTIVE_HIGH>;
 
 		port {

@@ -1,0 +1,64 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2023 Compulab
+ */
+
+/dts-v1/;
+
+#include "ucm-imx93.dtsi"
+
+/ {
+	model = "CompuLab UCM-i.MX93 board, mqs-support";
+	compatible = "compulab,ucm-imx93", "fsl,imx93";
+
+	sound-micfil {
+		status = "disabled";
+	};
+
+	sound-mqs {
+		compatible = "fsl,imx6sx-sdb-mqs",
+			     "fsl,imx-audio-mqs";
+		model = "mqs-audio";
+		audio-cpu = <&sai1>;
+		audio-codec = <&mqs1>;
+	};
+};
+
+&sai1 {
+	#sound-dai-cells = <0>;
+	clocks = <&clk IMX93_CLK_SAI1_IPG>, <&clk IMX93_CLK_DUMMY>,
+		 <&clk IMX93_CLK_SAI1_GATE>, <&clk IMX93_CLK_DUMMY>,
+		 <&clk IMX93_CLK_DUMMY>, <&clk IMX93_CLK_AUDIO_PLL>;
+	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3", "pll8k";
+	assigned-clocks = <&clk IMX93_CLK_SAI1>;
+	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
+	assigned-clock-rates = <24576000>;
+	status = "okay";
+  /delete-property/ pinctrl-0;
+  /delete-property/ pinctrl-names;
+};
+
+&mqs1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_mqs1>;
+	clocks = <&clk IMX93_CLK_MQS1_GATE>;
+	clock-names = "mclk";
+	status = "okay";
+};
+
+&micfil {
+	status = "disabled";
+};
+
+&iomuxc {
+	pinctrl_mqs1: mqs1grp {
+		fsl,pins = <
+      /*
+      MX93_PAD_SAI1_TXFS__MQS1_LEFT    0x31e
+      MX93_PAD_SAI1_RXD0__MQS1_RIGHT   0x31e
+      */
+			MX93_PAD_PDM_CLK__MQS1_LEFT			0x31e
+			MX93_PAD_PDM_BIT_STREAM0__MQS1_RIGHT	0x31e
+		>;
+	};
+};

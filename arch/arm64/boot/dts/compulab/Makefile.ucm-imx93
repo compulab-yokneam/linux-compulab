@@ -14,6 +14,7 @@ dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mipi-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-eth-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-eb-audimx9-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-thermal-overlay.dtbo
-# 
+dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-mqs.dtb
+#
 dtb-$(CONFIG_SOC_IMX9) += ucm-imx93-ml.dtb
 ucm-imx93-ml-dtbs := ucm-imx93.dtb ucm-imx93-ml.dtbo

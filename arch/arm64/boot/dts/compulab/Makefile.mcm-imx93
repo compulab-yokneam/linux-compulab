@@ -1,5 +1,6 @@
 # i.MX9
 dtb-$(CONFIG_SOC_IMX9) += sbc-mcm-imx93.dtb
+dtb-$(CONFIG_SOC_IMX9) += sbc-mcm-imx93-mipi-csi.dtb
 dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lpspi.dtb
 dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lpspi-slave.dtb
 dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-thermal.dtb
@@ -9,3 +10,11 @@ dtb-$(CONFIG_SOC_IMX9) += iot-link-btattach.dtb
 # i.MX9 overlays
 dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-lvds-overlay.dtbo
 dtb-$(CONFIG_SOC_IMX9) += mcm-imx93-thermal-overlay.dtbo
+
+# Optional ML firmware owns the M33
+dtb-$(CONFIG_SOC_IMX9) += sbc-mcm-imx93-ml.dtb iot-link-ml.dtb
+sbc-mcm-imx93-ml-dtbs := sbc-mcm-imx93.dtb sbc-mcm-imx93-ml.dtbo
+iot-link-ml-dtbs := iot-link.dtb iot-link-ml.dtbo
+
+dtb-$(CONFIG_SOC_IMX9) += iot-link-fars485.dtbo iot-link-fbrs485.dtbo
+dtb-$(CONFIG_SOC_IMX9) += iot-link-facan.dtbo iot-link-fbcan.dtbo
