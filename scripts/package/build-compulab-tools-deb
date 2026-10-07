@@ -1,0 +1,554 @@
+#!/bin/bash
+# SPDX-License-Identifier: GPL-2.0-only
+
+set -Eeuo pipefail
+
+readonly package_name=compulab-kernel-tools
+readonly default_tools="cpupower iio spi virtio"
+readonly default_selftests="firmware cpufreq cpu-hotplug rtc ptp timers pci_endpoint"
+
+die() {
+	printf 'ERROR: %s\n' "$*" >&2
+	exit 1
+}
+
+usage() {
+	cat <<'EOF'
+Usage: make [O=OUTPUT] [ARCH=ARCH] [CROSS_COMPILE=PREFIX] \
+              compulab-kernel-tools-bindeb-pkg
+
+Build a standalone Debian package containing statically linked target-side
+tools from the kernel source tree. This target does not use BitBake or a Yocto
+environment. Packaging fails if any target ELF has an interpreter or a shared
+library dependency.
+
+For an arm64 cross-build, for example:
+
+  make O=build ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+       compulab_v8_defconfig
+  make O=build ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- \
+       compulab-kernel-tools-bindeb-pkg
+
+The selected compiler determines the target triplet, sysroot, and binutils.
+Any arm64 GCC-compatible toolchain can be used if its sysroot contains the
+headers and static libraries needed by the selected tools. USB/IP requires a
+static libudev.a; some distributions do not provide one.
+
+The CROSS_COMPILE prefix may include an absolute path, for example:
+
+  make O=build ARCH=arm64 \
+       CROSS_COMPILE=/opt/toolchain/bin/aarch64-buildroot-linux-gnu- \
+       compulab-kernel-tools-bindeb-pkg
+
+Environment overrides:
+  COMPULAB_KERNEL_TOOLS       Space-separated tool list
+  COMPULAB_SELFTEST_TARGETS   Space-separated kselftest TARGETS list
+  COMPULAB_KERNEL_TOOLS_MAINTAINER
+                               Debian package maintainer identity
+  KDEB_PKGVERSION             Debian package version
+  PKG_CONFIG                  Target-aware pkg-config command
+  PKG_CONFIG_LIBDIR           Target pkg-config metadata directories
+  PKG_CONFIG_SYSROOT_DIR      pkg-config sysroot (normally auto-detected)
+  CC, LD, AR, STRIP, READELF  Explicit target toolchain programs
+  COMPULAB_KERNEL_TOOLS_LDFLAGS
+                               Additional flags appended after -static
+
+Default tools:
+  cpupower iio spi virtio
+EOF
+}
+
+require_commands() {
+	local command
+	local commands=(
+		autoconf automake awk chmod cp dirname dpkg dpkg-architecture
+		dpkg-deb du env find grep install libtoolize
+		ln make md5sum mkdir mktemp readlink rm rsync
+		sed sort xargs
+	)
+	local missing=()
+
+	for command in "${commands[@]}"; do
+		command -v "$command" >/dev/null 2>&1 || missing+=("$command")
+	done
+	((${#missing[@]} == 0)) ||
+		die "Required host commands are missing: ${missing[*]}"
+}
+
+resolve_path() {
+	local base=$1
+	local path=$2
+
+	case $path in
+	/*) readlink -m -- "$path" ;;
+	*) readlink -m -- "$base/$path" ;;
+	esac
+}
+
+debian_arch() {
+	case $1 in
+	x86_64*) echo amd64 ;;
+	i?86*) echo i386 ;;
+	arm64*|aarch64*) echo arm64 ;;
+	arm*) echo armhf ;;
+	riscv64*) echo riscv64 ;;
+	*) dpkg-architecture -qDEB_HOST_ARCH ;;
+	esac
+}
+
+contains_tool() {
+	local wanted=$1
+	local tool
+
+	for tool in $tools; do
+		[[ $tool == "$wanted" ]] && return 0
+	done
+	return 1
+}
+
+validate_tools() {
+	local tool
+
+	for tool in $tools; do
+		case $tool in
+		bpftool|cpupower|iio|pci|perf|rtla|selftests|spi|tmon|usbip|virtio|vsock) ;;
+		*) die "Unknown tool '$tool' in COMPULAB_KERNEL_TOOLS" ;;
+		esac
+	done
+}
+
+compiler_program() {
+	local program=$1
+	local result
+
+	result=$($target_cc -print-prog-name="$program" 2>/dev/null || true)
+	if [[ -z $result || $result == "$program" ]]; then
+		if [[ -n $cross_compile ]] && command -v "${cross_compile}${program}" >/dev/null 2>&1; then
+			result=${cross_compile}${program}
+		else
+			result=$program
+		fi
+	fi
+	printf '%s\n' "$result"
+}
+
+configure_pkg_config() {
+	local executable
+	local pkg_root
+	local -a directories=()
+
+	if [[ -n ${PKG_CONFIG:-} ]]; then
+		pkg_config=$PKG_CONFIG
+	elif [[ -n $cross_compile ]] && command -v "${cross_compile}pkg-config" >/dev/null 2>&1; then
+		pkg_config=${cross_compile}pkg-config
+	else
+		pkg_config=pkg-config
+	fi
+	executable=${pkg_config%% *}
+	command -v "$executable" >/dev/null 2>&1 ||
+		die "Target pkg-config command is missing: $executable"
+
+	# A toolchain-specific pkg-config wrapper normally supplies its own sysroot
+	# and search path. Configure these only for the generic host command.
+	case ${executable##*/} in
+	pkg-config|pkgconf)
+		if [[ $target_machine != "$build_machine" ]]; then
+			if [[ -z ${PKG_CONFIG_SYSROOT_DIR+x} && -n $target_sysroot ]]; then
+				export PKG_CONFIG_SYSROOT_DIR=$target_sysroot
+			fi
+			if [[ -z ${PKG_CONFIG_LIBDIR+x} ]]; then
+				pkg_root=${target_sysroot%/}
+				[[ -n $pkg_root ]] || pkg_root=/
+				[[ -z $compiler_multiarch ]] ||
+					directories+=("$pkg_root/usr/lib/$compiler_multiarch/pkgconfig")
+				directories+=(
+					"$pkg_root/usr/lib/$target_machine/pkgconfig"
+					"$pkg_root/usr/lib/$multiarch/pkgconfig"
+				)
+				if [[ $pkg_root != / ]]; then
+					directories+=(
+						"$pkg_root/usr/lib/pkgconfig"
+						"$pkg_root/lib/pkgconfig"
+					)
+				fi
+				directories+=("$pkg_root/usr/share/pkgconfig")
+				PKG_CONFIG_LIBDIR=$(IFS=:; printf '%s' "${directories[*]}")
+				export PKG_CONFIG_LIBDIR
+			fi
+		fi
+		;;
+	esac
+}
+
+check_static_toolchain() {
+	local test_binary
+
+	test_binary=$(mktemp "$object_tree/.compulab-static-check.XXXXXX")
+	rm -f -- "$test_binary"
+	if ! printf 'int main(void) { return 0; }\n' |
+		$target_cc -x c - $static_ldflags -o "$test_binary"; then
+		rm -f -- "$test_binary"
+		die "The selected toolchain cannot link a static arm64 executable: $target_cc"
+	fi
+	if "$target_readelf" -l "$test_binary" 2>/dev/null | grep -q INTERP ||
+		"$target_readelf" -d "$test_binary" 2>/dev/null | grep -q NEEDED; then
+		rm -f -- "$test_binary"
+		die "The selected toolchain ignored static linking: $target_cc"
+	fi
+	rm -f -- "$test_binary"
+}
+
+run_make() {
+	# Kbuild disables make's built-in rules through MAKEFLAGS. Several tools
+	# intentionally use those rules. The outer Kbuild also exports internal
+	# recursion state, which would make a nested kernel make ignore a new O=.
+	# Give every tool invocation a clean make/Kbuild environment.
+	env -u sub_make_done -u building_out_of_srctree -u srctree -u objtree \
+		-u KBUILD_OUTPUT MAKEFLAGS= MFLAGS= make "$@" \
+		ARCH="$arch" \
+		CROSS_COMPILE="$cross_compile" \
+		CC="$target_cc" \
+		LD="$target_ld" \
+		AR="$target_ar" \
+		STRIP="$target_strip" \
+		HOSTCC="$host_cc" \
+		PKG_CONFIG="$pkg_config" \
+		LDFLAGS="$static_ldflags"
+}
+
+prepare_tool_headers() {
+	[[ -r $headers_tree/usr/include/linux/version.h ]] && return
+	mkdir -p "$headers_tree"
+	cp "$object_tree/.config" "$headers_tree/.config"
+	run_make -C "$source_tree" O="$headers_tree" headers
+}
+
+build_bpftool() {
+	local output=$build_root/bpftool
+
+	mkdir -p "$output"
+	run_make -C "$source_tree/tools/bpf/bpftool" O="$output" \
+		HOST_LDFLAGS= \
+		prefix=/usr \
+		bash_compdir=/usr/share/bash-completion/completions \
+		DESTDIR="$package_root" install
+}
+
+build_cpupower() {
+	local output=$build_root/cpupower
+
+	mkdir -p "$output"
+	run_make -C "$source_tree/tools/power/cpupower" O="$output" \
+		CROSS="$cross_compile" STATIC=true NLS=false \
+		CPUFREQ_BENCH=false DEBUG=false \
+		DESTDIR="$package_root" \
+		bindir=/usr/bin sbindir=/usr/sbin libdir="/usr/lib/$multiarch" \
+		includedir=/usr/include mandir=/usr/share/man \
+		libexecdir=/usr/libexec unitdir=/usr/lib/systemd/system \
+		localedir=/usr/share/locale docdir=/usr/share/doc/cpupower \
+		confdir=/etc bash_completion_dir=/usr/share/bash-completion/completions \
+		install
+}
+
+build_iio() {
+	local output=$build_root/iio
+
+	mkdir -p "$output"
+	run_make -C "$source_tree/tools/iio" O="$output" \
+		DESTDIR="$package_root" bindir=/usr/bin install
+}
+
+build_perf() {
+	local output=$build_root/perf
+
+	mkdir -p "$output"
+	run_make -C "$source_tree/tools/perf" O="$output" \
+		WERROR=0 NO_GTK2=1 NO_LIBPYTHON=1 NO_LIBPERL=1 \
+		NO_LIBNUMA=1 NO_LIBAUDIT=1 NO_LIBBABELTRACE=1 \
+		NO_LIBPFM4=1 NO_LIBBFD=1 NO_JVMTI=1 \
+		DESTDIR="$package_root" prefix=/usr bindir=/usr/bin \
+		libdir=/usr/lib perfexecdir=/usr/libexec/perf-core \
+		sharedir=/usr/share sysconfdir=/etc mandir=/usr/share/man \
+		install
+}
+
+build_rtla() {
+	local output=$build_root/rtla
+
+	mkdir -p "$output" "$package_root/usr/bin"
+	run_make -C "$source_tree/tools/tracing/rtla" O="$output" \
+		BUILD_BPF_SKEL=0 static
+	install -m 0755 "$output/rtla-static" "$package_root/usr/bin/rtla"
+	ln -s rtla "$package_root/usr/bin/osnoise"
+	ln -s rtla "$package_root/usr/bin/hwnoise"
+	ln -s rtla "$package_root/usr/bin/timerlat"
+}
+
+build_spi() {
+	local output=$build_root/spi
+
+	mkdir -p "$output"
+	run_make -C "$source_tree/tools/spi" O="$output" \
+		DESTDIR="$package_root" bindir=/usr/bin install
+}
+
+build_tmon() {
+	local source=$build_root/tools/thermal/tmon
+
+	mkdir -p "$build_root/tools/thermal"
+	cp -a "$source_tree/tools/thermal/tmon" "$source"
+	ln -s "$source_tree/tools/build" "$build_root/tools/build"
+	run_make -C "$source" PKG_CONFIG="$pkg_config" all
+	install -Dm 0755 "$source/tmon" "$package_root/usr/bin/tmon"
+}
+
+build_usbip() {
+	local source=$build_root/usbip-source
+
+	cp -a "$source_tree/tools/usb/usbip" "$source"
+	(
+		cd "$source"
+		./autogen.sh
+		CC="$target_cc" LD="$target_ld" AR="$target_ar" \
+			STRIP="$target_strip" PKG_CONFIG="$pkg_config" \
+			LDFLAGS="$static_ldflags" ./configure \
+			--build="$build_gnu_type" \
+			--host="$target_gnu_type" \
+			--prefix=/usr \
+			--libdir="/usr/lib/$multiarch" \
+			--enable-static --disable-shared \
+			--with-tcp-wrappers=no
+		make
+		make DESTDIR="$package_root" install
+	)
+}
+
+build_virtio() {
+	local tree=$build_root/virtio-tree
+
+	prepare_tool_headers
+	mkdir -p "$tree/tools"
+	cp -a "$source_tree/tools/virtio" "$tree/tools/virtio"
+	ln -s "$source_tree/tools/include" "$tree/tools/include"
+	ln -s "$source_tree/include" "$tree/include"
+	ln -s "$source_tree/drivers" "$tree/drivers"
+	ln -s "$headers_tree/usr" "$tree/usr"
+	run_make -C "$tree/tools/virtio" \
+		EXTRA_CFLAGS=-Wno-error \
+		virtio-ivshmem-console virtio-ivshmem-block
+	install -Dm 0755 "$tree/tools/virtio/virtio-ivshmem-console" \
+		"$package_root/usr/bin/virtio-ivshmem-console"
+	install -Dm 0755 "$tree/tools/virtio/virtio-ivshmem-block" \
+		"$package_root/usr/bin/virtio-ivshmem-block"
+}
+
+build_vsock() {
+	local tree=$build_root/vsock-tree
+
+	prepare_tool_headers
+	mkdir -p "$tree/tools/testing"
+	cp -a "$source_tree/tools/testing/vsock" "$tree/tools/testing/vsock"
+	ln -s "$source_tree/tools/include" "$tree/tools/include"
+	ln -s "$headers_tree/usr" "$tree/usr"
+	run_make -C "$tree/tools/testing/vsock" all
+	mkdir -p "$package_root/usr/bin"
+	install -m 0755 \
+		"$tree/tools/testing/vsock/vsock_test" \
+		"$tree/tools/testing/vsock/vsock_diag_test" \
+		"$tree/tools/testing/vsock/vsock_perf" \
+		"$tree/tools/testing/vsock/vsock_uring_test" \
+		"$package_root/usr/bin/"
+}
+
+build_selftests() {
+	local install_path=$package_root/usr/lib/kernel-selftests
+
+	prepare_tool_headers
+	run_make -C "$source_tree/tools/testing/selftests" O="$headers_tree" \
+		TARGETS="$selftest_targets" \
+		KSFT_INSTALL_PATH="$install_path" install
+}
+
+build_pci() {
+	# pci_endpoint is kept as a separately selectable name for parity with the
+	# Yocto kernel-tools-pci package. Avoid rebuilding it if selftests selected it.
+	if contains_tool selftests && [[ " $selftest_targets " == *" pci_endpoint "* ]]; then
+		return
+	fi
+	prepare_tool_headers
+	run_make -C "$source_tree/tools/testing/selftests" O="$headers_tree" \
+		TARGETS=pci_endpoint \
+		KSFT_INSTALL_PATH="$package_root/usr/lib/kernel-selftests" install
+}
+
+write_md5sums() {
+	(
+		cd "$package_root"
+		find . -path ./DEBIAN -prune -o -type f -print0 |
+			sort -z | xargs -0 -r md5sum
+	) >"$package_root/DEBIAN/md5sums"
+}
+
+verify_static_binaries() {
+	local -a binaries=()
+	local -a dynamic=()
+	local file
+
+	while IFS= read -r -d '' file; do
+		if "$target_readelf" -h "$file" >/dev/null 2>&1; then
+			binaries+=("$file")
+			if "$target_readelf" -l "$file" 2>/dev/null | grep -q 'INTERP' ||
+				"$target_readelf" -d "$file" 2>/dev/null | grep -q '(NEEDED)'; then
+				dynamic+=("${file#$package_root/}")
+			fi
+		fi
+	done < <(find "$package_root" -type f -print0)
+
+	((${#binaries[@]})) || die 'The package contains no target ELF binaries'
+	((${#dynamic[@]} == 0)) || die "Dynamically linked files detected: ${dynamic[*]}"
+}
+
+write_control_file() {
+	local dependencies=$1
+	local installed_size
+
+	installed_size=$(du -sk -- "$package_root/usr" | awk '{ print $1 }')
+	cat >"$package_root/DEBIAN/control" <<EOF
+Package: $package_name
+Version: $package_version
+Section: kernel
+Priority: optional
+Architecture: $deb_arch
+Maintainer: $maintainer
+Installed-Size: $installed_size
+Depends: $dependencies
+Description: Statically linked CompuLab Linux kernel source-tree tools
+ This package contains statically linked target-side utilities and selected
+ selftests built from the tools directory of Linux kernel $kernel_release.
+EOF
+}
+
+main() {
+	local script_dir
+	local object_output=${KBUILD_OUTPUT:-}
+	local output_dir
+	local package_file
+	local filename_version
+	local tool
+	local cleanup_command
+
+	script_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)
+	source_tree=$(cd -- "$script_dir/../.." && pwd -P)
+
+	while (($#)); do
+		case $1 in
+		O=*) object_output=${1#O=} ;;
+		KBUILD_OUTPUT=*) object_output=${1#KBUILD_OUTPUT=} ;;
+		-h|--help)
+			usage
+			return 0
+			;;
+		*) die "Unknown argument: $1" ;;
+		esac
+		shift
+	done
+
+	require_commands
+	if [[ -n $object_output ]]; then
+		object_tree=$(resolve_path "$source_tree" "$object_output")
+	else
+		object_tree=$source_tree
+	fi
+	[[ -r $object_tree/.config ]] ||
+		die "Kernel configuration is missing: $object_tree/.config"
+
+	arch=${ARCH:-$(uname -m)}
+	cross_compile=${CROSS_COMPILE:-}
+	target_cc=${CC:-${cross_compile}gcc}
+	host_cc=${HOSTCC:-gcc}
+	for tool in "$target_cc" "$host_cc"; do
+		command -v "${tool%% *}" >/dev/null 2>&1 ||
+			die "Compiler tool is missing: ${tool%% *}"
+	done
+
+	target_machine=$($target_cc -dumpmachine) ||
+		die "Cannot determine the target of compiler: $target_cc"
+	case $target_machine in
+	aarch64*|arm64*) ;;
+	*) die "The selected compiler does not target arm64: $target_cc ($target_machine)" ;;
+	esac
+	target_sysroot=$($target_cc -print-sysroot 2>/dev/null || true)
+	compiler_multiarch=$($target_cc -print-multiarch 2>/dev/null || true)
+	[[ $compiler_multiarch != . ]] || compiler_multiarch=
+	build_machine=$($host_cc -dumpmachine 2>/dev/null || uname -m)
+	target_gnu_type=$target_machine
+	target_ld=${LD:-$(compiler_program ld)}
+	target_ar=${AR:-$(compiler_program ar)}
+	target_strip=${STRIP:-$(compiler_program strip)}
+	target_readelf=${READELF:-$(compiler_program readelf)}
+	for tool in "$target_ld" "$target_ar" "$target_strip" "$target_readelf"; do
+		command -v "${tool%% *}" >/dev/null 2>&1 ||
+			die "Toolchain program is missing: ${tool%% *}"
+	done
+
+	deb_arch=$(debian_arch "$target_machine")
+	multiarch=$(env -u CC dpkg-architecture -a "$deb_arch" -qDEB_HOST_MULTIARCH)
+	build_gnu_type=$(env -u CC dpkg-architecture -qDEB_BUILD_GNU_TYPE)
+	configure_pkg_config
+
+	kernel_release=${KERNELRELEASE:-}
+	if [[ -z $kernel_release ]]; then
+		kernel_release=$(make -s -C "$source_tree" O="$object_tree" \
+			ARCH="$arch" CROSS_COMPILE="$cross_compile" kernelrelease)
+	fi
+	if [[ -n ${KDEB_PKGVERSION:-} ]]; then
+		package_version=$KDEB_PKGVERSION
+	else
+		package_version=${kernel_release}-${KBUILD_BUILD_VERSION:-1}
+	fi
+	dpkg --validate-version "$package_version" >/dev/null 2>&1 ||
+		die "Invalid Debian package version: $package_version"
+	maintainer=${COMPULAB_KERNEL_TOOLS_MAINTAINER:-CompuLab Ltd. <compulab@compulab.com>}
+	[[ $maintainer != *$'\n'* && $maintainer == *'<'*'>' ]] ||
+		die "Invalid package maintainer: $maintainer"
+
+	tools=${COMPULAB_KERNEL_TOOLS:-$default_tools}
+	selftest_targets=${COMPULAB_SELFTEST_TARGETS:-$default_selftests}
+	static_ldflags="-static ${COMPULAB_KERNEL_TOOLS_LDFLAGS:-}"
+	validate_tools
+	check_static_toolchain
+
+	build_root=$(mktemp -d "$object_tree/.compulab-tools.XXXXXX")
+	headers_tree=$build_root/kbuild
+	package_root=$build_root/root
+	cleanup_command=$(printf 'rm -rf -- %q' "$build_root")
+	trap "$cleanup_command" EXIT
+	mkdir -p "$package_root/DEBIAN" "$package_root/usr/share/doc/$package_name"
+	install -m 0644 "$source_tree/COPYING" \
+		"$package_root/usr/share/doc/$package_name/copyright"
+
+	printf 'Building CompuLab kernel tools for %s (%s)\n' "$kernel_release" "$deb_arch"
+	printf '  Compiler:   %s\n' "$target_cc"
+	printf '  Target:     %s\n' "$target_machine"
+	printf '  Sysroot:    %s\n' "${target_sysroot:-<compiler default>}"
+	printf '  pkg-config: %s\n' "$pkg_config"
+	for tool in $tools; do
+		printf '\n  TOOL    %s\n' "$tool"
+		"build_${tool//-/_}"
+	done
+
+	verify_static_binaries
+	write_control_file 'bash, perl, python3'
+	write_md5sums
+	chmod 0644 "$package_root/DEBIAN/control" "$package_root/DEBIAN/md5sums"
+	find "$package_root" -type d -exec chmod 0755 {} +
+
+	output_dir=$(dirname -- "$object_tree")
+	filename_version=${package_version//:/%3a}
+	package_file=$output_dir/${package_name}_${filename_version}_${deb_arch}.deb
+	dpkg-deb --root-owner-group --build "$package_root" "$package_file"
+
+	printf '\nCreated CompuLab kernel tools package:\n  %s\n' "$package_file"
+}
+
+main "$@"

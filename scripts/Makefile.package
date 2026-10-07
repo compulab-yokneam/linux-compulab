@@ -143,6 +143,12 @@ PHONY += compulab-kernel-hooks-pkg
 compulab-kernel-hooks-pkg:
 	$(Q)$(srctree)/scripts/package/build-compulab-debs --hooks-only O=$(CURDIR)
 
+PHONY += compulab-kernel-tools-bindeb-pkg
+compulab-kernel-tools-bindeb-pkg:
+	+$(Q)KERNELRELEASE="$(KERNELRELEASE)" ARCH="$(ARCH)" \
+		SRCARCH="$(SRCARCH)" CROSS_COMPILE="$(CROSS_COMPILE)" \
+		$(srctree)/scripts/package/build-compulab-tools-deb O=$(CURDIR)
+
 # snap-pkg
 # ---------------------------------------------------------------------------
 PHONY += snap-pkg
@@ -255,6 +261,7 @@ help:
 	@echo '  bindeb-pkg          - Build only the binary kernel deb package'
 	@echo '  compulab-bindeb-pkg - Build binary kernel debs and the CompuLab hook package'
 	@echo '  compulab-kernel-hooks-pkg - Build only the CompuLab hook package'
+	@echo '  compulab-kernel-tools-bindeb-pkg - Build the standalone CompuLab kernel-tools deb'
 	@echo '  snap-pkg            - Build only the binary kernel snap package'
 	@echo '                        (will connect to external hosts)'
 	@echo '  pacman-pkg          - Build only the binary kernel pacman package'

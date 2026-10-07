@@ -117,6 +117,11 @@ GMO_FILES = ${shell for HLANG in ${LANGUAGES}; do echo $(OUTPUT)po/$$HLANG.gmo; 
 
 export CROSS CC AR STRIP RANLIB CFLAGS LDFLAGS LIB_OBJS
 
+CPUPOWER_ARCH := $(if $(ARCH),$(ARCH),$(shell uname -m))
+ifneq ($(filter x86 i386 x86_64,$(CPUPOWER_ARCH)),)
+PCI_LIBS := -lpci
+endif
+
 # check if compiler option is supported
 cc-supports = ${shell if $(CC) ${1} -S -o /dev/null -x c /dev/null > /dev/null 2>&1; then echo "$(1)"; fi;}
 
@@ -201,7 +206,13 @@ endif
 
 # the actual make rules
 
-all: libcpupower $(OUTPUT)cpupower $(COMPILE_NLS) $(COMPILE_BENCH)
+ifeq ($(strip $(STATIC)),true)
+CPUPOWER_LIBRARY_TARGET =
+else
+CPUPOWER_LIBRARY_TARGET = libcpupower
+endif
+
+all: $(CPUPOWER_LIBRARY_TARGET) $(OUTPUT)cpupower $(COMPILE_NLS) $(COMPILE_BENCH)
 
 $(OUTPUT)lib/%.o: $(LIB_SRC) $(LIB_HEADERS)
 	$(ECHO) "  CC      " $@
@@ -224,12 +235,16 @@ $(OUTPUT)%.o: %.c
 	$(ECHO) "  CC      " $@
 	$(QUIET) $(CC) $(CFLAGS) -I./lib -I ./utils -o $@ -c $*.c
 
+ifeq ($(strip $(STATIC)),true)
+$(OUTPUT)cpupower: $(UTIL_OBJS)
+else
 $(OUTPUT)cpupower: $(UTIL_OBJS) $(OUTPUT)libcpupower.so.$(LIB_VER)
+endif
 	$(ECHO) "  CC      " $@
 ifeq ($(strip $(STATIC)),true)
-	$(QUIET) $(CC) $(CFLAGS) $(LDFLAGS) $(UTIL_OBJS) -lrt -lpci -L$(OUTPUT) -o $@
+	$(QUIET) $(CC) $(CFLAGS) $(LDFLAGS) $(UTIL_OBJS) -lrt $(PCI_LIBS) -L$(OUTPUT) -o $@
 else
-	$(QUIET) $(CC) $(CFLAGS) $(LDFLAGS) $(UTIL_OBJS) -lcpupower -lrt -lpci -L$(OUTPUT) -o $@
+	$(QUIET) $(CC) $(CFLAGS) $(LDFLAGS) $(UTIL_OBJS) -lcpupower -lrt $(PCI_LIBS) -L$(OUTPUT) -o $@
 endif
 	$(QUIET) $(STRIPCMD) $@
 
