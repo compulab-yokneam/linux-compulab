@@ -14,7 +14,7 @@
 	};
 	usdhc2_pwrseq: usdhc2_pwrseq {
 		compatible = "mmc-pwrseq-simple";
-		reset-gpios = <&gpio5 2 GPIO_ACTIVE_LOW>;
+		reset-gpios = <&gpio5 4 GPIO_ACTIVE_LOW>;
 	};
 };
 
@@ -47,19 +47,12 @@
 };
 /********** WiFi/BT - End **********/
 
-&pcie {
-	status = "disabled";
-};
-&pcie_phy {
-	status = "disabled";
-};
-
 &pinctrl_uart4 {
 	fsl,pins = <
 		MX8MP_IOMUXC_UART4_TXD__UART4_DTE_RX				0x140
 		MX8MP_IOMUXC_UART4_RXD__UART4_DTE_TX				0x140
 		MX8MP_IOMUXC_ECSPI2_MISO__UART4_DTE_RTS				0x140
-			MX8MP_IOMUXC_ECSPI2_SS0__UART4_DTE_CTS			0x140
+		MX8MP_IOMUXC_ECSPI2_SS0__UART4_DTE_CTS				0x140
 	>;
 };
 
@@ -67,7 +60,7 @@
 	pinctrl_usdhc2_gpio: usdhc2grp-gpio {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO04__GPIO1_IO04			0x100 /* SD2_VSEL */
-			MX8MP_IOMUXC_SAI3_MCLK__GPIO5_IO02			0x140 /* WIFI_RSTn */
+			MX8MP_IOMUXC_SPDIF_RX__GPIO5_IO04			0x140 /* WIFI_RSTn */
 		>;
 	};
 };

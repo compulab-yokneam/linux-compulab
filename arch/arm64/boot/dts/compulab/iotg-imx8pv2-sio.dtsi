@@ -84,7 +84,7 @@ rs485_b: &uart1 {
 
 &gpio3 {
 	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_di0_di1>;
+	pinctrl-0 = <&pinctrl_di0_di1_di2>;
 	status = "okay";
 
 	di0_dis: di_0_dis@0 {
@@ -101,20 +101,20 @@ rs485_b: &uart1 {
 		line-name = "DI1 disabled";
 		status = "disabled";
 	};
-};
-
-&gpio2 {
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_di2_di3>;
-	status = "okay";
-
 	di2_dis: di_2_dis@2 {
 		gpio-hog;
-		gpios = <20 GPIO_ACTIVE_HIGH>;
+		gpios = <21 GPIO_ACTIVE_HIGH>;
 		input;
 		line-name = "DI2 disabled";
 		status = "disabled";
 	};
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_di3>;
+	status = "okay";
+
 	di3_dis: di_3_dis@3 {
 		gpio-hog;
 		gpios = <10 GPIO_ACTIVE_HIGH>;
@@ -176,15 +176,15 @@ rs485_b: &uart1 {
 		>;
 	};
 
-	pinctrl_di0_di1: di0di1grp {
+	pinctrl_di0_di1_di2: di0di1di2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SAI5_RXFS__GPIO3_IO19			0x100 /* DI0 */
 			MX8MP_IOMUXC_SAI5_RXC__GPIO3_IO20			0x100 /* DI1 */
+			MX8MP_IOMUXC_SAI5_RXD0__GPIO3_IO21			0x100 /* DI2 */
 		>;
 	};
-	pinctrl_di2_di3: di2di3grp {
+	pinctrl_di3: di3grp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SD2_WP__GPIO2_IO20				0x100 /* DI2 */
 			MX8MP_IOMUXC_SD1_RESET_B__GPIO2_IO10			0x100 /* DI3 */
 		>;
 	};

@@ -67,7 +67,7 @@
 		power-led-blue {
 			label = "PowerLED_Blue";
 			color = <LED_COLOR_ID_BLUE>;
-			gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+			gpios = <&gpio5 22 GPIO_ACTIVE_HIGH>;
 			linux,default-trigger = "pattern";
 			led-pattern = <LED_PATTERN_MORSE_OK>;
 		};
@@ -132,8 +132,21 @@
 			reg = <0>;
 			eee-broken-1000t;
 			realtek,clkout-disable;
+			realtek,led-modes = <
+				PHY_LED_LINK_ACTIVITY
+				PHY_LED_OFF
+				PHY_LED_LINK
+			>;
 		};
 	};
+};
+
+&eqosphy {
+	realtek,led-modes = <
+		PHY_LED_LINK_ACTIVITY
+		PHY_LED_LINK
+		PHY_LED_OFF
+	>;
 };
 
 &i2c2 {
@@ -227,13 +240,6 @@
 		>;
 	};
 
-	pinctrl_uart2: uart2grp {
-		fsl,pins = <
-			MX8MP_IOMUXC_SAI3_TXFS__UART2_DCE_RX			0x140
-			MX8MP_IOMUXC_SAI3_TXC__UART2_DCE_TX			0x140
-		>;
-	};
-
 	pinctrl_usb_hub_reset: usbhubrst {
 		fsl,pins = <
 			MX8MP_IOMUXC_GPIO1_IO01__GPIO1_IO01			0x100
@@ -242,7 +248,7 @@
 
 	pinctrl_user_leds: userledsgrp {
 		fsl,pins = <
-			MX8MP_IOMUXC_SAI5_RXD0__GPIO3_IO21			0x110
+			MX8MP_IOMUXC_UART1_RXD__GPIO5_IO22			0x110
 		>;
 	};
 

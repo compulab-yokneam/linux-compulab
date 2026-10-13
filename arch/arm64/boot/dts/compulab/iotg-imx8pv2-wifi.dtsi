@@ -2,7 +2,7 @@
  * Copyright 2026 CompuLab
  */
 
-/* PCIE_MUX_SEL: '0' - WIFI, '1' - NVME/HAILO */
+/* PCIE_MUX_SEL: '0' - NVME/HAILO, '1' - WIFI */
 &pcie_mux_sel {
 	output-high;
 	line-name = "PCIE_SEL_WIFI";
