@@ -1,7 +1,7 @@
 #include "overlay.h"
 
 &{/chosen/overlays} {
-	overlay-iotg-imx8pv2-rs485-b = "IOT-GATE-iMX8Plus v2: RS-485 b";
+	overlay-iotg-imx8pv2-rs485-b = "iotg-imx8pv2-rs485-b";
 };
 
 /* Enable ISO1_5V */

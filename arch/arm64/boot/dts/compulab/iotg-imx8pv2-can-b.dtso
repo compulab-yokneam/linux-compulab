@@ -1,7 +1,7 @@
 #include "overlay.h"
 
 &{/chosen/overlays} {
-	overlay-iotg-imx8pv2-can-b = "IOT-GATE-iMX8Plus v2: CAN b";
+	overlay-iotg-imx8pv2-can-b = "iotg-imx8pv2-can-b";
 };
 
 /* Enable ISO1_5V */

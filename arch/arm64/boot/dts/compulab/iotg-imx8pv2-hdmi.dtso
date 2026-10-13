@@ -1,7 +1,7 @@
 #include "overlay.h"
 
 &{/chosen/overlays} {
-	overlay-iotg-imx8pv2-hdmi = "IOT-GATE-iMX8Plus v2: HDMI";
+	overlay-iotg-imx8pv2-hdmi = "iotg-imx8pv2-hdmi";
 };
 
 #include "ucm-imx8m-plus-hdmi.dtsi"
