@@ -161,7 +161,22 @@ libs-$(CONFIG_EFI_STUB) += $(objtree)/drivers/firmware/efi/libstub/lib.a
 # Default target when executing plain make
 boot		:= arch/arm64/boot
 
-BOOT_TARGETS	:= Image vmlinuz.efi image.fit
+BOOT_TARGETS	:= Image vmlinuz.efi image.fit fitImage
+
+# Platform settings come from Kconfig; make command-line overrides are allowed.
+FIT_DEVICETREE ?= $(subst ",,$(CONFIG_FIT_DEVICETREE))
+FIT_KERNEL_IMAGE ?= Image.gz
+FIT_CONF_DEFAULT_DTB ?= $(notdir $(firstword $(FIT_DEVICETREE)))
+FIT_DESC ?= Linux-$(KERNELRELEASE)
+FIT_INITRAMFS ?=
+FIT_MKIMAGE ?= mkimage
+UBOOT_LOADADDRESS ?= $(subst ",,$(CONFIG_UBOOT_LOADADDRESS))
+UBOOT_ENTRYPOINT ?= $(subst ",,$(CONFIG_UBOOT_ENTRYPOINT))
+UBOOT_DTB_LOADADDRESS ?= $(subst ",,$(CONFIG_UBOOT_DTB_LOADADDRESS))
+UBOOT_DTBO_LOADADDRESS ?= $(subst ",,$(CONFIG_UBOOT_DTBO_LOADADDRESS))
+export FIT_DEVICETREE FIT_KERNEL_IMAGE FIT_CONF_DEFAULT_DTB FIT_DESC
+export FIT_INITRAMFS FIT_MKIMAGE UBOOT_LOADADDRESS UBOOT_ENTRYPOINT
+export UBOOT_DTB_LOADADDRESS UBOOT_DTBO_LOADADDRESS
 
 PHONY += $(BOOT_TARGETS)
 
@@ -174,6 +189,8 @@ endif
 all:	$(notdir $(KBUILD_IMAGE))
 
 image.fit: dtbs
+
+fitImage: $(FIT_KERNEL_IMAGE) $(FIT_DEVICETREE)
 
 vmlinuz.efi image.fit: Image
 $(BOOT_TARGETS): vmlinux
@@ -225,6 +242,7 @@ define archhelp
   echo  '* Image.gz      - Compressed kernel image (arch/$(ARCH)/boot/Image.gz)'
   echo  '  Image         - Uncompressed kernel image (arch/$(ARCH)/boot/Image)'
   echo  '  image.fit     - Flat Image Tree (arch/$(ARCH)/boot/image.fit)'
+  echo  '  fitImage      - FIT with optional FIT_INITRAMFS (arch/$(ARCH)/boot/fitImage)'
   echo  '  install       - Install kernel (compressed if COMPRESSED_INSTALL set)'
   echo  '  zinstall      - Install compressed kernel'
   echo  '                  Install using (your) ~/bin/installkernel or'

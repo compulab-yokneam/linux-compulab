@@ -13,6 +13,7 @@ ARM64 Architecture
     arm-cca
     asymmetric-32bit
     booting
+    compulab-fit-image
     cpu-feature-registers
     cpu-hotplug
     elf_hwcaps

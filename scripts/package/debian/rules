@@ -78,6 +78,9 @@ build-indep:
 build-arch:
 	$(Q)$(MAKE) $(make-opts) olddefconfig
 	$(Q)$(MAKE) $(make-opts) $(if $(filter um,$(ARCH)),,headers) all
+	$(Q)if grep -q '^CONFIG_FIT_IMAGE=y' include/config/auto.conf; then \
+		$(MAKE) $(make-opts) fitImage; \
+	fi
 
 .PHONY: clean
 clean:

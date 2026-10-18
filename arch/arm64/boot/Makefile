@@ -17,7 +17,9 @@
 OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S
 
 targets := Image Image.bz2 Image.gz Image.lz4 Image.lzma Image.lzo \
-	Image.zst Image.xz image.fit
+	Image.zst Image.xz image.fit fitImage
+
+clean-files += fit-image.its
 
 $(obj)/Image: vmlinux FORCE
 	$(call if_changed,objcopy)
@@ -45,6 +47,21 @@ $(obj)/Image.xz: $(obj)/Image FORCE
 
 $(obj)/image.fit: $(obj)/Image $(obj)/dts/dtbs-list FORCE
 	$(call if_changed,fit)
+
+quiet_cmd_compulab_fit = MKIMAGE $@
+      cmd_compulab_fit = $(PYTHON3) $(srctree)/scripts/make_compulab_fit.py \
+		--output $@ --kernel $(obj)/$(FIT_KERNEL_IMAGE) \
+		--description '$(FIT_DESC)' --default-dtb '$(FIT_CONF_DEFAULT_DTB)' \
+		--load $(UBOOT_LOADADDRESS) --entry $(UBOOT_ENTRYPOINT) \
+		--dtb-load $(UBOOT_DTB_LOADADDRESS) --dtbo-load $(UBOOT_DTBO_LOADADDRESS) \
+		--mkimage '$(FIT_MKIMAGE)' \
+		$(if $(FIT_INITRAMFS),--initramfs '$(FIT_INITRAMFS)') \
+		$(addprefix $(obj)/dts/,$(FIT_DEVICETREE))
+
+$(obj)/fitImage: $(obj)/$(FIT_KERNEL_IMAGE) \
+		$(addprefix $(obj)/dts/,$(FIT_DEVICETREE)) $(FIT_INITRAMFS) \
+		$(srctree)/scripts/make_compulab_fit.py FORCE
+	$(call if_changed,compulab_fit)
 
 EFI_ZBOOT_PAYLOAD	:= Image
 EFI_ZBOOT_BFD_TARGET	:= elf64-littleaarch64

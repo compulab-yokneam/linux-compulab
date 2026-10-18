@@ -1,0 +1,40 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+menu "FIT image settings"
+
+config FIT_IMAGE
+	bool "Include a FIT image in Debian kernel packages"
+	help
+	  Build fitImage during bindeb-pkg and include it as
+	  /boot/fitImage-<kernel-release> in the linux-image package.
+	  Requires the host mkimage and dtc tools and the FIT settings below.
+	  If disabled, Debian packaging does not build or include a FIT image.
+
+config FIT_DEVICETREE
+	string "FIT device trees and overlays"
+	help
+	  Space-separated DTB and DTBO paths relative to arch/arm64/boot/dts.
+	  The first entry should be a base DTB. These files are built and
+	  included by the fitImage target.
+
+config UBOOT_LOADADDRESS
+	string "FIT kernel load address"
+	help
+	  Kernel load address in hexadecimal, for example 0x80400000.
+
+config UBOOT_ENTRYPOINT
+	string "FIT kernel entry point"
+	help
+	  Kernel entry address in hexadecimal.
+
+config UBOOT_DTB_LOADADDRESS
+	string "FIT device tree load address"
+	help
+	  Base device tree load address in hexadecimal.
+
+config UBOOT_DTBO_LOADADDRESS
+	string "FIT overlay load address"
+	help
+	  Device tree overlay load address in hexadecimal.
+
+endmenu

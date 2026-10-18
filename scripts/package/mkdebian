@@ -212,7 +212,7 @@ Build-Depends-Arch: bc, bison, flex,
  gcc-${host_gnu} <!pkg.${sourcename}.nokernelheaders>,
  kmod, libdw-dev:native, libelf-dev:native,
  libssl-dev:native, libssl-dev <!pkg.${sourcename}.nokernelheaders>,
- python3:native, rsync
+ python3:native, rsync$(if_enabled_echo CONFIG_FIT_IMAGE ', u-boot-tools, device-tree-compiler')
 Homepage: https://www.kernel.org/
 
 Package: $packagename-${KERNELRELEASE}

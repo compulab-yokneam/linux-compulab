@@ -65,6 +65,11 @@ install_linux_image () {
 	esac
 	cp "$(${MAKE} -s -f ${srctree}/Makefile image_name)" "${pdir}/${installed_image_path}"
 
+	if is_enabled CONFIG_FIT_IMAGE; then
+		install -m 0644 "arch/${SRCARCH}/boot/fitImage" \
+			"${pdir}/boot/fitImage-${KERNELRELEASE}"
+	fi
+
 	if [ "${ARCH}" != um ]; then
 		install_maint_scripts "${pdir}"
 	fi
