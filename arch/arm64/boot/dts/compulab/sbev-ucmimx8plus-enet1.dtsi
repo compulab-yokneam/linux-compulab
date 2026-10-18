@@ -31,8 +31,6 @@
 				PHY_LED_LINK
 				PHY_LED_LINK
 			>;
-			interrupt-parent = <&gpio4>;
-			interrupts = <21 IRQ_TYPE_EDGE_FALLING>;
 		};
 	};
 };
