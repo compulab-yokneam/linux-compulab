@@ -29,6 +29,7 @@ if_enabled_echo() {
 install_linux_image () {
 	pname=$1
 	pdir=debian/$1
+	compulab_boot_update=0
 
 	# Only some architectures with OF support have this target
 	if is_enabled CONFIG_OF_EARLY_FLATTREE && [ -d "${srctree}/arch/${SRCARCH}/boot/dts" ]; then
@@ -70,6 +71,12 @@ install_linux_image () {
 			"${pdir}/boot/fitImage-${KERNELRELEASE}"
 	fi
 
+	if [ "${SRCARCH}" = arm64 ] && is_enabled CONFIG_COMPULAB_BOOT_UPDATE; then
+		compulab_boot_update=1
+		install -D -m 0755 "${srctree}/scripts/package/compulab-boot-update" \
+			"${pdir}/usr/lib/linux-image-${KERNELRELEASE}/compulab-boot-update"
+	fi
+
 	if [ "${ARCH}" != um ]; then
 		install_maint_scripts "${pdir}"
 	fi
@@ -104,8 +111,20 @@ install_maint_scripts () {
 		done
 		hookdirs="\${hookdirs# }"
 		test -n "\$hookdirs" && run-parts --arg="${KERNELRELEASE}" --arg="/${installed_image_path}" \$hookdirs
-		exit 0
 		EOF
+		if [ "$script" = postinst ] && [ "$compulab_boot_update" = 1 ]; then
+			fit_argument=
+			if is_enabled CONFIG_FIT_IMAGE; then
+				fit_argument=" /boot/fitImage-${KERNELRELEASE}"
+			fi
+			cat <<-EOF >> "${pdir}/DEBIAN/${script}"
+			if [ "\${1:-}" = configure ]; then
+				/usr/lib/linux-image-${KERNELRELEASE}/compulab-boot-update \\
+					"${KERNELRELEASE}" "/${installed_image_path}"${fit_argument}
+			fi
+			EOF
+		fi
+		echo 'exit 0' >> "${pdir}/DEBIAN/${script}"
 		chmod 755 "${pdir}/DEBIAN/${script}"
 	done
 }

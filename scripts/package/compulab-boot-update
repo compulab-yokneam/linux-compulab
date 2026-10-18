@@ -1,11 +1,11 @@
 #!/bin/bash
 # SPDX-License-Identifier: GPL-2.0-only
 #
-# Provision this file from the base image or companion package as:
-#   /etc/kernel/postinst.d/compulab-boot-update
+# Installed with each CompuLab linux-image package at:
+#   /usr/lib/linux-image-KERNEL_RELEASE/compulab-boot-update
 #
 # linux-image postinst scripts invoke it as:
-#   compulab-boot-update KERNEL_RELEASE KERNEL_IMAGE
+#   compulab-boot-update KERNEL_RELEASE KERNEL_IMAGE [FIT_IMAGE]
 
 set -Eeuo pipefail
 
@@ -15,9 +15,11 @@ readonly ROOTFS_BOOT_DIR=/boot
 
 release=
 package_image=
+package_fit_image=
 dtb_dir=
 work_dir=
 new_image=
+new_fit_image=
 boot_mount=
 boot_device=
 root_device=
@@ -145,10 +147,17 @@ device_tree_files() {
 }
 
 managed_boot_files() {
+	local fit_patterns=()
+
+	# Manage only this release and the active link. Older versioned FITs
+	# remain available, including files owned by other linux-image packages.
+	if [[ -n $package_fit_image ]]; then
+		fit_patterns=(-o -name fitImage -o -name "fitImage-$release")
+	fi
 	find "$boot_mount" -mindepth 1 -maxdepth 1 \
 		\( -type f -o -type l \) \
 		\( -name 'Image*' -o -name '*.dtb*' -o \
-		   -name 'kernel*' -o -name 'config*' \) -print0
+		   -name 'kernel*' -o -name 'config*' "${fit_patterns[@]}" \) -print0
 }
 
 clear_managed_boot_files() {
@@ -377,14 +386,37 @@ mount_boot_partition() {
 		die "Unexpected device mounted at $boot_mount: $mounted_source"
 }
 
+check_boot_fit_destinations() {
+	local destination
+
+	[[ -n $new_fit_image ]] || return 0
+	for destination in "$boot_mount/fitImage" "$boot_mount/fitImage-$release"; do
+		if [[ -e $destination || -L $destination ]]; then
+			[[ -f $destination || -L $destination ]] ||
+				die "Refusing to replace non-file FIT destination: $destination"
+		fi
+	done
+}
+
 create_boot_backup() {
 	local current_kernel=$1
 	local current_files=()
+	local active_fit
 	local source
 	local destination
 	local stamp
 
 	mapfile -d '' current_files < <(managed_boot_files)
+	if [[ -n $package_fit_image && -L $boot_mount/fitImage ]]; then
+		active_fit=$(readlink -- "$boot_mount/fitImage")
+		if [[ $active_fit =~ ^fitImage-[A-Za-z0-9._+-]+$ &&
+		      $active_fit != "fitImage-$release" &&
+		      -f $boot_mount/$active_fit ]]; then
+			# Back up the active FIT's contents as well as its link, without
+			# removing the older versioned file from the boot partition.
+			current_files+=("$boot_mount/$active_fit")
+		fi
+	fi
 	if ((${#current_files[@]} == 0)); then
 		printf 'No existing boot payload found; skipping backup for initial deployment\n'
 		return 0
@@ -420,13 +452,15 @@ create_boot_backup() {
 
 check_boot_space() {
 	local current_files=()
+	local payloads=("$new_image" "$dtb_dir")
 	local required_kb
 	local available_kb
 	local reclaimable_kb=0
 	local file
 
 	mapfile -d '' current_files < <(managed_boot_files)
-	required_kb=$(du -sk -- "$new_image" "$dtb_dir" | awk '{ total += $1 } END { print total + 0 }')
+	[[ -z $new_fit_image ]] || payloads+=("$new_fit_image")
+	required_kb=$(du -sk -- "${payloads[@]}" | awk '{ total += $1 } END { print total + 0 }')
 	available_kb=$(df -Pk -- "$boot_mount" | awk 'NR == 2 { print $4 }')
 	for file in "${current_files[@]}"; do
 		reclaimable_kb=$((reclaimable_kb + $(du -sk -- "$file" | awk '{ print $1 }')))
@@ -490,9 +524,20 @@ install_boot_payload() {
 		mv -- "$installed_image" "$boot_mount/Image"
 	fi
 	cp -a -- "${dtbs[@]}" "$boot_mount"/
+	if [[ -n $new_fit_image ]]; then
+		cp -a -- "$new_fit_image" "$boot_mount/fitImage-$release"
+		ln -sfn -- "fitImage-$release" "$boot_mount/fitImage"
+	fi
 	sync
 
 	cmp -s -- "$new_image" "$boot_mount/Image" || die 'Installed kernel Image failed verification'
+	if [[ -n $new_fit_image ]]; then
+		[[ -L $boot_mount/fitImage &&
+		   $(readlink -- "$boot_mount/fitImage") == "fitImage-$release" ]] ||
+			die 'Installed fitImage symlink failed verification'
+		cmp -s -- "$new_fit_image" "$boot_mount/fitImage-$release" ||
+			die 'Installed FIT image failed verification'
+	fi
 	for file in "${dtbs[@]}"; do
 		cmp -s -- "$file" "$boot_mount/${file##*/}" ||
 			die "Boot-partition device tree failed verification: ${file##*/}"
@@ -505,7 +550,8 @@ main() {
 	local root_status
 	local update_boot_partition=1
 
-	[[ $# -eq 2 ]] || die "Usage: $0 KERNEL_RELEASE KERNEL_IMAGE"
+	[[ $# -eq 2 || $# -eq 3 ]] ||
+		die "Usage: $0 KERNEL_RELEASE KERNEL_IMAGE [FIT_IMAGE]"
 	if [[ -n ${DEB_MAINT_PARAMS:-} && ${DEB_MAINT_PARAMS%% *} != configure ]]; then
 		printf 'Skipping CompuLab boot update for postinst action: %s\n' \
 			"${DEB_MAINT_PARAMS%% *}"
@@ -518,6 +564,11 @@ main() {
 	[[ $EUID -eq 0 ]] || die 'This updater must be run as root'
 	release=$1
 	package_image=$2
+	package_fit_image=${3:-}
+	if [[ $# -eq 3 ]]; then
+		[[ -f $package_fit_image && -s $package_fit_image ]] ||
+			die "Packaged FIT image is missing or empty: $package_fit_image"
+	fi
 	dtb_dir=/usr/lib/linux-image-$release/compulab
 	[[ $release =~ ^[A-Za-z0-9._+-]+$ ]] || die "Invalid kernel release: $release"
 	[[ -f $package_image && -s $package_image ]] ||
@@ -551,6 +602,12 @@ main() {
 		new_image=$work_dir/Image-$release
 		gzip -dc -- "$package_image" >"$new_image"
 		[[ -s $new_image ]] || die 'Decompressed kernel Image is empty'
+		if [[ -n $package_fit_image ]]; then
+			# /boot can already be the boot partition. Stage the packaged FIT
+			# before cleanup removes its destination on that same filesystem.
+			new_fit_image=$work_dir/fitImage-$release
+			cp -L -- "$package_fit_image" "$new_fit_image"
+		fi
 	fi
 
 	prepare_root_boot_directory
@@ -563,6 +620,7 @@ main() {
 			mkdir -- "$boot_mount"
 			mount_boot_partition
 		fi
+		check_boot_fit_destinations
 		create_boot_backup "$current_kernel"
 		check_boot_space
 	fi

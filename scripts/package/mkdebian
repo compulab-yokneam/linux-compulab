@@ -217,6 +217,17 @@ Homepage: https://www.kernel.org/
 
 Package: $packagename-${KERNELRELEASE}
 Architecture: $debarch
+EOF
+
+if [ "${SRCARCH}" = arm64 ] && is_enabled CONFIG_COMPULAB_BOOT_UPDATE; then
+cat <<EOF >> debian/control
+Depends: bash, coreutils, debianutils, diffutils, findutils, gzip, mount,
+ util-linux, mawk | gawk
+Conflicts: compulab-kernel-hooks
+EOF
+fi
+
+cat <<EOF >> debian/control
 Description: Linux kernel, version ${KERNELRELEASE}
  This package contains the Linux kernel, modules and corresponding other
  files, version: ${KERNELRELEASE}.

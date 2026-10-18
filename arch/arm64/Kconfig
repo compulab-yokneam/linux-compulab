@@ -447,6 +447,16 @@ source "arch/arm64/Kconfig.platforms"
 
 source "arch/arm64/Kconfig.fitimage"
 
+config COMPULAB_BOOT_UPDATE
+	bool "Deploy CompuLab boot files after Debian kernel installation"
+	depends on ARCH_MXC
+	default y
+	help
+	  Include the CompuLab boot updater in linux-image Debian packages
+	  and run it from postinst configure to deploy the kernel and device
+	  trees, plus a FIT image when packaged, to the boot partition.
+	  Disable this to package the kernel without the automatic updater.
+
 menu "Kernel Features"
 
 menu "ARM errata workarounds via the alternatives framework"

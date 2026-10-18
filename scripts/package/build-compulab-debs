@@ -14,15 +14,16 @@ usage() {
 	cat <<'EOF'
 Usage: scripts/package/build-compulab-debs [OPTIONS] [--] [MAKE_ARGUMENT ...]
 
-Build the normal kernel binary Debian packages, then create a companion
-compulab-kernel-hooks package containing the CompuLab KDEB postinst hook.
-The hook package version comes from scripts/package/compulab-kernel-hooks.version
+Build the normal kernel binary Debian packages with the integrated CompuLab
+postinst updater. No companion hook package is needed for new kernels.
+The legacy --hooks-only package version comes from
+scripts/package/compulab-kernel-hooks.version
 and can be overridden with the COMPULAB_KERNEL_HOOKS_VERSION environment variable.
 The maintainer defaults to CompuLab Ltd. <compulab@compulab.com> and can be
 overridden with the COMPULAB_KERNEL_HOOKS_MAINTAINER environment variable.
 
 Options:
-  --hooks-only         Build only compulab-kernel-hooks; do not run bindeb-pkg.
+  --hooks-only         Build legacy hooks for older kernels, without bindeb-pkg.
   -h, --help           Show this help.
 
 All remaining arguments are passed to make. For example:
@@ -210,6 +211,7 @@ main() {
 	if ((build_kernel)); then
 		printf 'Building kernel binary Debian packages\n'
 		make -C "$srctree" "${make_args[@]}" bindeb-pkg
+		return 0
 	fi
 
 	build_hook_package "$output_dir" "$hook_source" "$srctree" \

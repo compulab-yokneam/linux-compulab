@@ -113,6 +113,42 @@ Copy the resulting linux-image package to the ARM64 target and install it::
 
     sudo apt install ./linux-image-<kernel-release>_<version>_arm64.deb
 
-Configure U-Boot to load the versioned FIT from the intended boot filesystem.
-The package includes matching kernel modules as part of the normal linux-image
-payload. U-Boot environment settings are not changed by FIT packaging.
+ARM64 i.MX linux-image packages also contain a version-specific CompuLab boot
+updater when ``CONFIG_COMPULAB_BOOT_UPDATE=y`` (the default on ARM64 i.MX).
+It is called directly by ``postinst configure``. A separate
+``compulab-kernel-hooks`` package is no longer needed. The linux-image package
+declares a conflict with that legacy package so APT can remove it during the
+transition and prevent duplicate boot updates. ``compulab-bindeb-pkg`` is an
+alias for the normal binary package build; ``compulab-kernel-hooks-pkg`` is
+retained only for legacy installations.
+
+Set ``CONFIG_COMPULAB_BOOT_UPDATE=n`` to omit the updater, its post-install
+call, its runtime dependencies and the legacy hook-package conflict.
+``CONFIG_FIT_IMAGE`` still independently controls whether the FIT is built
+and included in the package; disabling automatic boot updates does not
+disable FIT packaging. Other kernel post-install hooks continue to run.
+This option is available in ``menuconfig`` as "Deploy CompuLab boot files
+after Debian kernel installation" and defaults to disabled on non-i.MX
+platforms.
+
+The updater backs up and verifies the existing boot payload before deploying
+the kernel and device trees. When the linux-image package contains a FIT, it
+also copies ``fitImage-<kernel-release>`` to the boot partition and creates
+the relative symlink ``fitImage -> fitImage-<kernel-release>``. FIT copies and
+the symlink are verified; deployment failures roll back the managed boot
+files and root-filesystem device trees. Older versioned FIT files are retained.
+When no FIT is packaged, existing boot-partition FIT files and links are left
+unchanged, even if a stale FIT exists on the root filesystem.
+
+The existing device-selection rules still apply: boot updates require root
+on partition 2 and deploy to partition 1 of the same device. If that boot
+partition is already mounted at ``/boot``, it is updated there; otherwise it
+is temporarily mounted. On unsupported root layouts the updater mirrors
+device trees into root-filesystem ``/boot`` and skips boot-partition changes.
+``COMPULAB_SKIP_BOOT_UPDATE=1`` skips the updater entirely.
+
+The boot filesystem must support symbolic links for FIT deployment; failure
+to create the requested link aborts and rolls back the update. Configure
+U-Boot to load ``fitImage`` from the boot partition. The package includes
+matching kernel modules as part of the normal linux-image payload. U-Boot
+environment settings are not changed by the updater.
