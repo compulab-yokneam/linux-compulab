@@ -9,6 +9,18 @@ fwdir := $(addprefix $(srctree)/,$(filter-out /%,$(fwdir)))$(filter /%,$(fwdir))
 firmware  := $(addsuffix .gen.o, $(CONFIG_EXTRA_FIRMWARE))
 obj-y += $(firmware)
 
+# Unpack the selected SDMA firmware when its compressed source is available.
+sdma_fw_arch := $(wildcard $(addsuffix .arch,$(addprefix $(fwdir)/, \
+		$(filter imx/sdma/sdma-imx7d.bin,$(CONFIG_EXTRA_FIRMWARE)))))
+
+quiet_cmd_sdma_fw = GUNZIP  $@
+      cmd_sdma_fw = gunzip -c $< > $@
+
+ifneq ($(sdma_fw_arch),)
+$(patsubst %.arch,%,$(sdma_fw_arch)): %: %.arch
+	$(call cmd,sdma_fw)
+endif
+
 FWNAME    = $(patsubst $(obj)/%.gen.S,%,$@)
 FWSTR     = $(subst $(comma),_,$(subst /,_,$(subst .,_,$(subst -,_,$(FWNAME)))))
 ASM_WORD  = $(if $(CONFIG_64BIT),.quad,.long)
