@@ -1,7 +1,0 @@
-#include "overlay.h"
-
-&{/chosen/overlays} {
-	overlay-iotg-imx8pv2-m2exp-wifi = "iotg-imx8pv2-m2exp-wifi";
-};
-
-#include "iotg-imx8pv2-m2exp-wifi.dtsi"
