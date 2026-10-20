@@ -209,9 +209,9 @@ static char trace_iocg_path[TRACE_IOCG_PATH_LEN];
 #define TRACE_IOCG_PATH(type, iocg, ...)	do { } while (0)
 #endif	/* CONFIG_TRACE_POINTS */
 
+#define	MILLION 1000000U
+#define WEIGHT_ONE (1U << 16)
 enum {
-	MILLION			= 1000000,
-
 	/* timer period is calculated from latency requirements, bound it */
 	MIN_PERIOD		= USEC_PER_MSEC,
 	MAX_PERIOD		= USEC_PER_SEC,
@@ -231,7 +231,6 @@ enum {
 	TIMER_SLACK_PCT		= 1,
 
 	/* 1/64k is granular enough and can easily be handled w/ u32 */
-	WEIGHT_ONE		= 1 << 16,
 
 	/*
 	 * As vtime is used to calculate the cost of each IO, it needs to
