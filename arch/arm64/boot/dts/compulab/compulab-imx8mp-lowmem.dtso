@@ -1,0 +1,103 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 CompuLab Ltd.
+ *
+ * Apply at boot, after other display and CMA overlays, to release the GPU
+ * carveout and use a small DMA pool on headless CompuLab i.MX8MP systems.
+ */
+
+#include "overlay.h"
+
+/* Some base DTs have no /chosen node until the bootloader creates it. */
+&{/} {
+	chosen {
+		overlays {
+			overlay-compulab-imx8mp-lowmem = "CompuLab i.MX8MP: low memory";
+		};
+	};
+};
+
+&{/} {
+	display-subsystem {
+		status = "disabled";
+	};
+};
+
+&resmem {
+	/* IOTDIN may already have removed this carveout from the base DT. */
+	gpu_reserved@100000000 {
+		status = "disabled";
+	};
+
+	linux,cma {
+		compatible = "shared-dma-pool";
+		reusable;
+		size = <0 0x02000000>;
+		alloc-ranges = <0 0x40000000 0 0x80000000>;
+		linux,cma-default;
+	};
+};
+
+&mix_gpu_ml {
+	status = "disabled";
+};
+
+&gpu_3d {
+	status = "disabled";
+};
+
+&gpu_2d {
+	status = "disabled";
+};
+
+&ml_vipsi {
+	status = "disabled";
+};
+
+&vpu_g1 {
+	status = "disabled";
+};
+
+&vpu_g2 {
+	status = "disabled";
+};
+
+&vpu_vc8000e {
+	status = "disabled";
+};
+
+&vpu_v4l2 {
+	status = "disabled";
+};
+
+&lcdif1 {
+	status = "disabled";
+};
+
+&lcdif2 {
+	status = "disabled";
+};
+
+&lcdif3 {
+	status = "disabled";
+};
+
+&ldb {
+	status = "disabled";
+};
+
+&ldb_phy {
+	status = "disabled";
+};
+
+&mipi_dsi {
+	status = "disabled";
+};
+
+&hdmi {
+	status = "disabled";
+};
+
+&hdmiphy {
+	status = "disabled";
+};
