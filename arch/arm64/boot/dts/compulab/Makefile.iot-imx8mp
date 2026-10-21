@@ -18,3 +18,12 @@ iotdin-imx8p-usbdev-dtbs := iotdin-imx8p.dtb ucm-imx8m-plus-usbdev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-usbdev.dtb
 # Overlays
 dtb-$(CONFIG_ARCH_MXC) += iot-gate-imx8plus-gpio-keys.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += compulab-imx8mp-lowmem.dtbo
+# The overlay creates /chosen at the root of the base DT.
+$(obj)/compulab-imx8mp-lowmem.dtbo: DTC_FLAGS += -Wno-chosen_node_is_root
+
+iotdin-imx8p-lowmem-dtbs := iotdin-imx8p.dtb \
+		compulab-imx8mp-lowmem.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += iotdin-imx8p-lowmem.dtb
