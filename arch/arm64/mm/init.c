@@ -493,8 +493,17 @@ void __init mem_init(void)
 {
 	bool swiotlb = max_pfn > PFN_DOWN(arm64_dma_phys_limit);
 
-	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC))
+	if (IS_ENABLED(CONFIG_DMA_BOUNCE_UNALIGNED_KMALLOC) && !swiotlb) {
+		/*
+		 * If no bouncing needed for ZONE_DMA, reduce the swiotlb
+		 * buffer for kmalloc() bouncing to 1MB per 1GB of RAM.
+		 */
+		unsigned long size =
+			DIV_ROUND_UP(memblock_phys_mem_size(), 1024);
+
+		swiotlb_adjust_size(min(swiotlb_size_or_default(), size));
 		swiotlb = true;
+	}
 
 	swiotlb_init(swiotlb, SWIOTLB_VERBOSE);
 
