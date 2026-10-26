@@ -734,13 +734,9 @@
 	sram = <&sram1>;
 };
 
-&scmi_misc {
-	nxp,ctrl-ids = <BRD_SM_CTRL_SD3_WAKE	FALLING_EDGE
-			BRD_SM_CTRL_PCIE1_WAKE	FALLING_EDGE
-			BRD_SM_CTRL_BT_WAKE	FALLING_EDGE
-			BRD_SM_CTRL_PCIE2_WAKE	FALLING_EDGE
-			BRD_SM_CTRL_BUTTON	FALLING_EDGE>;
-};
+/* The CompuLab SM does not initialize the EVK PCAL6408A wake expander.
+ * Do not request its SD3/PCIe/BT/button notifications on this board.
+ */
 
 &wdog3 {
 	status = "okay";
