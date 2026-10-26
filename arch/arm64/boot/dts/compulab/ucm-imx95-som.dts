@@ -264,6 +264,8 @@
 
 	sound-bt-sco {
 		compatible = "simple-audio-card";
+		/* Enable this card together with its SAI1 PCM interface. */
+		status = "disabled";
 		simple-audio-card,name = "bt-sco-audio";
 		simple-audio-card,format = "dsp_a";
 		simple-audio-card,bitclock-inversion;
