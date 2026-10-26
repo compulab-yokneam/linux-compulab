@@ -23,6 +23,10 @@
 #define BRD_SM_CTRL_PCIE2_WAKE		0x8003	/*!< PCAL6408A-6 */
 #define BRD_SM_CTRL_BUTTON		0x8004	/*!< PCAL6408A-7 */
 
+&ele_if0 {
+	memory-region = <&ele_reserved>;
+};
+
 / {
 	model = "CompuLab i.MX95 19x19 SOM";
 	compatible = "compulab,ucm-imx95", "fsl,imx95";
@@ -77,6 +81,13 @@
 		#address-cells = <2>;
 		#size-cells = <2>;
 		ranges;
+
+		/* Secure-enclave DMA pool, matching the i.MX95 reference layout. */
+		ele_reserved: ele-reserved@a4120000 {
+			compatible = "shared-dma-pool";
+			reg = <0 0xa4120000 0 0x100000>;
+			no-map;
+		};
 
 		linux_cma: linux,cma {
 			compatible = "shared-dma-pool";
