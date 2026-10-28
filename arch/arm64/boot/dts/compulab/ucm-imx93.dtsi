@@ -75,30 +75,6 @@
 			"IN3R", "AMIC",
 			"IN1R", "AMIC";
 	};
-
-	sound-micfil {
-		compatible = "fsl,imx-audio-card";
-		model = "micfil-audio";
-
-		pri-dai-link {
-			link-name = "micfil hifi";
-			format = "i2s";
-			cpu {
-				sound-dai = <&micfil>;
-			};
-		};
-	};
-
-	sound-xcvr {
-		compatible = "fsl,imx-audio-card";
-		model = "imx-audio-xcvr";
-		pri-dai-link {
-			link-name = "XCVR PCM";
-			cpu {
-				sound-dai = <&xcvr>;
-			};
-		};
-	};
 };
 
 &aips2 {
@@ -112,34 +88,6 @@
 		#pwm-cells = <3>;
 		status = "disabled";
 	};
-};
-
-&micfil {
-	#sound-dai-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_pdm>;
-	assigned-clocks = <&clk IMX93_CLK_PDM>;
-	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>;
-	assigned-clock-rates = <49152000>;
-	status = "disabled";
-};
-
-&xcvr {
-	#sound-dai-cells = <0>;
-	pinctrl-names = "default";
-	pinctrl-0 = <&pinctrl_spdif>;
-	clocks = <&clk IMX93_CLK_BUS_WAKEUP>,
-		<&clk IMX93_CLK_SPDIF_GATE>,
-		<&clk IMX93_CLK_DUMMY>,
-		<&clk IMX93_CLK_AUD_XCVR_GATE>,
-		<&clk IMX93_CLK_AUDIO_PLL>;
-	clock-names = "ipg", "phy", "spba", "pll_ipg", "pll8k";
-	assigned-clocks = <&clk IMX93_CLK_SPDIF>,
-			 <&clk IMX93_CLK_AUDIO_XCVR>;
-	assigned-clock-parents = <&clk IMX93_CLK_AUDIO_PLL>,
-			 <&clk IMX93_CLK_SYS_PLL_PFD1_DIV2>;
-	assigned-clock-rates = <12288000>, <200000000>;
-	status = "disabled";
 };
 
 &eqos {

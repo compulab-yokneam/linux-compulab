@@ -4,12 +4,6 @@
  */
 
 &iomuxc {
-
-
-
-
-
-
 	pinctrl_usdhc1: usdhc1grp {
 		fsl,pins = <
 			MX93_PAD_SD1_CLK__USDHC1_CLK		0x17fe
@@ -47,9 +41,6 @@
 
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
 
-
-
-
 	pinctrl_usdhc3: usdhc3grp {
 		fsl,pins = <
 			MX93_PAD_SD3_CLK__USDHC3_CLK			0x17fe
@@ -61,8 +52,6 @@
 		>;
 	};
 
-
-
 	pinctrl_usdhc3_wlan: usdhc3wlangrp {
 		fsl,pins = <
 			MX93_PAD_CCM_CLKO1__GPIO3_IO26			0x31e
@@ -71,14 +60,9 @@
 		>;
 	};
 
-
-
-
 	pinctrl_pmic: pmicirq {
 		fsl,pins = <
 			MX93_PAD_WDOG_ANY__GPIO1_IO15	0x31e
 		>;
 	};
-
-
 };

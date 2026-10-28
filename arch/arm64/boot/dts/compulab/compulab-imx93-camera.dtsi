@@ -24,6 +24,10 @@
 };
 
 &isi {
+	status = "okay";
+	cap_device {
+		status = "okay";
+	};
 	port {
 		isi_in: endpoint {
 			remote-endpoint = <&mipi_csi_out>;
