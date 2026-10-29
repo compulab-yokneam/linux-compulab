@@ -6,12 +6,10 @@
 #include "compulab-imx93.dtsi"
 
 / {
-
 	leds {
 		compatible = "gpio-leds";
 		pinctrl-names = "default";
 		pinctrl-0 = <&pinctrl_gpio_led>;
-
 		heartbeat-led {
 			gpios = <&gpio1 10 GPIO_ACTIVE_LOW>;
 			linux,default-trigger = "heartbeat";
@@ -408,14 +406,17 @@
 
 &isi {
 	status = "okay";
-
 	cap_device {
 		status = "okay";
 	};
 };
 
-&iomuxc {
+&adc1 {
+	vref-supply = <&reg_vref_1v8>;
+	status = "okay";
+};
 
+&iomuxc {
 	pinctrl_eqos: eqosgrp {
 		fsl,pins = <
 			MX93_PAD_ENET1_MDC__ENET_QOS_MDC			0x57e
@@ -508,7 +509,6 @@
 		>;
 	};
 
-
 	pinctrl_uart2: uart2grp {
 		fsl,pins = <
 			MX93_PAD_UART2_RXD__LPUART2_RX		0x31e
@@ -533,10 +533,6 @@
 		>;
 	};
 
-
-
-
-
 	pinctrl_sai1: sai1grp {
 		fsl,pins = <
 			MX93_PAD_SAI1_TXC__SAI1_TX_BCLK			0x31e
@@ -545,7 +541,6 @@
 			MX93_PAD_SAI1_RXD0__SAI1_RX_DATA00		0x31e
 		>;
 	};
-
 
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
 	pinctrl_usdhc1: usdhc1grp {
@@ -565,9 +560,7 @@
 	};
 
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
-
 	/* need to config the SION for data and cmd pad, refer to ERR052021 */
-
 
 	pinctrl_sai3_sleep: sai3sleepgrp {
 		fsl,pins = <
@@ -701,5 +694,4 @@
 			MX93_PAD_GPIO_IO21__GPIO2_IO21		0x31e
 		>;
 	};
-
 };
