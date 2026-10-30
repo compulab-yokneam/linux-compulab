@@ -1101,6 +1101,7 @@ properties:
         items:
           - enum:
               - beacon,imx8mp-beacon-kit  # i.MX8MP Beacon Development Kit
+              - compulab,mcm-imx8pv2      # CompuLab MCM-iMX8Pv2 SoM
               - dmo,imx8mp-data-modul-edm-sbc # i.MX8MP eDM SBC
               - emcraft,imx8mp-navqp      # i.MX8MP Emcraft Systems NavQ+ Kit
               - fsl,frdm-imx8mp           # FRDM-IMX8MP Board
@@ -1122,6 +1123,12 @@ properties:
               - skov,imx8mp-skov-revc-tian-g07017 # SKOV i.MX8MP climate control with 7" panel
               - ultratronik,imx8mp-ultra-mach-sbc # Ultratronik SBC i.MX8MP based board
               - ysoft,imx8mp-iota2-lumpy  # Y Soft i.MX8MP IOTA2 Lumpy Board
+          - const: fsl,imx8mp
+
+      - description: CompuLab MCM-iMX8Pv2 module on SBC-MCM8PV2
+        items:
+          - const: compulab,sbc-mcm8pv2
+          - const: compulab,mcm-imx8pv2
           - const: fsl,imx8mp
 
       - description: ABB Boards with i.MX8M Plus Modules from ADLink

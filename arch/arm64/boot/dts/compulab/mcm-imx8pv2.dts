@@ -1,0 +1,12 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+/dts-v1/;
+
+#include "mcm-imx8pv2.dtsi"
+#include "sbc-mcm8pv2.dtsi"
+
+/ {
+	model = "CompuLab SBC-MCM8PV2";
+	compatible = "compulab,sbc-mcm8pv2", "compulab,mcm-imx8pv2", "fsl,imx8mp";
+};

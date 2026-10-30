@@ -14,6 +14,7 @@ ARM64 Architecture
     asymmetric-32bit
     booting
     compulab-fit-image
+    compulab-mcm-imx8pv2
     cpu-feature-registers
     cpu-hotplug
     elf_hwcaps
