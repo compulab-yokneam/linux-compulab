@@ -1,5 +1,8 @@
 DTC_FLAGS := -@
 
+# Common i.MX8MP overlays
+dtb-$(CONFIG_ARCH_MXC) += compulab-imx8mp-lowmem.dtbo
+
 # include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.imx8mm
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.ucm-imx8mp
 include $(srctree)/arch/arm64/boot/dts/compulab/Makefile.iot-imx8mp
