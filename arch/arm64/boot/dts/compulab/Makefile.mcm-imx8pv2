@@ -1,0 +1,46 @@
+# SPDX-License-Identifier: GPL-2.0
+
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2-som.dtb mcm-imx8pv2-base.dtb
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-enet.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-enet1.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-mipi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-wm8962.dtbo
+
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p17_can.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p19_uart-b.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p20_uart-a.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p15_spi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p16_spi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p16_i2c.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-p18_gpio.dtbo
+
+sbc-mcm8pv2-headless-dtbs := mcm-imx8pv2-base.dtb \
+	sbc-mcm8pv2-enet.dtbo sbc-mcm8pv2-enet1.dtbo sbc-mcm8pv2-wm8962.dtbo \
+	sbc-mcm8pv2-p17_can.dtbo \
+	sbc-mcm8pv2-p19_uart-b.dtbo \
+	sbc-mcm8pv2-p20_uart-a.dtbo \
+	sbc-mcm8pv2-p15_spi.dtbo \
+	sbc-mcm8pv2-p16_spi.dtbo \
+	sbc-mcm8pv2-p16_i2c.dtbo \
+	sbc-mcm8pv2-p18_gpio.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-headless.dtb
+
+sbc-mcm8pv2-hdmi-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-hdmi.dtb
+
+sbc-mcm8pv2-lvds-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-lvds.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-lvds.dtb
+
+sbc-mcm8pv2-mipi-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-mipi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-mipi.dtb
+
+sbc-mcm8pv2-dualhead-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-dualhead.dtb
+
+# Preserve the default U-Boot fdtfile with all previously enabled displays.
+mcm-imx8pv2-dtbs := sbc-mcm8pv2-headless.dtb \
+	sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-mipi.dtbo sbc-mcm8pv2-hdmi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2.dtb

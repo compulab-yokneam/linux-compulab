@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbc-mcm8pv2-p16_spi = "SBC-MCM8PV2: ECSPI1 on P16";
+};
+
+#include "sbc-mcm8pv2-p16_spi.dtsi"

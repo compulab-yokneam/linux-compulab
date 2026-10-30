@@ -1,6 +1,3 @@
-dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2-som.dtb
-dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2.dtb
-
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus-som.dtb
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8m-plus.dtb
 

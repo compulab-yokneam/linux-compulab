@@ -1,0 +1,21 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+/* Sheet 10: ATA6563 VCC = 5 V, VIO = 3.3 V.
+ * STBY is pulled low by R325; there is no software standby GPIO.
+ */
+&flexcan2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_p17_can>;
+	xceiver-supply = <&sbc_5v0>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_p17_can: sbc-p17-cangrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_TXD0__CAN2_TX	0x154 /* ATA6563 TXD */
+			MX8MP_IOMUXC_SAI2_MCLK__CAN2_RX	0x154 /* ATA6563 RXD */
+		>;
+	};
+};

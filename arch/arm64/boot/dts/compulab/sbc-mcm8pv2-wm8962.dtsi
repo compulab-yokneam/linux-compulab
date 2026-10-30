@@ -1,0 +1,70 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/*
+ * Copyright 2026 CompuLab Ltd.
+ */
+
+/*
+ * Sheet 13: headphone output and stereo IN4 line input.
+ * HP_JD connects to codec GPIO5; GPIO4_IO22 is CODEC_INT, not jack detect.
+ */
+&{/} {
+	sound-wm8962 {
+		compatible = "fsl,imx-audio-wm8962x";
+		model = "wm8962-audio";
+		audio-cpu = <&sai3>;
+		audio-codec = <&sbc_codec>;
+		audio-routing =
+			"Headphone Jack", "HPOUTL",
+			"Headphone Jack", "HPOUTR",
+			"IN4L", "Line In Jack",
+			"IN4R", "Line In Jack";
+	};
+};
+
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	sbc_codec: codec@1a {
+		compatible = "wlf,wm8962";
+		reg = <0x1a>;
+		clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_SAI3_MCLK1>;
+		DCVDD-supply = <&sbc_1v8>;
+		DBVDD-supply = <&sbc_3v3>;
+		AVDD-supply = <&sbc_1v8>;
+		CPVDD-supply = <&sbc_1v8>;
+		MICVDD-supply = <&sbc_3v3>;
+		PLLVDD-supply = <&sbc_1v8>;
+		SPKVDD1-supply = <&sbc_5v0>;
+		SPKVDD2-supply = <&sbc_5v0>;
+		status = "okay";
+	};
+};
+
+&sai3 {
+	#sound-dai-cells = <0>;
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_sai3>;
+	assigned-clocks = <&clk IMX8MP_CLK_SAI3>;
+	assigned-clock-parents = <&clk IMX8MP_AUDIO_PLL1_OUT>;
+	assigned-clock-rates = <12288000>;
+	clocks = <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_SAI3_IPG>, <&clk IMX8MP_CLK_DUMMY>,
+		 <&audio_blk_ctrl IMX8MP_CLK_AUDIOMIX_SAI3_MCLK1>, <&clk IMX8MP_CLK_DUMMY>,
+		 <&clk IMX8MP_CLK_DUMMY>;
+	clock-names = "bus", "mclk0", "mclk1", "mclk2", "mclk3";
+	fsl,sai-mclk-direction-output;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_sai3: sai3grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_TXFS__AUDIOMIX_SAI3_TX_SYNC	0xd6
+			MX8MP_IOMUXC_SAI3_TXC__AUDIOMIX_SAI3_TX_BCLK	0xd6
+			MX8MP_IOMUXC_SAI3_RXD__AUDIOMIX_SAI3_RX_DATA00	0xd6
+			MX8MP_IOMUXC_SAI3_TXD__AUDIOMIX_SAI3_TX_DATA00	0xd6
+			MX8MP_IOMUXC_SAI3_MCLK__AUDIOMIX_SAI3_MCLK	0xd6
+		>;
+	};
+};

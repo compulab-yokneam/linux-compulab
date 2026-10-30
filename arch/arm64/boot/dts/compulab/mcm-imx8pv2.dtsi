@@ -4,8 +4,15 @@
 #include "compulab-imx8m-plus.dtsi"
 
 / {
+	aliases {
+		spi1 = &ecspi1;
+		spi2 = &ecspi2;
+	};
+
 	chosen {
 		stdout-path = &uart2;
+
+		overlays {};
 	};
 
 	/* U-Boot fixes up the memory ranges for the installed DRAM. */
@@ -355,4 +362,22 @@
 		>;
 	};
 
+};
+
+/* Samsung HDMI PHY exports one clock without a clock index. */
+&hdmiphy {
+	#clock-cells = <0>;
+	/delete-property/ clock-output-names;
+};
+
+&hdmi {
+	clocks = <&clk IMX8MP_CLK_HDMI_APB>,
+		 <&clk IMX8MP_CLK_HDMI_24M>,
+		 <&hdmiphy>;
+};
+
+&lcdif3 {
+	clocks = <&hdmiphy>,
+		 <&clk IMX8MP_CLK_HDMI_AXI>,
+		 <&clk IMX8MP_CLK_HDMI_APB>;
 };

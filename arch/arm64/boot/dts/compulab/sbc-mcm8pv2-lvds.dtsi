@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+&{/} {
+	sbc_lvds_backlight: backlight-lvds {
+		compatible = "pwm-backlight";
+		power-supply = <&sbc_5v0>;
+		pwms = <&pwm2 0 50000 0>;
+		brightness-levels = <0 16 32 64 96 128 160 192 224 255>;
+		default-brightness-level = <8>;
+	};
+	/* Provisional panel; confirm the attached panel before deployment. */
+	sbc_lvds_panel: panel-lvds {
+		compatible = "boe,hv070wsa-100";
+		power-supply = <&sbc_3v3>;
+		enable-gpios = <&sbc_gpio 3 GPIO_ACTIVE_HIGH>;
+		backlight = <&sbc_lvds_backlight>;
+
+		port {
+			sbc_lvds_in: endpoint {
+				remote-endpoint = <&sbc_lvds_out>;
+			};
+		};
+	};
+};
+
+&pwm2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_pwm2>;
+	status = "okay";
+};
+
+&lcdif2 {
+	status = "okay";
+};
+
+&ldb {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	lvds-channel@0 {
+		reg = <0>;
+		#address-cells = <1>;
+		#size-cells = <0>;
+		fsl,data-mapping = "spwg";
+		fsl,data-width = <24>;
+		status = "okay";
+
+		port@1 {
+			reg = <1>;
+			sbc_lvds_out: endpoint {
+				remote-endpoint = <&sbc_lvds_in>;
+			};
+		};
+	};
+
+	lvds-channel@1 {
+		reg = <1>;
+		status = "disabled";
+	};
+};
+
+&ldb_phy {
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_pwm2: sbc-pwm2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SPDIF_RX__PWM2_OUT 0x116
+		>;
+	};
+};

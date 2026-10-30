@@ -1,0 +1,19 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+&uart4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_p19_uart4>;
+	assigned-clocks = <&clk IMX8MP_CLK_UART4>;
+	assigned-clock-parents = <&clk IMX8MP_SYS_PLL1_80M>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_p19_uart4: sbc-p19-uart4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_UART4_RXD__UART4_DCE_RX	0x140 /* P19.2 */
+			MX8MP_IOMUXC_UART4_TXD__UART4_DCE_TX	0x140 /* P19.4 */
+		>;
+	};
+};

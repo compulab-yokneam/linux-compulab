@@ -1,0 +1,33 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+/* P16.3/P16.5 are dedicated I2C4 signals, separate from ECSPI1. */
+&i2c4 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	clock-frequency = <100000>;
+	pinctrl-names = "default", "gpio";
+	pinctrl-0 = <&pinctrl_sbc_p16_i2c4>;
+	pinctrl-1 = <&pinctrl_sbc_p16_i2c4_gpio>;
+	scl-gpios = <&gpio5 20 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	sda-gpios = <&gpio5 21 (GPIO_ACTIVE_HIGH | GPIO_OPEN_DRAIN)>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_p16_i2c4: sbc-p16-i2c4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C4_SCL__I2C4_SCL	0x400001c2 /* P16.5 */
+			MX8MP_IOMUXC_I2C4_SDA__I2C4_SDA	0x400001c2 /* P16.3 */
+		>;
+	};
+};
+
+&iomuxc {
+	pinctrl_sbc_p16_i2c4_gpio: sbc-p16-i2c4-gpiogrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_I2C4_SCL__GPIO5_IO20	0x1c2 /* P16.5 recovery */
+			MX8MP_IOMUXC_I2C4_SDA__GPIO5_IO21	0x1c2 /* P16.3 recovery */
+		>;
+	};
+};

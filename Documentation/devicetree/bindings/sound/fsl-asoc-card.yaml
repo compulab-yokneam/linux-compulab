@@ -86,6 +86,7 @@ properties:
               - fsl,imx-audio-wm8904
               - fsl,imx-audio-wm8960
               - fsl,imx-audio-wm8962
+              - fsl,imx-audio-wm8962x
               - fsl,imx-audio-wm8958
               - fsl,imx-audio-spdif
 

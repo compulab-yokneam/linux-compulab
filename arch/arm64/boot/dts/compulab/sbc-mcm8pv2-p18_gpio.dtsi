@@ -1,0 +1,74 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+/* Sheet 10: six GPIO signals on P18, available through libgpiod.
+ * No hogs: directions and output values are selected by userspace.
+ */
+&gpio1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_p18_gpio1>;
+	gpio-line-names =
+		"P18P4", "", "", "",
+		"", "", "", "",
+		"", "", "P18P3", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "";
+};
+
+&iomuxc {
+	pinctrl_sbc_p18_gpio1: sbc-p18-gpio1grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO00__GPIO1_IO00	0x19 /* P18P4 */
+			MX8MP_IOMUXC_GPIO1_IO10__GPIO1_IO10	0x19 /* P18P3 */
+		>;
+	};
+};
+
+&gpio2 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_p18_gpio2>;
+	gpio-line-names =
+		"", "", "", "",
+		"P18P9", "P18P7", "", "",
+		"", "", "", "P18P5",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "";
+};
+
+&iomuxc {
+	pinctrl_sbc_p18_gpio2: sbc-p18-gpio2grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SD1_DATA2__GPIO2_IO04	0x19 /* P18P9 */
+			MX8MP_IOMUXC_SD1_DATA3__GPIO2_IO05	0x19 /* P18P7 */
+			MX8MP_IOMUXC_SD1_STROBE__GPIO2_IO11	0x19 /* P18P5 */
+		>;
+	};
+};
+
+&gpio4 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_p18_gpio4>;
+	gpio-line-names =
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "", "", "",
+		"", "P18P6", "", "",
+		"", "", "", "";
+};
+
+&iomuxc {
+	pinctrl_sbc_p18_gpio4: sbc-p18-gpio4grp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI2_TXC__GPIO4_IO25	0x19 /* P18P6 */
+		>;
+	};
+};

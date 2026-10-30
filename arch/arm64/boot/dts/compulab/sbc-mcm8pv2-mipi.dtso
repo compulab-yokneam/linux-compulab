@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbc-mcm8pv2-mipi = "SBC-MCM8PV2: mipi";
+};
+
+#include "sbc-mcm8pv2-mipi.dtsi"

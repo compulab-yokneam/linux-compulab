@@ -627,7 +627,7 @@ static int phy_clk_register(struct fsl_samsung_hdmi_phy *phy)
 		return dev_err_probe(dev, PTR_ERR(phyclk),
 				     "failed to register clock\n");
 
-	ret = of_clk_add_hw_provider(np, of_clk_hw_simple_get, phyclk);
+	ret = of_clk_add_hw_provider(np, of_clk_hw_simple_get, &phy->hw);
 	if (ret)
 		return dev_err_probe(dev, ret,
 				     "failed to register clock provider\n");
