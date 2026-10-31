@@ -27,6 +27,8 @@ rails, I2C3, EEPROM and the GPIO expander remain in ``sbc-mcm8pv2.dtsi``:
   schematic annotates address 5: TBD: to talk to the HW engineer.
 * Both MACs use RGMII with PHY RX/TX delays enabled.
 * I2C3 hosts the PCA9555 at 0x20 and carrier EEPROM at 0x54.
+* The micro-SD socket P4 uses USDHC2 as mmc1, with a four-bit bus,
+  GPIO2_IO12 active-low card detect and fixed 3.3 V power at up to 50 MHz.
 * PCA9555 IO0.2 resets DSI, and IO0.3 releases LVDS display reset.
 * HDMI at P22 uses native DDC, HPD and CEC signals with fixed 5 V power
   and hardware-enabled level shifters. LCDIF3, HDMI PAVI, the transmitter,
@@ -40,13 +42,14 @@ These definitions follow MCM-IMX8PV2_R1V0_12_CL2_T.PDF and
 SBC-MCM8PV2_REV1V0.pdf. They retain the module EEPROM's 24C08 symbol
 identification; the module schematic's part annotation names CAT24C02,
 so confirm the installed part when finalizing the assembly description.
-Unverified carrier peripherals such as SD, Wi-Fi, PCIe and
+Unverified carrier peripherals such as Wi-Fi, PCIe and
 USB host are left disabled.
 
 Feature overlays
 ----------------
 
-``mcm-imx8pv2-base.dtb`` contains the module and shared carrier devices.
+``mcm-imx8pv2-base.dtb`` contains the module and shared carrier devices,
+including the micro-SD socket. All combined carrier DTBs inherit it.
 Apply any of these overlays to that base; they do not depend on each other:
 
 * ``sbc-mcm8pv2-enet.dtbo``: EQOS/RTL8211F.
@@ -83,6 +86,26 @@ For example, assemble Ethernet and analog audio without displays::
 
     fdtoverlay -i mcm-imx8pv2-base.dtb -o selected.dtb \
         sbc-mcm8pv2-enet.dtbo sbc-mcm8pv2-enet1.dtbo sbc-mcm8pv2-wm8962.dtbo
+
+Micro-SD
+--------
+
+The P4 socket is enabled by the shared carrier description and overlay.
+It appears as ``/dev/mmcblk1`` when a card is inserted; eMMC remains
+``/dev/mmcblk2``. The module-only DTB leaves the carrier socket disabled.
+The card supply has no GPIO power switch, and no write-protect switch is
+wired. Signal voltage stays at 3.3 V, so 1.8 V UHS modes are disabled.
+
+After installing an updated carrier DTB, insert a card and inspect it::
+
+    dmesg | grep -Ei 'mmc1|mmcblk1|30b50000'
+    lsblk -o NAME,SIZE,TYPE,FSTYPE,MOUNTPOINTS
+    cat /sys/block/mmcblk1/device/type
+
+An SD root filesystem can use ``root=/dev/mmcblk1p2 rootwait`` when
+partition 2 contains the root filesystem. U-Boot must also enable the
+socket to load the kernel and device tree from SD. Card access and boot
+still require hardware verification.
 
 Carrier headers
 ---------------
