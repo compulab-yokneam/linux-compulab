@@ -33,12 +33,14 @@ rails, I2C3, EEPROM and the GPIO expander remain in ``sbc-mcm8pv2.dtsi``:
   PHY, interrupt steering and AUD2HTX HDMI audio are enabled.
 * LVDS backlight uses SPDIF_RX/PWM2; DSI backlight uses SPDIF_TX/PWM3.
   Both use a 50,000 ns period (20 kHz).
+* The LVDS overlay includes the verified Goodix GT911 touchscreen on I2C3
+  at 0x5d, with GPIO4_IO28 interrupt and PCA9555 IO0.4 reset release.
 
 These definitions follow MCM-IMX8PV2_R1V0_12_CL2_T.PDF and
 SBC-MCM8PV2_REV1V0.pdf. They retain the module EEPROM's 24C08 symbol
 identification; the module schematic's part annotation names CAT24C02,
 so confirm the installed part when finalizing the assembly description.
-Unverified carrier peripherals such as SD, Wi-Fi, PCIe, touch and
+Unverified carrier peripherals such as SD, Wi-Fi, PCIe and
 USB host are left disabled.
 
 Feature overlays
@@ -49,7 +51,7 @@ Apply any of these overlays to that base; they do not depend on each other:
 
 * ``sbc-mcm8pv2-enet.dtbo``: EQOS/RTL8211F.
 * ``sbc-mcm8pv2-enet1.dtbo``: FEC/KSZ9131.
-* ``sbc-mcm8pv2-lvds.dtbo``: LVDS panel and PWM2 backlight.
+* ``sbc-mcm8pv2-lvds.dtbo``: LVDS panel, PWM2 backlight and Goodix touch.
 * ``sbc-mcm8pv2-mipi.dtbo``: MIPI-DSI panel and PWM3 backlight.
 * ``sbc-mcm8pv2-hdmi.dtbo``: HDMI video and audio.
 * ``sbc-mcm8pv2-wm8962.dtbo``: analog audio codec on SAI3/I2C3.
@@ -73,9 +75,9 @@ The Makefile also assembles these ready-to-boot DTBs:
 * ``sbc-mcm8pv2-hdmi.dtb``: headless plus HDMI.
 * ``sbc-mcm8pv2-lvds.dtb``: headless plus LVDS.
 * ``sbc-mcm8pv2-mipi.dtb``: headless plus MIPI-DSI.
-* ``sbc-mcm8pv2-dualhead.dtb``: headless plus LVDS and HDMI.
-* ``mcm-imx8pv2.dtb``: headless plus all three displays, preserving the
-  default U-Boot filename and the previously enabled display interfaces.
+* ``sbc-mcm8pv2-allheads.dtb``: headless plus LVDS, HDMI and MIPI-DSI.
+* ``mcm-imx8pv2.dtb``: headless plus LVDS and HDMI, preserving the default
+  U-Boot filename. MIPI-DSI is disabled in this default configuration.
 
 For example, assemble Ethernet and analog audio without displays::
 

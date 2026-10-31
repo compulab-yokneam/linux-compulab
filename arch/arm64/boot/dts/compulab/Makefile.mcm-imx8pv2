@@ -37,10 +37,11 @@ dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-lvds.dtb
 sbc-mcm8pv2-mipi-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-mipi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-mipi.dtb
 
-sbc-mcm8pv2-dualhead-dtbs := sbc-mcm8pv2-headless.dtb sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-hdmi.dtbo
-dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-dualhead.dtb
+sbc-mcm8pv2-allheads-dtbs := sbc-mcm8pv2-headless.dtb \
+	sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-hdmi.dtbo sbc-mcm8pv2-mipi.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-allheads.dtb
 
-# Preserve the default U-Boot fdtfile with all previously enabled displays.
+# Keep the default U-Boot fdtfile with LVDS and HDMI enabled.
 mcm-imx8pv2-dtbs := sbc-mcm8pv2-headless.dtb \
-	sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-mipi.dtbo sbc-mcm8pv2-hdmi.dtbo
+	sbc-mcm8pv2-lvds.dtbo sbc-mcm8pv2-hdmi.dtbo
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2.dtb
