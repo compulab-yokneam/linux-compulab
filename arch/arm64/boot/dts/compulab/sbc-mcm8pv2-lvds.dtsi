@@ -22,6 +22,37 @@
 			};
 		};
 	};
+
+	/* Keep touch reset deasserted, as on SBEV-UCMiMX8Plus. */
+	sbc_ts_reset: regulator-tsreset {
+		compatible = "regulator-fixed";
+		regulator-name = "touch-reset";
+		regulator-min-microvolt = <3300000>;
+		regulator-max-microvolt = <3300000>;
+		gpio = <&sbc_gpio 4 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
+};
+
+&i2c3 {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+
+	touchscreen@5d {
+		compatible = "goodix,gt911";
+		reg = <0x5d>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <28 IRQ_TYPE_LEVEL_HIGH>;
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_sbc_lvds_touch>;
+		irq-gpios = <&gpio4 28 GPIO_ACTIVE_HIGH>;
+		/* Reset is released by regulator-tsreset, matching the reference. */
+		touchscreen-inverted-x;
+		touchscreen-inverted-y;
+		status = "okay";
+	};
 };
 
 &pwm2 {
@@ -66,6 +97,12 @@
 };
 
 &iomuxc {
+	pinctrl_sbc_lvds_touch: sbc-lvds-touchgrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_SAI3_RXFS__GPIO4_IO28 0x19
+		>;
+	};
+
 	pinctrl_sbc_pwm2: sbc-pwm2grp {
 		fsl,pins = <
 			MX8MP_IOMUXC_SPDIF_RX__PWM2_OUT 0x116
