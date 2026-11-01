@@ -29,6 +29,10 @@ rails, I2C3, EEPROM and the GPIO expander remain in ``sbc-mcm8pv2.dtsi``:
 * I2C3 hosts the PCA9555 at 0x20 and carrier EEPROM at 0x54.
 * The micro-SD socket P4 uses USDHC2 as mmc1, with a four-bit bus,
   GPIO2_IO12 active-low card detect and fixed 3.3 V power at up to 50 MHz.
+* USB1 defaults to host mode on J3; USB2 is a host on J2.
+  ``sbc-mcm8pv2-usbdev.dtbo`` switches USB1 to peripheral mode.
+  E1 closed selects J2; E1 open selects the USB interface on P8.
+  PCA9555 IO0.1 enables the shared 5 V USB supply through U41.
 * PCA9555 IO0.2 resets DSI, and IO0.3 releases LVDS display reset.
 * HDMI at P22 uses native DDC, HPD and CEC signals with fixed 5 V power
   and hardware-enabled level shifters. LCDIF3, HDMI PAVI, the transmitter,
@@ -42,8 +46,7 @@ These definitions follow MCM-IMX8PV2_R1V0_12_CL2_T.PDF and
 SBC-MCM8PV2_REV1V0.pdf. They retain the module EEPROM's 24C08 symbol
 identification; the module schematic's part annotation names CAT24C02,
 so confirm the installed part when finalizing the assembly description.
-Unverified carrier peripherals such as Wi-Fi, PCIe and
-USB host are left disabled.
+Unverified carrier peripherals such as Wi-Fi and PCIe are left disabled.
 
 Feature overlays
 ----------------
@@ -58,6 +61,8 @@ Apply any of these overlays to that base; they do not depend on each other:
 * ``sbc-mcm8pv2-mipi.dtbo``: MIPI-DSI panel and PWM3 backlight.
 * ``sbc-mcm8pv2-hdmi.dtbo``: HDMI video and audio.
 * ``sbc-mcm8pv2-wm8962.dtbo``: analog audio codec on SAI3/I2C3.
+* ``sbc-mcm8pv2-usbdev.dtbo``: USB1 peripheral mode instead of the
+  default host mode on J3; USB2 on J2 remains a host.
 * ``sbc-mcm8pv2-p17_can.dtbo``: FlexCAN2 and the ATA6563 transceiver.
 * ``sbc-mcm8pv2-p19_uart-b.dtbo``: UART4 on P19.
 * ``sbc-mcm8pv2-p20_uart-a.dtbo``: independent UART1 and UART3 on P20.
@@ -106,6 +111,47 @@ An SD root filesystem can use ``root=/dev/mmcblk1p2 rootwait`` when
 partition 2 contains the root filesystem. U-Boot must also enable the
 socket to load the kernel and device tree from SD. Card access and boot
 still require hardware verification.
+
+USB
+---
+
+The shared carrier board tree enables both USB PHYs and controller wrappers
+in host mode. USB1 serves J3 by default in Linux. Apply the board-specific
+``sbc-mcm8pv2-usbdev.dtbo`` overlay to select USB1 peripheral mode
+before Linux boots. It includes ``ucm-imx8m-plus-usbdev.dtsi`` and targets
+only ``usb_dwc3_0``. Its own ``/chosen/overlays`` marker is
+``overlay-sbc-mcm8pv2-usbdev``.
+For example, from the U-Boot prompt::
+
+    setenv fdtfile mcm-imx8pv2.dtb
+    setenv fdtofile sbc-mcm8pv2-usbdev.dtbo
+    setenv bootcmd 'run bsp_bootcmd'
+    saveenv
+    run bsp_bootcmd
+
+Include any other required overlays in the same space-separated fdtofile
+list. Remove only the usbdev entry to restore the default USB1 host role
+at the next boot. Linux device mode still needs a configured USB gadget.
+USB1's P21 connector is a peripheral-only SDP/recovery connection used
+with NXP MfgTools/UUU. The Linux overlay does not change ROM SDP mode or
+U-Boot's own USB role configuration.
+
+USB2 is configured as a host. On the carrier board, E1 closed selects
+J2 and E1 open selects the USB interface on the P8 mini-PCIe socket.
+The jumper routes the USB2 D+/D- signals without changing the Linux host
+role. The SuperSpeed pairs connect directly to J2. Its PHY consumes
+the shared 5V0_USB regulator, whose enable is PCA9555 IO0.1 (USB_PWR_EN).
+Keep this rail always on because it also supplies the other host connector.
+
+After booting an updated carrier DTB, inspect attached devices::
+
+    dmesg | grep -Ei 'usb|xhci|dwc3'
+    lsusb
+    lsusb -t
+
+USB enumeration, role selection and SuperSpeed operation still require
+hardware verification. The module-only DTB retains USB1 peripheral mode
+and leaves USB2 disabled.
 
 Carrier headers
 ---------------

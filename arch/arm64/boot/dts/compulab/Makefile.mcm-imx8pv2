@@ -2,6 +2,7 @@
 
 dtb-$(CONFIG_ARCH_MXC) += mcm-imx8pv2-som.dtb mcm-imx8pv2-base.dtb
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2.dtbo
+dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-usbdev.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-enet.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-enet1.dtbo
 dtb-$(CONFIG_ARCH_MXC) += sbc-mcm8pv2-lvds.dtbo

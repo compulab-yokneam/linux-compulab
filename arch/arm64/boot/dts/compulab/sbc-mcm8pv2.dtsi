@@ -24,6 +24,18 @@
 		regulator-max-microvolt = <5000000>;
 		regulator-always-on;
 	};
+
+	/* U41 supplies the shared 5V0_USB rail for the host connectors. */
+	sbc_usb_vbus: regulator-usb-vbus {
+		compatible = "regulator-fixed";
+		regulator-name = "sbc-usb-vbus";
+		regulator-min-microvolt = <5000000>;
+		regulator-max-microvolt = <5000000>;
+		vin-supply = <&sbc_5v0>;
+		gpio = <&sbc_gpio 1 GPIO_ACTIVE_HIGH>;
+		enable-active-high;
+		regulator-always-on;
+	};
 };
 
 &i2c3 {
@@ -50,6 +62,36 @@
 		reg = <0x54>;
 		pagesize = <16>;
 	};
+};
+
+/* USB1 defaults to host on J3; the usbdev overlay selects peripheral mode. */
+&usb3_phy0 {
+	vbus-supply = <&sbc_usb_vbus>;
+	status = "okay";
+};
+
+&usb3_0 {
+	status = "okay";
+};
+
+&usb_dwc3_0 {
+	dr_mode = "host";
+	status = "okay";
+};
+
+/* Sheet 9: USB2 host connector J2. */
+&usb3_phy1 {
+	vbus-supply = <&sbc_usb_vbus>;
+	status = "okay";
+};
+
+&usb3_1 {
+	status = "okay";
+};
+
+&usb_dwc3_1 {
+	dr_mode = "host";
+	status = "okay";
 };
 
 /* Sheet 3: P4 micro-SD socket, directly powered from VCC_3V3. */

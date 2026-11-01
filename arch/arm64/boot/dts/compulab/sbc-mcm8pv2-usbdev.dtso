@@ -1,0 +1,10 @@
+// SPDX-License-Identifier: GPL-2.0-or-later
+/* Copyright 2026 CompuLab Ltd. */
+
+#include "overlay.h"
+
+&{/chosen/overlays} {
+	overlay-sbc-mcm8pv2-usbdev = "SBC-MCM8PV2: USB device";
+};
+
+#include "ucm-imx8m-plus-usbdev.dtsi"
