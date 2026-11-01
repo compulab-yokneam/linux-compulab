@@ -46,7 +46,9 @@ These definitions follow MCM-IMX8PV2_R1V0_12_CL2_T.PDF and
 SBC-MCM8PV2_REV1V0.pdf. They retain the module EEPROM's 24C08 symbol
 identification; the module schematic's part annotation names CAT24C02,
 so confirm the installed part when finalizing the assembly description.
-Unverified carrier peripherals such as Wi-Fi and PCIe are left disabled.
+PCIe on P23 is included in the headless DTB and all device trees derived
+from it. Wi-Fi operation also needs the driver and firmware for the
+installed module.
 
 Feature overlays
 ----------------
@@ -63,6 +65,7 @@ Apply any of these overlays to that base; they do not depend on each other:
 * ``sbc-mcm8pv2-wm8962.dtbo``: analog audio codec on SAI3/I2C3.
 * ``sbc-mcm8pv2-usbdev.dtbo``: USB1 peripheral mode instead of the
   default host mode on J3; USB2 on J2 remains a host.
+* ``sbc-mcm8pv2-pcie.dtbo``: PCIe root port and PHY for the P23 M.2 socket.
 * ``sbc-mcm8pv2-p17_can.dtbo``: FlexCAN2 and the ATA6563 transceiver.
 * ``sbc-mcm8pv2-p19_uart-b.dtbo``: UART4 on P19.
 * ``sbc-mcm8pv2-p20_uart-a.dtbo``: independent UART1 and UART3 on P20.
@@ -78,8 +81,8 @@ feature overlay again to a DTB which already includes it.
 
 The Makefile also assembles these ready-to-boot DTBs:
 
-* ``sbc-mcm8pv2-headless.dtb``: carrier, both Ethernet ports, WM8962, CAN,
-  header UARTs, GPIO, SPI and I2C.
+* ``sbc-mcm8pv2-headless.dtb``: carrier board, both Ethernet ports, WM8962,
+  PCIe, CAN, header UARTs, GPIO, SPI and I2C.
 * ``sbc-mcm8pv2-hdmi.dtb``: headless plus HDMI.
 * ``sbc-mcm8pv2-lvds.dtb``: headless plus LVDS.
 * ``sbc-mcm8pv2-mipi.dtb``: headless plus MIPI-DSI.
@@ -152,6 +155,45 @@ After booting an updated carrier DTB, inspect attached devices::
 USB enumeration, role selection and SuperSpeed operation still require
 hardware verification. The module-only DTB retains USB1 peripheral mode
 and leaves USB2 disabled.
+
+PCIe on P23
+-----------
+
+The ``sbc-mcm8pv2-pcie.dtbo`` overlay enables the PCIe root port and PHY
+for the P23 M.2 Key E socket. It is included in the headless DTB and all
+device trees derived from it; do not apply it again to those DTBs.
+Select it separately when starting from the base or module-only DTB.
+It follows the UCM-iMX8M-Plus PCIe
+overlay's clock setup, with the SoC supplying the reference clock.
+P23 has fixed 3.3 V power and no GPIO power switch. CLKREQ# is disabled
+because the schematic marks its R257 link as not fitted by default.
+
+PERST# on P23 pin 52 connects directly to GPIO1_IO11, not the GPIO
+expander. The overlay selects the ``GPIO1_IO11__GPIO1_IO11`` pin mux and
+uses ``reset-gpio = <&gpio1 11 GPIO_ACTIVE_LOW>``. The PCIe driver owns
+the pin and asserts reset low before releasing it high.
+
+To enable PCIe on the base DTB, select this overlay from the U-Boot prompt,
+retaining any other required feature overlays in the same fdtofile list::
+
+    setenv fdtfile mcm-imx8pv2-base.dtb
+    setenv fdtofile sbc-mcm8pv2-pcie.dtbo
+    setenv bootcmd 'run bsp_bootcmd'
+    saveenv
+    run bsp_bootcmd
+
+For the module-only DTB, apply ``sbc-mcm8pv2.dtbo`` before the PCIe
+overlay to provide the shared carrier board supply. After boot::
+
+    dmesg | grep -Ei 'pcie|pci|link up|link down'
+    lspci -nn
+    lspci -t
+    ls /proc/device-tree/chosen/overlays/
+
+Expect ``overlay-sbc-mcm8pv2-pcie`` in the feature markers. Endpoint
+enumeration and link speed require hardware verification with a fitted
+PCIe module; its device driver and firmware are separate requirements.
+The M.2 USB interface is independent and is not enabled by this overlay.
 
 Carrier headers
 ---------------

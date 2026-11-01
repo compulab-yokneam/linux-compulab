@@ -1,0 +1,30 @@
+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
+/* Copyright 2026 CompuLab Ltd. */
+
+#include <dt-bindings/phy/phy-imx8-pcie.h>
+
+/* Sheet 11: P23 M.2 Key E, PERST# on pin 52, fixed VCC_3V3 supply. */
+&pcie {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_sbc_pcie>;
+	reset-gpio = <&gpio1 11 GPIO_ACTIVE_LOW>;
+	vpcie-supply = <&sbc_3v3>;
+	status = "okay";
+};
+
+&pcie_phy {
+	clocks = <&hsio_blk_ctrl>;
+	clock-names = "ref";
+	/* R257, the P23 CLKREQ# link, is not fitted by default. */
+	fsl,clkreq-unsupported;
+	fsl,refclk-pad-mode = <IMX8_PCIE_REFCLK_PAD_OUTPUT>;
+	status = "okay";
+};
+
+&iomuxc {
+	pinctrl_sbc_pcie: sbc-pciegrp {
+		fsl,pins = <
+			MX8MP_IOMUXC_GPIO1_IO11__GPIO1_IO11 0x140
+		>;
+	};
+};
