@@ -912,6 +912,10 @@ struct platform_device *ci_hdrc_add_device(struct device *dev,
 	pdev->dev.parent = dev;
 	device_set_of_node_from_dev(&pdev->dev, dev);
 
+	/* Host DMA uses the glue device as hcd->self.sysdev. */
+	if (platdata->dr_mode == USB_DR_MODE_HOST)
+		pdev->skip_dma_configure = true;
+
 	ret = platform_device_add_resources(pdev, res, nres);
 	if (ret)
 		goto err;

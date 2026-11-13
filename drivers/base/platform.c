@@ -1442,6 +1442,9 @@ static int platform_dma_configure(struct device *dev)
 	enum dev_dma_attr attr;
 	int ret = 0;
 
+	if (to_platform_device(dev)->skip_dma_configure)
+		return 0;
+
 	if (is_of_node(fwnode)) {
 		ret = of_dma_configure(dev, to_of_node(fwnode), true);
 	} else if (is_acpi_device_node(fwnode)) {
@@ -1462,6 +1465,9 @@ static int platform_dma_configure(struct device *dev)
 static void platform_dma_cleanup(struct device *dev)
 {
 	struct platform_driver *drv = to_platform_driver(dev->driver);
+
+	if (to_platform_device(dev)->skip_dma_configure)
+		return;
 
 	if (!drv->driver_managed_dma)
 		iommu_device_unuse_default_domain(dev);

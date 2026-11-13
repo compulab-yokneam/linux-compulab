@@ -24,6 +24,8 @@ struct platform_device {
 	const char	*name;
 	int		id;
 	bool		id_auto;
+	/* Software child whose DMA is handled through its parent. */
+	bool		skip_dma_configure;
 	struct device	dev;
 	u64		platform_dma_mask;
 	struct device_dma_parameters dma_parms;
