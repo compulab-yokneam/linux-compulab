@@ -8,7 +8,9 @@
  *   run:   sudo ./neutron_repro race|alloc [MiB]|range|dupfree|badbuf|uaf
  *
  * Exit code 0 = fixed behaviour, 1 = bug reproduced.
- * dupfree, badbuf and uaf crash or corrupt a stock kernel: run them last, on a test board.
+ * range, dupfree, badbuf and uaf crash or corrupt a stock kernel: use a test board.
+ * badbuf and uaf each need a fresh boot (a failed job stalls the stock driver's queue);
+ * uaf also needs the NPU busy with real jobs (see uaf()).
  */
 #define _GNU_SOURCE
 #include <errno.h>
@@ -133,23 +135,29 @@ static int badbuf(void)
 	return r >= 0;
 }
 
-/* 6. Use-after-free: the queued job holds no reference to its buffer. */
+/*
+ * 6. Use-after-free: a queued job holds no reference to its buffer.
+ * Needs the NPU busy with real jobs (e.g. 3 x benchmark_model with the Neutron
+ * delegate), so this job waits in the queue. Its buffer is freed by close();
+ * when the running job finishes, the driver dequeues this one and reads the
+ * freed buffer. One attempt per boot: on the stock driver a job that runs and
+ * fails leaves the queue stalled.
+ */
 static int uaf(void)
 {
-	for (int i = 0; i < 1000; i++) {
-		int fd = buf_create(MiB), inf;
-		/* firmw_id that never matches: the job stops at "firmware is not ready" */
-		struct neutron_uapi_inference_args a = { .buf_id = fd, .firmw_id = 0x7e57 };
+	int fd = buf_create(MiB), inf;
+	/* firmw_id that never matches: the job stops at "firmware is not ready" */
+	struct neutron_uapi_inference_args a = { .buf_id = fd, .firmw_id = 0x7e57 };
 
-		if (fd < 0)
-			return 2;
-		inf = ioctl(dev, NEUTRON_IOCTL_INFERENCE_CREATE, &a);
-		close(fd);	/* last reference: the buffer is freed while the job is queued */
-		usleep(2000);
-		if (inf >= 0)
-			close(inf);
-	}
-	printf("uaf: 1000 jobs whose buffer was closed while queued; check dmesg (KASAN)\n");
+	if (fd < 0)
+		return 2;
+	inf = ioctl(dev, NEUTRON_IOCTL_INFERENCE_CREATE, &a);
+	close(fd);	/* last reference: the buffer is freed while the job is queued */
+	sleep(5);	/* the job must stay alive (inf open) until it is dequeued */
+	printf("uaf: job %s, its buffer closed while queued; check dmesg (KASAN)\n",
+	       inf < 0 ? strerror(errno) : "created");
+	if (inf >= 0)
+		close(inf);
 	return 0;
 }
 
