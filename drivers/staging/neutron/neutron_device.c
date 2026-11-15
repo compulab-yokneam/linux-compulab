@@ -6,6 +6,8 @@
 
 #include <linux/dma-mapping.h>
 #include <linux/dma-map-ops.h>
+#include <linux/dma-direct.h>
+#include <linux/iommu.h>
 #include <linux/bitmap.h>
 #include <linux/interrupt.h>
 #include <linux/mutex.h>
@@ -223,7 +225,7 @@ static int neutron_firmw_request(struct neutron_device *ndev, struct neutron_buf
 	}
 
 	/* Sync the data for device */
-	neutron_memory_sync(ndev, buf->dma_addr, buf->size, DMA_TO_DEVICE);
+	neutron_buffer_sync(buf, 0, buf->size, DMA_TO_DEVICE);
 
 	/* Firmware is changed, it should be reloaded on next job */
 	ndev->firmw_id = 0;
@@ -258,25 +260,30 @@ int neutron_firmw_reload(struct neutron_device *ndev, struct neutron_buffer *buf
 	return ret;
 }
 
+/*
+ * Cache maintenance for one physically contiguous range at device address addr.
+ * The device is flagged dma_coherent (so the DMA API maps buffers cacheable) but is
+ * not coherent in practice, so the maintenance is done here on the physical address.
+ * The stock driver instead cleared dev->dma_coherent around a dma_sync_single_*()
+ * call; that flag is device-wide, so concurrent users skipped each other's
+ * maintenance and an mmap() made meanwhile got non-cacheable attributes: data loss
+ * with several processes using the NPU.
+ */
 void neutron_memory_sync(struct neutron_device *ndev, dma_addr_t addr,
 			 size_t size, enum dma_data_direction dir)
 {
-	/* unset dma_coherent to ensure arch_sync_dma_for_device() is executed */
-	ndev->dev->dma_coherent = false;
+	struct iommu_domain *dom = iommu_get_domain_for_dev(ndev->dev);
+	phys_addr_t phys;
 
-	switch (dir) {
-	case DMA_TO_DEVICE:
-		dma_sync_single_for_device(ndev->dev, addr, size, DMA_TO_DEVICE);
-		break;
-	case DMA_FROM_DEVICE:
-		dma_sync_single_for_cpu(ndev->dev, addr, size, DMA_FROM_DEVICE);
-		break;
-	default:
-		break;
-	}
-
-	/* recovery dma_coherent */
-	ndev->dev->dma_coherent = true;
+	if (!size)
+		return;
+	phys = dom ? iommu_iova_to_phys(dom, addr) : dma_to_phys(ndev->dev, addr);
+	if (!phys)
+		return;
+	if (dir == DMA_TO_DEVICE)
+		arch_sync_dma_for_device(phys, size, DMA_TO_DEVICE);
+	else if (dir == DMA_FROM_DEVICE)
+		arch_sync_dma_for_cpu(phys, size, DMA_FROM_DEVICE);
 }
 
 /* Clock gating via RESETCTRL register */
@@ -566,19 +573,19 @@ static long neutron_ioctl(struct file *file,
 			break;
 		}
 
-		if (uapi.offset + uapi.size > buf->size) {
+		/* u64: offset + size must not wrap */
+		if ((u64)uapi.offset + uapi.size > buf->size) {
 			dev_err(ndev->dev,
 				"CACHE_SYNC: Out of range: fd %d, 0x%x + 0x%x > 0x%lx\n",
 				uapi.fd, uapi.offset, uapi.size, buf->size);
+			neutron_buffer_put(buf);
 			ret = -EINVAL;
+			break;
 		}
 
-		if (uapi.direction)
-			neutron_memory_sync(ndev, buf->dma_addr + uapi.offset,
-					    uapi.size, DMA_FROM_DEVICE);
-		else
-			neutron_memory_sync(ndev, buf->dma_addr + uapi.offset,
-					    uapi.size, DMA_TO_DEVICE);
+		neutron_buffer_sync(buf, uapi.offset, uapi.size,
+				    uapi.direction ? DMA_FROM_DEVICE : DMA_TO_DEVICE);
+		neutron_buffer_put(buf);
 
 		break;
 	}
@@ -610,6 +617,7 @@ static long neutron_ioctl(struct file *file,
 		mutex_lock(&ndev->mutex);
 		ret = neutron_firmw_request(ndev, buf, buf->cpu_addr + data_offset, fw_name);
 		mutex_unlock(&ndev->mutex);
+		neutron_buffer_put(buf);
 
 		break;
 	}

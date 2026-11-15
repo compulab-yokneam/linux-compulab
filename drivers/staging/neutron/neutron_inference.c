@@ -107,7 +107,7 @@ static int neutron_inference_run(struct neutron_inference *inf)
 		neutron_clk_enable(ndev);
 
 	/* Sync the input data for device before running inference job */
-	neutron_memory_sync(ndev, inf->buf->dma_addr + inf->args.input_offset,
+	neutron_buffer_sync(inf->buf, inf->args.input_offset,
 			    inf->args.input_size, DMA_TO_DEVICE);
 
 	// reload only when firmware was changed
@@ -289,7 +289,7 @@ static void inference_done_callback(struct work_struct *work)
 	pm_runtime_get_sync(ndev->dev);
 
 	/* Sync the output data for cpu after inference is done */
-	neutron_memory_sync(ndev, inf->buf->dma_addr + inf->args.output_offset,
+	neutron_buffer_sync(inf->buf, inf->args.output_offset,
 			    inf->args.output_size, DMA_FROM_DEVICE);
 
 	/* Wake up the waiting process */
@@ -344,6 +344,7 @@ static void neutron_inference_kref_destroy(struct kref *kref)
 	if (inf->poll_mode)
 		hrtimer_cancel(&inf->poll_timer);
 
+	neutron_buffer_put(inf->buf);
 	devm_kfree(inf->ndev->dev, inf);
 }
 
@@ -452,13 +453,18 @@ int neutron_inference_create(struct neutron_device *ndev, enum neutron_cmd_type 
 
 	memcpy(&inf->args, uapi, sizeof(struct neutron_uapi_inference_args));
 
+	/* The job holds a buffer reference until it is destroyed. */
+	inf->buf = neutron_buffer_get_from_fd(inf->args.buf_id);
+	if (IS_ERR(inf->buf)) {
+		ret = PTR_ERR(inf->buf);
+		goto kfree_inference;
+	}
+
 	/* Create file descriptor */
 	ret = anon_inode_getfd("neutron-inference", &neutron_inference_fops,
 			       inf, O_RDWR | O_CLOEXEC);
 	if (ret < 0)
-		goto kfree_inference;
-
-	inf->buf = neutron_buffer_get_from_fd(inf->args.buf_id);
+		goto put_buf;
 
 	pm_runtime_resume_and_get(ndev->dev);
 	inference_inqueue(ndev->queue, inf);
@@ -472,7 +478,11 @@ int neutron_inference_create(struct neutron_device *ndev, enum neutron_cmd_type 
 
 	return ret;
 
+put_buf:
+	neutron_buffer_put(inf->buf);
 kfree_inference:
+	if (inf->poll_mode)
+		hrtimer_cancel(&inf->poll_timer);
 	devm_kfree(ndev->dev, inf);
 
 	return ret;
